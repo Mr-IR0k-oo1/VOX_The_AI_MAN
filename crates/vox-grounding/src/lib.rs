@@ -111,9 +111,9 @@ pub fn tokenize(text: &str) -> Vec<String> {
 }
 
 /// Whether `ch` belongs to a word. Besides alphanumerics this accepts the
-/// combining vowel signs, virama, and other marks of the Devanagari and
-/// Tamil blocks — without them, Indic words split into meaningless
-/// fragments (`குங்குமப்பூ` would become four pieces).
+/// combining vowel signs, virama, and other marks of Indian scripts (Devanagari,
+/// Tamil, Telugu, Kannada, Bengali, Gurmukhi, Gujarati, Odia, Malayalam) — without
+/// them, Indic words split into meaningless fragments.
 fn is_word_char(ch: char) -> bool {
     if ch.is_alphanumeric() {
         return true;
@@ -123,9 +123,24 @@ fn is_word_char(ch: char) -> bool {
         | 0x093A..=0x094F                     // Devanagari vowel signs, virama
         | 0x0951..=0x0957                     // Devanagari stress marks
         | 0x0962..=0x0963                     // Devanagari vocalic signs
+        | 0x0981..=0x0983 | 0x09BC            // Bengali signs
+        | 0x09BE..=0x09CD | 0x09D7 | 0x09E2..=0x09E3
+        | 0x0A01..=0x0A03 | 0x0A3C            // Gurmukhi signs
+        | 0x0A3E..=0x0A4D | 0x0A51 | 0x0A70..=0x0A75
+        | 0x0A81..=0x0A83 | 0x0ABC            // Gujarati signs
+        | 0x0ABE..=0x0ACD | 0x0AE2..=0x0AE3
+        | 0x0B01..=0x0B03 | 0x0B3C            // Odia signs
+        | 0x0B3E..=0x0B4D | 0x0B56..=0x0B57 | 0x0B62..=0x0B63
         | 0x0B82 | 0x0B83                     // Tamil sign combinations
         | 0x0BBE..=0x0BC2 | 0x0BC6..=0x0BC8   // Tamil vowel signs
         | 0x0BCA..=0x0BCD | 0x0BD7            // Tamil virama, length mark
+        | 0x0C00..=0x0C03                     // Telugu signs
+        | 0x0C3E..=0x0C4D | 0x0C55..=0x0C56 | 0x0C62..=0x0C63
+        | 0x0C82..=0x0C83                     // Kannada signs
+        | 0x0CBE..=0x0CCD | 0x0CD5..=0x0CD6 | 0x0CE2..=0x0CE3
+        | 0x0D02..=0x0D03                     // Malayalam signs
+        | 0x0D3E..=0x0D4D | 0x0D57 | 0x0D62..=0x0D63
+        | 0x200C | 0x200D                     // Zero-width non-joiner, zero-width joiner
     )
 }
 
@@ -137,8 +152,8 @@ fn push_token(tokens: &mut Vec<String>, raw: &str) {
 }
 
 /// Small multilingual stopword list covering English plus the most common
-/// Hindi and Tamil function words. Question words carry intent, not topic,
-/// so they are excluded from lexical matching.
+/// Hindi, Tamil, Telugu, and Kannada function words. Question words carry intent,
+/// not topic, so they are excluded from lexical matching.
 const STOPWORDS: &[&str] = &[
     // English
     "a",
@@ -223,6 +238,34 @@ const STOPWORDS: &[&str] = &[
     "யார்",
     "எப்போது",
     "ஏன்",
+    // Telugu
+    "అంటే",
+    "ఏమిటి",
+    "ఏమి",
+    "ఎలా",
+    "ఎప్పుడు",
+    "ఎవరు",
+    "ఎందుకు",
+    "మరియు",
+    "యొక్క",
+    "లో",
+    "నుండి",
+    "ఒక",
+    "గా",
+    "తో",
+    // Kannada
+    "ಎಂದರೇನು",
+    "ಏನು",
+    "ಹೇಗೆ",
+    "ಯಾವಾಗ",
+    "ಯಾರು",
+    "ಏಕೆ",
+    "ಮತ್ತು",
+    "ರಲ್ಲಿ",
+    "ಇಂದ",
+    "ಒಂದು",
+    "ಆಗಿ",
+    "ಜೊತೆಗೆ",
 ];
 
 /// Pre-tokenized evidence shared by assessment and verification.
@@ -479,9 +522,11 @@ mod tests {
     }
 
     #[test]
-    fn tokenize_should_handle_hindi_and_tamil_queries() {
+    fn tokenize_should_handle_indic_queries() {
         assert_eq!(tokenize("जीएसटी क्या है?"), vec!["जीएसटी"]);
         assert_eq!(tokenize("குங்குமப்பூ என்றால் என்ன?"), vec!["குங்குமப்பூ"]);
+        assert_eq!(tokenize("జీఎస్టీ అంటే ఏమిటి?"), vec!["జీఎస్టీ"]);
+        assert_eq!(tokenize("ಜಿಎಸ್‌ಟಿ ಎಂದರೇನು?"), vec!["ಜಿಎಸ್‌ಟಿ"]);
     }
 
     #[test]

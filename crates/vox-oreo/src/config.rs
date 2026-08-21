@@ -58,7 +58,13 @@ pub struct OreoConfig {
 impl Default for OreoConfig {
     fn default() -> Self {
         Self {
-            languages: vec![Language::En, Language::Hi, Language::Ta],
+            languages: vec![
+                Language::En,
+                Language::Hi,
+                Language::Ta,
+                Language::Te,
+                Language::Kn,
+            ],
             chunking: ChunkingStrategy::Sentence {
                 max_chars: 700,
                 min_chars: 80,
@@ -255,11 +261,17 @@ mod tests {
     }
 
     #[test]
-    fn defaults_should_cover_primary_languages() {
+    fn defaults_should_cover_configured_languages() {
         let config = OreoConfig::default();
         assert_eq!(
             config.languages,
-            vec![Language::En, Language::Hi, Language::Ta]
+            vec![
+                Language::En,
+                Language::Hi,
+                Language::Ta,
+                Language::Te,
+                Language::Kn
+            ]
         );
         assert_eq!(config.candidate_top, 20);
         assert_eq!(config.final_top, 5);

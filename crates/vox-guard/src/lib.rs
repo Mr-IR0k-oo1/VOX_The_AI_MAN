@@ -42,6 +42,8 @@ const INSUFFICIENT_EN: &str =
     "I don't have enough information in the retrieved sources to answer that reliably.";
 const INSUFFICIENT_HI: &str = "मेरे पास इसका विश्वसनीय उत्तर देने के लिए पर्याप्त स्रोत नहीं हैं।";
 const INSUFFICIENT_TA: &str = "நம்பகமான பதில் அளிக்க தேவையான ஆதாரங்கள் என்னிடம் இல்லை.";
+const INSUFFICIENT_TE: &str = "విశ్వసనీయ సమాధానం ఇవ్వడానికి తగినంత సమాచారం మూలాలలో లేదు.";
+const INSUFFICIENT_KN: &str = "ವಿಶ್ವಾಸಾರ್ಹ ಉತ್ತರವನ್ನು ನೀಡಲು ಆಧಾರಗಳಲ್ಲಿ ಸಾಕಷ್ಟು ಮಾಹಿತಿ ಇಲ್ಲ.";
 
 /// Terms that make an input (or generated answer) unsafe to process. Matching
 /// is exact-token based with simple plural forms (`s`/`es` suffixes) so that
@@ -69,6 +71,8 @@ pub fn refusal_message(reason: &str, language: Language) -> String {
     let localized = match language {
         Language::Hi => INSUFFICIENT_HI,
         Language::Ta => INSUFFICIENT_TA,
+        Language::Te => INSUFFICIENT_TE,
+        Language::Kn => INSUFFICIENT_KN,
         _ => INSUFFICIENT_EN,
     };
     match reason {
@@ -318,11 +322,14 @@ mod tests {
     fn refusal_message_should_localize_insufficiency_reasons() {
         let hindi = refusal_message(REASON_INSUFFICIENT_CONTEXT, Language::Hi);
         let tamil = refusal_message(REASON_INSUFFICIENT_CONTEXT, Language::Ta);
-        assert!(
-            !hindi.is_empty()
-                && hindi != refusal_message(REASON_INSUFFICIENT_CONTEXT, Language::En)
-        );
-        assert!(!tamil.is_empty() && tamil != hindi);
+        let telugu = refusal_message(REASON_INSUFFICIENT_CONTEXT, Language::Te);
+        let kannada = refusal_message(REASON_INSUFFICIENT_CONTEXT, Language::Kn);
+        let english = refusal_message(REASON_INSUFFICIENT_CONTEXT, Language::En);
+
+        assert!(!hindi.is_empty() && hindi != english);
+        assert!(!tamil.is_empty() && tamil != hindi && tamil != english);
+        assert!(!telugu.is_empty() && telugu != tamil && telugu != english);
+        assert!(!kannada.is_empty() && kannada != telugu && kannada != english);
     }
 
     #[test]

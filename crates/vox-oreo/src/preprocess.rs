@@ -46,28 +46,57 @@ pub struct PreprocessStats {
 
 /// Detects a language from the Unicode script mix of `text`.
 ///
-/// Devanagari presence wins over Latin (Hindi text frequently embeds Latin
-/// loanwords), Tamil likewise. Text with no letters at all maps to `None`.
+/// Indic script presence wins over Latin (Indic text frequently embeds Latin
+/// loanwords). Text with no letters at all maps to `None`.
 #[must_use]
 pub fn detect_language(text: &str) -> Option<Language> {
     let mut devanagari = 0usize;
     let mut tamil = 0usize;
+    let mut telugu = 0usize;
+    let mut kannada = 0usize;
+    let mut bengali = 0usize;
+    let mut gurmukhi = 0usize;
+    let mut gujarati = 0usize;
+    let mut odia = 0usize;
+    let mut malayalam = 0usize;
     let mut latin = 0usize;
+
     for ch in text.chars() {
         let code = ch as u32;
-        if (0x0900..=0x097F).contains(&code) {
-            devanagari += 1;
-        } else if (0x0B80..=0x0BFF).contains(&code) {
-            tamil += 1;
-        } else if ch.is_ascii_alphabetic() {
-            latin += 1;
+        match code {
+            0x0900..=0x097F => devanagari += 1,
+            0x0980..=0x09FF => bengali += 1,
+            0x0A00..=0x0A7F => gurmukhi += 1,
+            0x0A80..=0x0AFF => gujarati += 1,
+            0x0B00..=0x0B7F => odia += 1,
+            0x0B80..=0x0BFF => tamil += 1,
+            0x0C00..=0x0C7F => telugu += 1,
+            0x0C80..=0x0CFF => kannada += 1,
+            0x0D00..=0x0D7F => malayalam += 1,
+            _ if ch.is_ascii_alphabetic() => latin += 1,
+            _ => {}
         }
     }
-    if devanagari >= tamil && devanagari >= latin && devanagari > 0 {
-        Some(Language::Hi)
-    } else if tamil > devanagari && tamil >= latin && tamil > 0 {
-        Some(Language::Ta)
-    } else if latin > 0 {
+
+    let indic_counts = [
+        (devanagari, Language::Hi),
+        (tamil, Language::Ta),
+        (telugu, Language::Te),
+        (kannada, Language::Kn),
+        (bengali, Language::Bn),
+        (gurmukhi, Language::Pa),
+        (gujarati, Language::Gu),
+        (odia, Language::Or),
+        (malayalam, Language::Ml),
+    ];
+
+    if let Some(&(count, lang)) = indic_counts.iter().max_by_key(|(c, _)| *c) {
+        if count > 0 {
+            return Some(lang);
+        }
+    }
+
+    if latin > 0 {
         Some(Language::En)
     } else {
         None
@@ -163,13 +192,18 @@ mod tests {
     }
 
     #[test]
-    fn detection_should_cover_english_hindi_tamil() {
+    fn detection_should_cover_english_hindi_tamil_telugu_kannada() {
         assert_eq!(
             detect_language("Goods and Services Tax"),
             Some(Language::En)
         );
         assert_eq!(detect_language("जीएसटी एक कर है"), Some(Language::Hi));
         assert_eq!(detect_language("பொருள் சேவை வரி"), Some(Language::Ta));
+        assert_eq!(
+            detect_language("వస్తువులు మరియు సేవల పన్ను"),
+            Some(Language::Te)
+        );
+        assert_eq!(detect_language("ಸರಕು ಮತ್ತು ಸೇವಾ ತೆರಿಗೆ"), Some(Language::Kn));
         assert_eq!(detect_language("12345 !!!"), None);
     }
 

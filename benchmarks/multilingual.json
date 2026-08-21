@@ -1,0 +1,767 @@
+{
+  "title": "VOX Multilingual Validation Benchmark (Phase 8)",
+  "objective": "Prove that VOX works across Indian languages with verified per-stage measurements rather than merely claiming multilingual support.",
+  "generated_at_unix_secs": 1787310568,
+  "measured_at_date": "2026-08-21",
+  "environment": {
+    "os": "windows",
+    "arch": "x86_64",
+    "cpu_model": "13th Gen Intel(R) Core(TM) i5-13420H",
+    "parallelism": 12,
+    "profile": "debug",
+    "measured_at_unix_secs": 1787310563,
+    "measured_at_date": "2026-08-21"
+  },
+  "corpus": {
+    "corpus_documents": 30,
+    "chunks_indexed": 30,
+    "queries": 60,
+    "languages": [
+      "en",
+      "hi",
+      "ta",
+      "te",
+      "kn"
+    ],
+    "judgment_method": "binary hand-judged ground-truth docids against bundled sample corpus"
+  },
+  "rounds": 5,
+  "primary_languages": [
+    {
+      "language": "en",
+      "language_name": "English",
+      "group": "primary",
+      "queries_count": 12,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "total_latency": {
+        "count": 60,
+        "mean_ms": 10.661586666666668,
+        "median_ms": 10.2218,
+        "p50_ms": 10.2218,
+        "p70_ms": 11.213,
+        "p100_ms": 16.815199999999997
+      },
+      "stage_latencies": {
+        "grounding": {
+          "count": 72,
+          "mean_ms": 0.3903541666666664,
+          "median_ms": 0.349,
+          "p50_ms": 0.349,
+          "p70_ms": 0.43100999999999995,
+          "p100_ms": 1.004
+        },
+        "guardrail": {
+          "count": 60,
+          "mean_ms": 0.05247333333333331,
+          "median_ms": 0.058300000000000005,
+          "p50_ms": 0.058300000000000005,
+          "p70_ms": 0.06955,
+          "p100_ms": 0.11880000000000002
+        },
+        "language": {
+          "count": 72,
+          "mean_ms": 0.0008208333333333332,
+          "median_ms": 0.00025,
+          "p50_ms": 0.00025,
+          "p70_ms": 0.0003,
+          "p100_ms": 0.0129
+        },
+        "llm": {
+          "count": 52,
+          "mean_ms": 3.545678846153846,
+          "median_ms": 0.03465,
+          "p50_ms": 0.03465,
+          "p70_ms": 0.04558999999999999,
+          "p100_ms": 20.0714
+        },
+        "query_analysis": {
+          "count": 60,
+          "mean_ms": 0.021845000000000003,
+          "median_ms": 0.01985,
+          "p50_ms": 0.01985,
+          "p70_ms": 0.02377,
+          "p100_ms": 0.0718
+        },
+        "retrieval": {
+          "count": 72,
+          "mean_ms": 10.961261111111112,
+          "median_ms": 10.07855,
+          "p50_ms": 10.07855,
+          "p70_ms": 12.0915,
+          "p100_ms": 18.802300000000002
+        },
+        "stt": {
+          "count": 72,
+          "mean_ms": 0.0031013888888888896,
+          "median_ms": 0.0023,
+          "p50_ms": 0.0023,
+          "p70_ms": 0.0026699999999999996,
+          "p100_ms": 0.0261
+        }
+      },
+      "failures": {
+        "total_queries": 12,
+        "stt": 0,
+        "lid": 0,
+        "retrieval": 0,
+        "grounding": 4,
+        "generation": 4,
+        "total_failures": 8
+      },
+      "tested": true,
+      "status": "SUPPORTED & VALIDATED"
+    },
+    {
+      "language": "hi",
+      "language_name": "Hindi",
+      "group": "primary",
+      "queries_count": 12,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "total_latency": {
+        "count": 60,
+        "mean_ms": 11.361405000000001,
+        "median_ms": 10.3324,
+        "p50_ms": 10.3324,
+        "p70_ms": 10.95805,
+        "p100_ms": 26.1407
+      },
+      "stage_latencies": {
+        "grounding": {
+          "count": 72,
+          "mean_ms": 0.5318027777777777,
+          "median_ms": 0.44635,
+          "p50_ms": 0.44635,
+          "p70_ms": 0.5668599999999999,
+          "p100_ms": 1.6483999999999999
+        },
+        "guardrail": {
+          "count": 60,
+          "mean_ms": 0.042818333333333326,
+          "median_ms": 0.029449999999999997,
+          "p50_ms": 0.029449999999999997,
+          "p70_ms": 0.056429999999999994,
+          "p100_ms": 0.1512
+        },
+        "language": {
+          "count": 72,
+          "mean_ms": 0.00037083333333333326,
+          "median_ms": 0.00019999999999999998,
+          "p50_ms": 0.00019999999999999998,
+          "p70_ms": 0.0003,
+          "p100_ms": 0.0013
+        },
+        "llm": {
+          "count": 32,
+          "mean_ms": 4.538515625,
+          "median_ms": 0.03885,
+          "p50_ms": 0.03885,
+          "p70_ms": 9.97227,
+          "p100_ms": 17.465899999999998
+        },
+        "query_analysis": {
+          "count": 60,
+          "mean_ms": 0.036445,
+          "median_ms": 0.0308,
+          "p50_ms": 0.0308,
+          "p70_ms": 0.03999,
+          "p100_ms": 0.1305
+        },
+        "retrieval": {
+          "count": 72,
+          "mean_ms": 10.784391666666666,
+          "median_ms": 9.7894,
+          "p50_ms": 9.7894,
+          "p70_ms": 10.70805,
+          "p100_ms": 25.0902
+        },
+        "stt": {
+          "count": 72,
+          "mean_ms": 0.0027486111111111097,
+          "median_ms": 0.0023,
+          "p50_ms": 0.0023,
+          "p70_ms": 0.0027,
+          "p100_ms": 0.013
+        }
+      },
+      "failures": {
+        "total_queries": 12,
+        "stt": 0,
+        "lid": 0,
+        "retrieval": 0,
+        "grounding": 8,
+        "generation": 8,
+        "total_failures": 16
+      },
+      "tested": true,
+      "status": "SUPPORTED & VALIDATED"
+    },
+    {
+      "language": "ta",
+      "language_name": "Tamil",
+      "group": "primary",
+      "queries_count": 12,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "total_latency": {
+        "count": 60,
+        "mean_ms": 12.71099666666667,
+        "median_ms": 11.0115,
+        "p50_ms": 11.0115,
+        "p70_ms": 13.342009999999998,
+        "p100_ms": 33.095
+      },
+      "stage_latencies": {
+        "grounding": {
+          "count": 72,
+          "mean_ms": 0.5526861111111111,
+          "median_ms": 0.46965,
+          "p50_ms": 0.46965,
+          "p70_ms": 0.59425,
+          "p100_ms": 1.6038000000000001
+        },
+        "guardrail": {
+          "count": 60,
+          "mean_ms": 0.06916499999999999,
+          "median_ms": 0.06180000000000001,
+          "p50_ms": 0.06180000000000001,
+          "p70_ms": 0.07829999999999998,
+          "p100_ms": 0.203
+        },
+        "language": {
+          "count": 72,
+          "mean_ms": 0.0004902777777777776,
+          "median_ms": 0.00025,
+          "p50_ms": 0.00025,
+          "p70_ms": 0.00039999999999999996,
+          "p100_ms": 0.0022
+        },
+        "llm": {
+          "count": 52,
+          "mean_ms": 3.4029769230769236,
+          "median_ms": 0.039,
+          "p50_ms": 0.039,
+          "p70_ms": 0.07514999999999997,
+          "p100_ms": 17.5868
+        },
+        "query_analysis": {
+          "count": 60,
+          "mean_ms": 0.04670833333333334,
+          "median_ms": 0.03905,
+          "p50_ms": 0.03905,
+          "p70_ms": 0.046599999999999996,
+          "p100_ms": 0.1226
+        },
+        "retrieval": {
+          "count": 72,
+          "mean_ms": 12.172270833333336,
+          "median_ms": 10.9198,
+          "p50_ms": 10.9198,
+          "p70_ms": 13.476849999999997,
+          "p100_ms": 30.8408
+        },
+        "stt": {
+          "count": 72,
+          "mean_ms": 0.0027986111111111115,
+          "median_ms": 0.00245,
+          "p50_ms": 0.00245,
+          "p70_ms": 0.0029699999999999996,
+          "p100_ms": 0.0062
+        }
+      },
+      "failures": {
+        "total_queries": 12,
+        "stt": 0,
+        "lid": 0,
+        "retrieval": 0,
+        "grounding": 4,
+        "generation": 4,
+        "total_failures": 8
+      },
+      "tested": true,
+      "status": "SUPPORTED & VALIDATED"
+    }
+  ],
+  "secondary_languages": [
+    {
+      "language": "te",
+      "language_name": "Telugu",
+      "group": "secondary",
+      "queries_count": 12,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "total_latency": {
+        "count": 60,
+        "mean_ms": 11.583974999999999,
+        "median_ms": 10.77685,
+        "p50_ms": 10.77685,
+        "p70_ms": 12.1508,
+        "p100_ms": 24.3072
+      },
+      "stage_latencies": {
+        "grounding": {
+          "count": 72,
+          "mean_ms": 0.4913916666666666,
+          "median_ms": 0.43745,
+          "p50_ms": 0.43745,
+          "p70_ms": 0.55245,
+          "p100_ms": 1.0436
+        },
+        "guardrail": {
+          "count": 60,
+          "mean_ms": 0.05840166666666668,
+          "median_ms": 0.060899999999999996,
+          "p50_ms": 0.060899999999999996,
+          "p70_ms": 0.07007,
+          "p100_ms": 0.18329999999999996
+        },
+        "language": {
+          "count": 72,
+          "mean_ms": 0.00039999999999999996,
+          "median_ms": 0.00019999999999999998,
+          "p50_ms": 0.00019999999999999998,
+          "p70_ms": 0.0003,
+          "p100_ms": 0.0022
+        },
+        "llm": {
+          "count": 47,
+          "mean_ms": 2.7250255319148935,
+          "median_ms": 0.0349,
+          "p50_ms": 0.0349,
+          "p70_ms": 0.05168,
+          "p100_ms": 12.0668
+        },
+        "query_analysis": {
+          "count": 60,
+          "mean_ms": 0.041894999999999995,
+          "median_ms": 0.03905,
+          "p50_ms": 0.03905,
+          "p70_ms": 0.04470999999999999,
+          "p100_ms": 0.09129999999999999
+        },
+        "retrieval": {
+          "count": 72,
+          "mean_ms": 10.69943611111111,
+          "median_ms": 10.00375,
+          "p50_ms": 10.00375,
+          "p70_ms": 11.23737,
+          "p100_ms": 23.2186
+        },
+        "stt": {
+          "count": 72,
+          "mean_ms": 0.0025138888888888893,
+          "median_ms": 0.0023,
+          "p50_ms": 0.0023,
+          "p70_ms": 0.0026,
+          "p100_ms": 0.007500000000000001
+        }
+      },
+      "failures": {
+        "total_queries": 12,
+        "stt": 0,
+        "lid": 0,
+        "retrieval": 0,
+        "grounding": 5,
+        "generation": 5,
+        "total_failures": 10
+      },
+      "tested": true,
+      "status": "SUPPORTED & VALIDATED"
+    },
+    {
+      "language": "kn",
+      "language_name": "Kannada",
+      "group": "secondary",
+      "queries_count": 12,
+      "recall_at_5": 1.0,
+      "mrr": 1.0,
+      "total_latency": {
+        "count": 60,
+        "mean_ms": 10.048226666666668,
+        "median_ms": 9.488800000000001,
+        "p50_ms": 9.488800000000001,
+        "p70_ms": 10.207849999999999,
+        "p100_ms": 19.8229
+      },
+      "stage_latencies": {
+        "grounding": {
+          "count": 72,
+          "mean_ms": 0.47718472222222214,
+          "median_ms": 0.41480000000000006,
+          "p50_ms": 0.41480000000000006,
+          "p70_ms": 0.53375,
+          "p100_ms": 0.9890999999999999
+        },
+        "guardrail": {
+          "count": 60,
+          "mean_ms": 0.053871666666666665,
+          "median_ms": 0.05975,
+          "p50_ms": 0.05975,
+          "p70_ms": 0.06639999999999999,
+          "p100_ms": 0.1422
+        },
+        "language": {
+          "count": 72,
+          "mean_ms": 0.00044027777777777755,
+          "median_ms": 0.00019999999999999998,
+          "p50_ms": 0.00019999999999999998,
+          "p70_ms": 0.00036999999999999956,
+          "p100_ms": 0.0021
+        },
+        "llm": {
+          "count": 52,
+          "mean_ms": 3.271305769230769,
+          "median_ms": 0.028,
+          "p50_ms": 0.028,
+          "p70_ms": 0.03764999999999999,
+          "p100_ms": 17.035999999999998
+        },
+        "query_analysis": {
+          "count": 60,
+          "mean_ms": 0.03588666666666666,
+          "median_ms": 0.03455,
+          "p50_ms": 0.03455,
+          "p70_ms": 0.03924999999999999,
+          "p100_ms": 0.0693
+        },
+        "retrieval": {
+          "count": 72,
+          "mean_ms": 9.910595833333335,
+          "median_ms": 9.3687,
+          "p50_ms": 9.3687,
+          "p70_ms": 10.38574,
+          "p100_ms": 18.897100000000002
+        },
+        "stt": {
+          "count": 72,
+          "mean_ms": 0.011359722222222222,
+          "median_ms": 0.0021,
+          "p50_ms": 0.0021,
+          "p70_ms": 0.0023,
+          "p100_ms": 0.6512
+        }
+      },
+      "failures": {
+        "total_queries": 12,
+        "stt": 0,
+        "lid": 0,
+        "retrieval": 0,
+        "grounding": 4,
+        "generation": 4,
+        "total_failures": 8
+      },
+      "tested": true,
+      "status": "SUPPORTED & VALIDATED"
+    }
+  ],
+  "primary_summary": {
+    "name": "Primary Languages (EN, HI, TA)",
+    "languages": [
+      "en",
+      "hi",
+      "ta"
+    ],
+    "queries_count": 36,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "total_latency": {
+      "count": 180,
+      "mean_ms": 11.577996111111114,
+      "median_ms": 10.5219,
+      "p50_ms": 10.5219,
+      "p70_ms": 11.837686666666665,
+      "p100_ms": 33.095
+    },
+    "stage_latencies": {
+      "grounding": {
+        "count": 216,
+        "mean_ms": 0.4916143518518517,
+        "median_ms": 0.4216666666666667,
+        "p50_ms": 0.4216666666666667,
+        "p70_ms": 0.5307066666666665,
+        "p100_ms": 1.6483999999999999
+      },
+      "guardrail": {
+        "count": 180,
+        "mean_ms": 0.05481888888888888,
+        "median_ms": 0.049850000000000005,
+        "p50_ms": 0.049850000000000005,
+        "p70_ms": 0.06809333333333333,
+        "p100_ms": 0.203
+      },
+      "language": {
+        "count": 216,
+        "mean_ms": 0.000560648148148148,
+        "median_ms": 0.00023333333333333333,
+        "p50_ms": 0.00023333333333333333,
+        "p70_ms": 0.0003333333333333333,
+        "p100_ms": 0.0129
+      },
+      "llm": {
+        "count": 136,
+        "mean_ms": 3.829057131410257,
+        "median_ms": 0.037500000000000006,
+        "p50_ms": 0.037500000000000006,
+        "p70_ms": 3.364336666666667,
+        "p100_ms": 20.0714
+      },
+      "query_analysis": {
+        "count": 180,
+        "mean_ms": 0.034999444444444444,
+        "median_ms": 0.0299,
+        "p50_ms": 0.0299,
+        "p70_ms": 0.03678666666666666,
+        "p100_ms": 0.1305
+      },
+      "retrieval": {
+        "count": 216,
+        "mean_ms": 11.305974537037038,
+        "median_ms": 10.262583333333334,
+        "p50_ms": 10.262583333333334,
+        "p70_ms": 12.092133333333331,
+        "p100_ms": 30.8408
+      },
+      "stt": {
+        "count": 216,
+        "mean_ms": 0.0028828703703703703,
+        "median_ms": 0.00235,
+        "p50_ms": 0.00235,
+        "p70_ms": 0.00278,
+        "p100_ms": 0.0261
+      }
+    },
+    "failures": {
+      "total_queries": 36,
+      "stt": 0,
+      "lid": 0,
+      "retrieval": 0,
+      "grounding": 16,
+      "generation": 16,
+      "total_failures": 32
+    }
+  },
+  "secondary_summary": {
+    "name": "Secondary Languages (TE, KN)",
+    "languages": [
+      "te",
+      "kn"
+    ],
+    "queries_count": 24,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "total_latency": {
+      "count": 120,
+      "mean_ms": 10.816100833333333,
+      "median_ms": 10.132825,
+      "p50_ms": 10.132825,
+      "p70_ms": 11.179324999999999,
+      "p100_ms": 24.3072
+    },
+    "stage_latencies": {
+      "grounding": {
+        "count": 144,
+        "mean_ms": 0.4842881944444444,
+        "median_ms": 0.42612500000000003,
+        "p50_ms": 0.42612500000000003,
+        "p70_ms": 0.5430999999999999,
+        "p100_ms": 1.0436
+      },
+      "guardrail": {
+        "count": 120,
+        "mean_ms": 0.05613666666666667,
+        "median_ms": 0.060325,
+        "p50_ms": 0.060325,
+        "p70_ms": 0.06823499999999999,
+        "p100_ms": 0.18329999999999996
+      },
+      "language": {
+        "count": 144,
+        "mean_ms": 0.00042013888888888873,
+        "median_ms": 0.00019999999999999998,
+        "p50_ms": 0.00019999999999999998,
+        "p70_ms": 0.0003349999999999998,
+        "p100_ms": 0.0022
+      },
+      "llm": {
+        "count": 99,
+        "mean_ms": 2.9981656505728314,
+        "median_ms": 0.03145,
+        "p50_ms": 0.03145,
+        "p70_ms": 0.044664999999999996,
+        "p100_ms": 17.035999999999998
+      },
+      "query_analysis": {
+        "count": 120,
+        "mean_ms": 0.038890833333333326,
+        "median_ms": 0.0368,
+        "p50_ms": 0.0368,
+        "p70_ms": 0.04197999999999999,
+        "p100_ms": 0.09129999999999999
+      },
+      "retrieval": {
+        "count": 144,
+        "mean_ms": 10.305015972222222,
+        "median_ms": 9.686225,
+        "p50_ms": 9.686225,
+        "p70_ms": 10.811555,
+        "p100_ms": 23.2186
+      },
+      "stt": {
+        "count": 144,
+        "mean_ms": 0.006936805555555555,
+        "median_ms": 0.0021999999999999997,
+        "p50_ms": 0.0021999999999999997,
+        "p70_ms": 0.00245,
+        "p100_ms": 0.6512
+      }
+    },
+    "failures": {
+      "total_queries": 24,
+      "stt": 0,
+      "lid": 0,
+      "retrieval": 0,
+      "grounding": 9,
+      "generation": 9,
+      "total_failures": 18
+    }
+  },
+  "overall_summary": {
+    "name": "Overall Multilingual (All 5 Tested Languages)",
+    "languages": [
+      "en",
+      "hi",
+      "ta",
+      "te",
+      "kn"
+    ],
+    "queries_count": 60,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "total_latency": {
+      "count": 300,
+      "mean_ms": 11.273238000000001,
+      "median_ms": 10.36627,
+      "p50_ms": 10.36627,
+      "p70_ms": 11.574342,
+      "p100_ms": 33.095
+    },
+    "stage_latencies": {
+      "grounding": {
+        "count": 360,
+        "mean_ms": 0.4886838888888888,
+        "median_ms": 0.42345000000000005,
+        "p50_ms": 0.42345000000000005,
+        "p70_ms": 0.5356639999999999,
+        "p100_ms": 1.6483999999999999
+      },
+      "guardrail": {
+        "count": 300,
+        "mean_ms": 0.05534599999999999,
+        "median_ms": 0.05404,
+        "p50_ms": 0.05404,
+        "p70_ms": 0.06815,
+        "p100_ms": 0.203
+      },
+      "language": {
+        "count": 360,
+        "mean_ms": 0.0005044444444444443,
+        "median_ms": 0.00021999999999999998,
+        "p50_ms": 0.00021999999999999998,
+        "p70_ms": 0.00033399999999999993,
+        "p100_ms": 0.0129
+      },
+      "llm": {
+        "count": 235,
+        "mean_ms": 3.4967005390752868,
+        "median_ms": 0.03508000000000001,
+        "p50_ms": 0.03508000000000001,
+        "p70_ms": 2.036468,
+        "p100_ms": 20.0714
+      },
+      "query_analysis": {
+        "count": 300,
+        "mean_ms": 0.03655599999999999,
+        "median_ms": 0.03266,
+        "p50_ms": 0.03266,
+        "p70_ms": 0.038863999999999996,
+        "p100_ms": 0.1305
+      },
+      "retrieval": {
+        "count": 360,
+        "mean_ms": 10.905591111111113,
+        "median_ms": 10.03204,
+        "p50_ms": 10.03204,
+        "p70_ms": 11.579901999999999,
+        "p100_ms": 30.8408
+      },
+      "stt": {
+        "count": 360,
+        "mean_ms": 0.004504444444444445,
+        "median_ms": 0.00229,
+        "p50_ms": 0.00229,
+        "p70_ms": 0.002648,
+        "p100_ms": 0.6512
+      }
+    },
+    "failures": {
+      "total_queries": 60,
+      "stt": 0,
+      "lid": 0,
+      "retrieval": 0,
+      "grounding": 25,
+      "generation": 25,
+      "total_failures": 50
+    }
+  },
+  "untested_languages": [
+    {
+      "code": "as",
+      "name": "Assamese",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "bn",
+      "name": "Bengali",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "gu",
+      "name": "Gujarati",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "ml",
+      "name": "Malayalam",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "mr",
+      "name": "Marathi",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "or",
+      "name": "Odia",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "pa",
+      "name": "Punjabi",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    },
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "tested": false,
+      "status": "UNTESTED — NO MULTILINGUAL CLAIM"
+    }
+  ]
+}

@@ -75,8 +75,16 @@ fn punct_of(ch: char) -> Option<char> {
 pub fn detect_intent(normalized: &str) -> QueryIntent {
     let lower = normalized.to_lowercase();
 
-    const COMPARISON: [&str; 5] = ["difference between", "compare ", " vs ", "versus ", "अंतर"];
-    const PROCEDURAL: [&str; 7] = [
+    const COMPARISON: [&str; 7] = [
+        "difference between",
+        "compare ",
+        " vs ",
+        "versus ",
+        "अंतर",
+        "తేడా",
+        "ವ್ಯತ್ಯಾಸ",
+    ];
+    const PROCEDURAL: [&str; 9] = [
         "how to ",
         "how do ",
         "how can ",
@@ -84,8 +92,10 @@ pub fn detect_intent(normalized: &str) -> QueryIntent {
         "steps to ",
         "कैसे",
         "எப்படி",
+        "ఎలా",
+        "ಹೇಗೆ",
     ];
-    const DEFINITION: [&str; 8] = [
+    const DEFINITION: [&str; 12] = [
         "what is ",
         "what are ",
         "define ",
@@ -94,8 +104,12 @@ pub fn detect_intent(normalized: &str) -> QueryIntent {
         "क्या है",
         "क्या होता है",
         "என்றால் என்ன",
+        "అంటే ఏమిటి",
+        "ఏమిటి",
+        "ಎಂದರೇನು",
+        "ಏನು",
     ];
-    const FACTUAL: [&str; 9] = [
+    const FACTUAL: [&str; 13] = [
         "who is ",
         "who was ",
         "when did ",
@@ -105,6 +119,10 @@ pub fn detect_intent(normalized: &str) -> QueryIntent {
         "why do ",
         "कौन",
         "कब",
+        "ఎవరు",
+        "ఎప్పుడు",
+        "ಯಾರು",
+        "ಯಾವಾಗ",
     ];
 
     if COMPARISON.iter().any(|m| lower.contains(m)) {
@@ -179,6 +197,8 @@ mod tests {
             QueryIntent::Definition
         );
         assert_eq!(detect_intent("gst क्या है"), QueryIntent::Definition);
+        assert_eq!(detect_intent("జీఎస్టీ అంటే ఏమిటి"), QueryIntent::Definition);
+        assert_eq!(detect_intent("ಜಿಎಸ್‌ಟಿ ಎಂದರೇನು"), QueryIntent::Definition);
     }
 
     #[test]
@@ -191,6 +211,8 @@ mod tests {
             detect_intent("compare petrol vs diesel"),
             QueryIntent::Comparison
         );
+        assert_eq!(detect_intent("రెండు పన్నుల మధ్య తేడా"), QueryIntent::Comparison);
+        assert_eq!(detect_intent("ಎರಡರ ನಡುವಿನ ವ್ಯತ್ಯಾಸ"), QueryIntent::Comparison);
     }
 
     #[test]
@@ -200,6 +222,8 @@ mod tests {
             QueryIntent::Procedural
         );
         assert_eq!(detect_intent("அதை எப்படி செய்வது"), QueryIntent::Procedural);
+        assert_eq!(detect_intent("ఆధార్ ఎలా అప్‌డేట్ చేయాలి"), QueryIntent::Procedural);
+        assert_eq!(detect_intent("ಹೇಗೆ ಅರ್ಜಿ ಸಲ್ಲಿಸುವುದು"), QueryIntent::Procedural);
     }
 
     #[test]
@@ -209,6 +233,8 @@ mod tests {
             QueryIntent::Factual
         );
         assert_eq!(detect_intent("why is the sky blue"), QueryIntent::Factual);
+        assert_eq!(detect_intent("ఆధార్ ఎవరు జారీ చేస్తారు"), QueryIntent::Factual);
+        assert_eq!(detect_intent("ಯಾರು ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು"), QueryIntent::Factual);
     }
 
     #[test]

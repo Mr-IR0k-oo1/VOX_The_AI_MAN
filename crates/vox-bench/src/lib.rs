@@ -10,12 +10,18 @@
 pub mod environment;
 pub mod eval;
 pub mod metrics;
+pub mod multilingual;
 pub mod report;
 pub mod runner;
 
 pub use environment::EnvironmentInfo;
 pub use eval::{eval_queries, EvalQuery};
 pub use metrics::{mrr, recall_at_k};
+pub use multilingual::{
+    print_multilingual_summary, render_multilingual_markdown, run_multilingual_validation,
+    GroupEvaluation, LanguageEvaluation, MultilingualReport, StageFailures, UntestedLanguage,
+    DEFAULT_BENCH_ROUNDS, PRIMARY_LANGUAGES, SECONDARY_LANGUAGES,
+};
 pub use runner::{
     bench_config, evaluate_chunking, evaluate_mode, run_baseline, BaselineRun, ChunkingEvaluation,
     DatasetInfo, EngineConfigSummary, ModeEvaluation, RetrievalMode, StageStats, StageTimings,

@@ -92,5 +92,6 @@ mod tests {
         assert_eq!(detect_by_script("বাংলা"), Language::Bn);
         assert_eq!(detect_by_script("ਪੰਜਾਬੀ"), Language::Pa);
         assert_eq!(detect_by_script("తెలుగు"), Language::Te);
+        assert_eq!(detect_by_script("ಕನ್ನಡ"), Language::Kn);
     }
 }

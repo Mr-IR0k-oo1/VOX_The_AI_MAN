@@ -114,7 +114,9 @@ struct Args {
 fn print_usage() {
     println!(
         "usage: vox-bench [--level all|L0|L1|L2] [--rounds N] [--warmup N] \
-         [--out DIR] [--retrieval-url URL]\n       vox-bench eval [output-dir]"
+         [--out DIR] [--retrieval-url URL]\n       \
+         vox-bench eval [output-dir]\n       \
+         vox-bench multilingual [output-dir] [--rounds N]"
     );
 }
 
@@ -582,6 +584,39 @@ async fn eval_main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+async fn multilingual_main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut out_dir = PathBuf::from("benchmarks");
+    let mut rounds = vox_bench::DEFAULT_BENCH_ROUNDS;
+
+    let mut it = std::env::args().skip(2);
+    while let Some(arg) = it.next() {
+        match arg.as_str() {
+            "--rounds" => {
+                if let Some(r) = it.next() {
+                    rounds = r.parse().unwrap_or(vox_bench::DEFAULT_BENCH_ROUNDS);
+                }
+            }
+            dir if !dir.starts_with('-') => {
+                out_dir = PathBuf::from(dir);
+            }
+            _ => {}
+        }
+    }
+
+    std::fs::create_dir_all(&out_dir)?;
+
+    println!("Running Phase 8: Multilingual Validation across primary (en, hi, ta) and secondary (te, kn) languages...");
+    let report = vox_bench::run_multilingual_validation(rounds).await?;
+
+    vox_bench::print_multilingual_summary(&report);
+
+    let path = out_dir.join("multilingual.json");
+    write_json(&path, &report)?;
+    println!("multilingual benchmark JSON written to {}", path.display());
+
+    Ok(())
+}
+
 fn write_json<T: Serialize>(
     path: &std::path::Path,
     value: &T,
@@ -593,12 +628,21 @@ fn write_json<T: Serialize>(
 
 #[tokio::main]
 async fn main() {
-    if std::env::args().nth(1).as_deref() == Some("eval") {
-        eval_main().await.unwrap_or_else(|err| {
-            eprintln!("eval failed: {err}");
-            std::process::exit(1);
-        });
-    } else {
-        e2e_main().await;
+    match std::env::args().nth(1).as_deref() {
+        Some("eval") => {
+            eval_main().await.unwrap_or_else(|err| {
+                eprintln!("eval failed: {err}");
+                std::process::exit(1);
+            });
+        }
+        Some("multilingual") => {
+            multilingual_main().await.unwrap_or_else(|err| {
+                eprintln!("multilingual evaluation failed: {err}");
+                std::process::exit(1);
+            });
+        }
+        _ => {
+            e2e_main().await;
+        }
     }
 }

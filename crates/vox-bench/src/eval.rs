@@ -46,13 +46,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn eval_set_should_parse_and_cover_three_languages() {
+    fn eval_set_should_parse_and_cover_five_languages() {
         let queries = eval_queries();
-        assert_eq!(queries.len(), 36);
+        assert_eq!(queries.len(), 60);
         assert!(queries.iter().all(|q| !q.relevant.is_empty()));
-        for language in [Language::En, Language::Hi, Language::Ta] {
+        for language in [
+            Language::En,
+            Language::Hi,
+            Language::Ta,
+            Language::Te,
+            Language::Kn,
+        ] {
             let count = queries.iter().filter(|q| q.language == language).count();
-            assert_eq!(count, 12, "expected 12 queries per language");
+            assert_eq!(count, 12, "expected 12 queries for {language}");
         }
     }
 
