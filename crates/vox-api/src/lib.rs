@@ -43,6 +43,8 @@ pub const MAX_BODY_BYTES: usize = 16 * 1024 * 1024;
 /// Builds the application router over `state`.
 pub fn build_router(state: Arc<AppState>) -> Router {
     Router::new()
+        .route("/", get(routes::demo_ui))
+        .route("/demo", get(routes::demo_ui))
         .route("/health", get(routes::health))
         .route("/metrics", get(routes::metrics))
         .route("/v1/retrieve", post(routes::retrieve))

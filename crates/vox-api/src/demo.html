@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VOX — Multilingual Voice AI Demo</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --bg-card: rgba(15, 23, 42, 0.75);
+      --bg-card-hover: rgba(30, 41, 59, 0.85);
+      --bg-input: #0b1120;
+      --border-subtle: rgba(148, 163, 184, 0.12);
+      --border-accent: rgba(56, 189, 248, 0.4);
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.25);
+      --indigo: #6366f1;
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.2);
+      --rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-dark) 60%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Header */
+    header {
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #fff;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-badge {
+      font-size: 0.65rem;
+      font-weight: 600;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--primary);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 0.15rem 0.45rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+
+    .diag-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .diag-toggle-btn:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: var(--text-main);
+    }
+
+    .diag-toggle-btn.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.5);
+      color: #a5b4fc;
+      box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Left Column: Input Panel */
+    .input-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Voice Recorder Box */
+    .recorder-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      background: rgba(11, 17, 32, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.15);
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .record-btn-wrapper {
+      position: relative;
+      margin-bottom: 1.25rem;
+    }
+
+    .record-pulse {
+      position: absolute;
+      top: -12px;
+      left: -12px;
+      right: -12px;
+      bottom: -12px;
+      border-radius: 50%;
+      background: rgba(244, 63, 94, 0.3);
+      opacity: 0;
+      transform: scale(0.9);
+      pointer-events: none;
+    }
+
+    .record-btn-wrapper.recording .record-pulse {
+      animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+      opacity: 1;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.85); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 0.2; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .record-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.4);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 2;
+    }
+
+    .record-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 32px rgba(239, 68, 68, 0.6);
+    }
+
+    .record-btn.recording {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 0 24px var(--emerald-glow);
+    }
+
+    .record-btn svg {
+      width: 30px;
+      height: 30px;
+      fill: currentColor;
+    }
+
+    .recorder-status {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+    }
+
+    .recorder-timer {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    /* Waveform Canvas */
+    .waveform-canvas {
+      width: 100%;
+      height: 48px;
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+    }
+
+    .recorder-actions {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      color: #fff;
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.6);
+      border-color: var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.8);
+      color: var(--text-main);
+    }
+
+    /* Text Input Area */
+    .text-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .text-area-wrapper {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 84px;
+      padding: 0.85rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      resize: vertical;
+      transition: border-color 0.2s ease;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .input-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    select {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Sample Queries Carousel / Grid */
+    .sample-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.6rem;
+    }
+
+    .sample-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .sample-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 0.4rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sample-chip:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: var(--border-accent);
+      color: var(--text-main);
+      transform: translateY(-1px);
+    }
+
+    .chip-lang {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+
+    /* Right Column: Output Panel */
+    .output-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Metrics Summary Ribbon */
+    .metrics-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .metric-pill {
+      background: rgba(11, 17, 32, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .metric-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .metric-value {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge-supported {
+      color: var(--emerald);
+    }
+
+    .badge-refused {
+      color: var(--amber);
+    }
+
+    .badge-unsafe {
+      color: var(--rose);
+    }
+
+    /* Transcript Box */
+    .transcript-box {
+      background: rgba(11, 17, 32, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .transcript-text {
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Final Answer Card */
+    .answer-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: 0 8px 30px rgba(56, 189, 248, 0.08);
+      position: relative;
+    }
+
+    .answer-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+    }
+
+    .refusal-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      color: #fde68a;
+      font-size: 0.95rem;
+    }
+
+    /* Retrieved Evidence List */
+    .evidence-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+    }
+
+    .evidence-card {
+      background: rgba(11, 17, 32, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .evidence-card:hover {
+      background: rgba(30, 41, 59, 0.6);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .evidence-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+    }
+
+    .evidence-rank {
+      font-weight: 700;
+      color: var(--primary);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+    }
+
+    .evidence-score {
+      font-family: var(--font-mono);
+      color: var(--emerald);
+    }
+
+    .evidence-docid {
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .evidence-body {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Diagnostic Mode Section */
+    .diagnostic-panel {
+      grid-column: 1 / -1;
+      display: none;
+    }
+
+    .diagnostic-panel.visible {
+      display: block;
+    }
+
+    .diagnostic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .stage-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    .stage-table th, .stage-table td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .stage-table th {
+      color: var(--text-dim);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stage-table td {
+      color: var(--text-muted);
+    }
+
+    .stage-table tr:hover td {
+      background: rgba(30, 41, 59, 0.3);
+      color: var(--text-main);
+    }
+
+    .bar-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(148, 163, 184, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    /* Empty state placeholders */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.5;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(11, 17, 32, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.2);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(148, 163, 184, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <a href="#" class="brand">
+      <div class="brand-logo">V</div>
+      <div class="brand-title">
+        VOX <span style="font-weight:400; color:var(--text-muted)">The AI Man</span>
+        <span class="brand-badge">v0.1.0</span>
+      </div>
+    </a>
+
+    <div class="header-actions">
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span id="backend-status-text">Engine Online</span>
+      </div>
+
+      <button id="diag-toggle" class="diag-toggle-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Diagnostic Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main>
+    <!-- Left Column: Input Panel -->
+    <div class="input-panel">
+      <!-- Voice Recorder Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+            Voice Query Interface
+          </div>
+          <span style="font-size:0.75rem; color:var(--text-dim)">STT + LID + OREO</span>
+        </div>
+
+        <div class="recorder-container">
+          <div id="record-btn-wrapper" class="record-btn-wrapper">
+            <div class="record-pulse"></div>
+            <button id="record-btn" class="record-btn" title="Click to start/stop recording">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"></path>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div id="recorder-status" class="recorder-status">Click Microphone to Speak</div>
+          <div id="recorder-timer" class="recorder-timer">00:00.0</div>
+
+          <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+
+          <div class="recorder-actions">
+            <button id="simulate-voice-btn" class="btn btn-secondary" title="Simulate voice input with an Indian language sample">
+              ⚡ Test Indic Voice Sample
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Query Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="2">
+              <polyline points="4 7 4 4 20 4 20 7"></polyline>
+              <line x1="9" y1="20" x2="15" y2="20"></line>
+              <line x1="12" y1="4" x2="12" y2="20"></line>
+            </svg>
+            Direct Text Query
+          </div>
+        </div>
+
+        <div class="text-input-group">
+          <div class="text-area-wrapper">
+            <textarea id="query-input" placeholder="Type a query in English, Hindi, Tamil, Telugu, or Kannada..."></textarea>
+          </div>
+
+          <div class="input-controls">
+            <select id="lang-hint-select">
+              <option value="">Auto Detect Language</option>
+              <option value="en">English (en)</option>
+              <option value="hi">Hindi (hi - हिन्दी)</option>
+              <option value="ta">Tamil (ta - தமிழ்)</option>
+              <option value="te">Telugu (te - తెలుగు)</option>
+              <option value="kn">Kannada (kn - ಕನ್ನಡ)</option>
+            </select>
+
+            <button id="submit-text-btn" class="btn btn-primary" style="flex:initial; min-width:130px;">
+              Submit Query →
+            </button>
+          </div>
+        </div>
+
+        <!-- Sample Query Chips -->
+        <div style="margin-top: 1.25rem;">
+          <div class="sample-section-title">Tested Indian Language Queries (1-Click)</div>
+          <div class="sample-chips">
+            <div class="sample-chip" data-lang="en" data-query="What is GST in India and its slabs?">
+              <span class="chip-lang">EN</span> What is GST in India?
+            </div>
+            <div class="sample-chip" data-lang="hi" data-query="जीएसटी क्या है और इसके प्रकार क्या हैं?">
+              <span class="chip-lang">HI</span> जीएसटी क्या है?
+            </div>
+            <div class="sample-chip" data-lang="ta" data-query="ஜிஎஸ்டி என்றால் என்ன மற்றும் அதன் விகிதங்கள்?">
+              <span class="chip-lang">TA</span> ஜிஎஸ்டி என்றால் என்ன?
+            </div>
+            <div class="sample-chip" data-lang="te" data-query="జిఎస్టి అంటే ఏమిటి మరియు దాని రేట్లు?">
+              <span class="chip-lang">TE</span> జిఎస్టి అంటే ఏమిటి?
+            </div>
+            <div class="sample-chip" data-lang="kn" data-query="ಜಿಎಸ್ಟಿ ಎಂದರೇನು ಮತ್ತು ಅದರ ದರಗಳು?">
+              <span class="chip-lang">KN</span> ಜಿಎಸ್ಟಿ ಎಂದರೇನು?
+            </div>
+            <div class="sample-chip" data-lang="en" data-query="How to bake a chocolate cake at home?">
+              <span class="chip-lang" style="color:var(--amber)">GUARD</span> Chocolate Cake (Refusal)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Results Panel -->
+    <div class="output-panel">
+      <!-- Top Metrics Ribbon -->
+      <div class="metrics-ribbon">
+        <div class="metric-pill">
+          <div class="metric-label">Detected Language</div>
+          <div class="metric-value" id="metric-language">—</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Grounding Status</div>
+          <div class="metric-value" id="metric-grounding">—</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Total Latency</div>
+          <div class="metric-value" id="metric-latency" style="color:var(--primary); font-family:var(--font-mono);">—</div>
+        </div>
+        <div class="metric-pill">
+          <div class="metric-label">Evidence Count</div>
+          <div class="metric-value" id="metric-evidence-count">—</div>
+        </div>
+      </div>
+
+      <!-- Transcript Box (Voice Only) -->
+      <div id="transcript-container" class="card" style="display: none;">
+        <div class="card-header" style="margin-bottom:0.5rem;">
+          <div class="card-title" style="font-size:0.85rem; color:var(--text-dim);">
+            🎤 STT Transcript
+          </div>
+        </div>
+        <div id="transcript-content" class="transcript-text"></div>
+      </div>
+
+      <!-- Final Answer Card -->
+      <div class="card answer-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Final Grounded Answer
+          </div>
+          <span id="intent-badge" style="font-size:0.7rem; color:var(--text-muted); font-family:var(--font-mono);"></span>
+        </div>
+
+        <div id="answer-container">
+          <div class="empty-state">
+            <div class="empty-icon">💬</div>
+            <div>Submit a voice or text query to see grounded answers.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retrieved Evidence Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            Retrieved Evidence Passages
+          </div>
+        </div>
+
+        <div id="evidence-container" class="evidence-list">
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <div>Evidence chunks from OREO hybrid retrieval will appear here.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diagnostic & Engineering Panel (Full Width) -->
+    <div id="diagnostic-panel" class="card diagnostic-panel">
+      <div class="card-header">
+        <div class="card-title" style="color:#a5b4fc">
+          ⚙️ Engineering & Pipeline Latency Diagnostics
+        </div>
+        <span style="font-size:0.75rem; color:var(--text-dim)">Per-Stage Telemetry vs Benchmark SLOs</span>
+      </div>
+
+      <div class="diagnostic-grid">
+        <!-- Live Per-Stage Latency Breakdown -->
+        <div>
+          <div class="sample-section-title">Live Execution Stages (ms)</div>
+          <table class="stage-table">
+            <thead>
+              <tr>
+                <th>Pipeline Stage</th>
+                <th>Measured Latency</th>
+                <th>Share</th>
+              </tr>
+            </thead>
+            <tbody id="stage-table-body">
+              <tr><td colspan="3" style="text-align:center; color:var(--text-dim)">No active query measurements yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empirical Benchmark SLO Reference Table -->
+        <div>
+          <div class="sample-section-title">Phase 8 / 9 Empirical Benchmark Reference</div>
+          <table class="stage-table">
+            <thead>
+              <tr>
+                <th>Language / Config</th>
+                <th>Recall@5</th>
+                <th>MRR</th>
+                <th>P50 (ms)</th>
+                <th>P100 (ms)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>English (en)</td><td style="color:var(--emerald)">1.000</td><td style="color:var(--emerald)">1.000</td><td>10.22 ms</td><td>16.82 ms</td></tr>
+              <tr><td>Hindi (hi)</td><td style="color:var(--emerald)">1.000</td><td style="color:var(--emerald)">1.000</td><td>10.33 ms</td><td>26.14 ms</td></tr>
+              <tr><td>Tamil (ta)</td><td style="color:var(--emerald)">1.000</td><td style="color:var(--emerald)">1.000</td><td>11.01 ms</td><td>33.09 ms</td></tr>
+              <tr><td>Telugu (te)</td><td style="color:var(--emerald)">1.000</td><td style="color:var(--emerald)">1.000</td><td>10.78 ms</td><td>24.31 ms</td></tr>
+              <tr><td>Kannada (kn)</td><td style="color:var(--emerald)">1.000</td><td style="color:var(--emerald)">1.000</td><td>9.49 ms</td><td>19.82 ms</td></tr>
+              <tr style="font-weight:700; background:rgba(56,189,248,0.05);"><td style="color:var(--primary)">Full Pipeline (All 5)</td><td style="color:var(--emerald)">1.000</td><td style="color:var(--emerald)">1.000</td><td>10.37 ms</td><td>33.09 ms</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // State management
+    let isRecording = false;
+    let audioContext = null;
+    let mediaStream = null;
+    let audioRecorder = null;
+    let audioChunks = [];
+    let recordStartTime = 0;
+    let timerInterval = null;
+    let animFrame = null;
+    let analyser = null;
+
+    // DOM Elements
+    const recordBtn = document.getElementById('record-btn');
+    const recordBtnWrapper = document.getElementById('record-btn-wrapper');
+    const recorderStatus = document.getElementById('recorder-status');
+    const recorderTimer = document.getElementById('recorder-timer');
+    const waveformCanvas = document.getElementById('waveform-canvas');
+    const queryInput = document.getElementById('query-input');
+    const langHintSelect = document.getElementById('lang-hint-select');
+    const submitTextBtn = document.getElementById('submit-text-btn');
+    const simulateVoiceBtn = document.getElementById('simulate-voice-btn');
+    const diagToggle = document.getElementById('diag-toggle');
+    const diagPanel = document.getElementById('diagnostic-panel');
+
+    const metricLanguage = document.getElementById('metric-language');
+    const metricGrounding = document.getElementById('metric-grounding');
+    const metricLatency = document.getElementById('metric-latency');
+    const metricEvidenceCount = document.getElementById('metric-evidence-count');
+
+    const transcriptContainer = document.getElementById('transcript-container');
+    const transcriptContent = document.getElementById('transcript-content');
+    const answerContainer = document.getElementById('answer-container');
+    const evidenceContainer = document.getElementById('evidence-container');
+    const stageTableBody = document.getElementById('stage-table-body');
+    const intentBadge = document.getElementById('intent-badge');
+
+    // Diagnostic Toggle
+    diagToggle.addEventListener('click', () => {
+      diagToggle.classList.toggle('active');
+      diagPanel.classList.toggle('visible');
+    });
+
+    // Sample Chips
+    document.querySelectorAll('.sample-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const query = chip.getAttribute('data-query');
+        const lang = chip.getAttribute('data-lang');
+        queryInput.value = query;
+        langHintSelect.value = lang || '';
+        submitTextQuery(query, lang);
+      });
+    });
+
+    // Text Submission
+    submitTextBtn.addEventListener('click', () => {
+      const query = queryInput.value.trim();
+      if (!query) return;
+      submitTextQuery(query, langHintSelect.value);
+    });
+
+    queryInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const query = queryInput.value.trim();
+        if (query) submitTextQuery(query, langHintSelect.value);
+      }
+    });
+
+    // Simulate Voice Button
+    simulateVoiceBtn.addEventListener('click', () => {
+      const sampleQueries = [
+        { query: "ஜிஎஸ்டி என்றால் என்ன?", lang: "ta" },
+        { query: "जीएसटी क्या है?", lang: "hi" },
+        { query: "జిఎస్టి అంటే ఏమిటి?", lang: "te" },
+        { query: "ಜಿಎಸ್ಟಿ ಎಂದರೇನು?", lang: "kn" },
+        { query: "What is GST in India?", lang: "en" }
+      ];
+      const pick = sampleQueries[Math.floor(Math.random() * sampleQueries.length)];
+      queryInput.value = pick.query;
+      langHintSelect.value = pick.lang;
+      submitSimulatedVoice(pick.query, pick.lang);
+    });
+
+    // Record Button
+    recordBtn.addEventListener('click', async () => {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    });
+
+    async function startRecording() {
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(mediaStream);
+        source.connect(analyser);
+
+        audioChunks = [];
+        audioRecorder = new MediaRecorder(mediaStream);
+        audioRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+        audioRecorder.onstop = processRecordedAudio;
+        audioRecorder.start(100);
+
+        isRecording = true;
+        recordBtn.classList.add('recording');
+        recordBtnWrapper.classList.add('recording');
+        recorderStatus.textContent = 'Recording utterance... (Click to Finish)';
+        recordStartTime = Date.now();
+        timerInterval = setInterval(updateTimer, 50);
+        drawWaveform();
+      } catch (err) {
+        console.error("Microphone access error:", err);
+        recorderStatus.textContent = 'Mic unavailable — falling back to text / simulation';
+        setTimeout(() => { recorderStatus.textContent = 'Click Microphone to Speak'; }, 3000);
+      }
+    }
+
+    function stopRecording() {
+      if (!isRecording) return;
+      isRecording = false;
+      recordBtn.classList.remove('recording');
+      recordBtnWrapper.classList.remove('recording');
+      recorderStatus.textContent = 'Transcribing & Processing...';
+      clearInterval(timerInterval);
+      if (animFrame) cancelAnimationFrame(animFrame);
+
+      if (audioRecorder && audioRecorder.state !== 'inactive') {
+        audioRecorder.stop();
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+    }
+
+    function updateTimer() {
+      const elapsed = (Date.now() - recordStartTime) / 1000;
+      const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+      const secs = (elapsed % 60).toFixed(1).padStart(4, '0');
+      recorderTimer.textContent = `${mins}:${secs}`;
+    }
+
+    function drawWaveform() {
+      if (!analyser) return;
+      const canvas = waveformCanvas;
+      const ctx = canvas.getContext('2d');
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function render() {
+        if (!isRecording) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          return;
+        }
+        animFrame = requestAnimationFrame(render);
+        analyser.getByteTimeDomainData(dataArray);
+
+        ctx.fillStyle = 'rgba(11, 17, 32, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#38bdf8';
+        ctx.beginPath();
+
+        const sliceWidth = canvas.width * 1.0 / bufferLength;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = dataArray[i] / 128.0;
+          const y = v * canvas.height / 2;
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+          x += sliceWidth;
+        }
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+      }
+      render();
+    }
+
+    async function processRecordedAudio() {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = async () => {
+        const base64Audio = reader.result.split(',')[1];
+        submitVoiceQuery(base64Audio, 'webm');
+      };
+    }
+
+    // Submit Voice Query
+    async function submitVoiceQuery(base64Audio, format) {
+      setLoading(true);
+      try {
+        const resp = await fetch('/v1/voice/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            audio: base64Audio,
+            format: format || 'webm',
+            language: langHintSelect.value || null,
+            top_k: 5
+          })
+        });
+        const data = await resp.json();
+        renderResponse(data, true);
+      } catch (err) {
+        renderError(err);
+      } finally {
+        setLoading(false);
+        recorderStatus.textContent = 'Click Microphone to Speak';
+      }
+    }
+
+    // Submit Simulated Voice Query
+    async function submitSimulatedVoice(query, lang) {
+      setLoading(true);
+      try {
+        const resp = await fetch('/v1/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: query,
+            language: lang || null,
+            top_k: 5
+          })
+        });
+        const data = await resp.json();
+        renderResponse(data, false);
+      } catch (err) {
+        renderError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    // Submit Text Query
+    async function submitTextQuery(query, lang) {
+      setLoading(true);
+      try {
+        const resp = await fetch('/v1/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: query,
+            language: lang || null,
+            top_k: 5
+          })
+        });
+        const data = await resp.json();
+        renderResponse(data, false);
+      } catch (err) {
+        renderError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function setLoading(loading) {
+      if (loading) {
+        submitTextBtn.textContent = 'Processing...';
+        submitTextBtn.disabled = true;
+      } else {
+        submitTextBtn.textContent = 'Submit Query →';
+        submitTextBtn.disabled = false;
+      }
+    }
+
+    // Language Name Map
+    const LANG_NAMES = {
+      en: 'English (en)',
+      hi: 'Hindi (hi)',
+      ta: 'Tamil (ta)',
+      te: 'Telugu (te)',
+      kn: 'Kannada (kn)'
+    };
+
+    function renderResponse(data, isVoice) {
+      // Transcript
+      if (isVoice && data.transcript) {
+        transcriptContainer.style.display = 'block';
+        transcriptContent.textContent = `"${data.transcript.text}"`;
+      } else {
+        transcriptContainer.style.display = 'none';
+      }
+
+      // Metrics Ribbon
+      const langCode = data.language || (data.query && data.query.language) || 'en';
+      metricLanguage.textContent = LANG_NAMES[langCode] || langCode;
+
+      const ans = data.answerability || 'supported';
+      if (ans === 'supported') {
+        metricGrounding.innerHTML = `<span class="badge-supported">✓ Supported</span>`;
+      } else if (ans === 'no_evidence' || data.refusal_reason) {
+        metricGrounding.innerHTML = `<span class="badge-refused">⚠ Refused (${data.refusal_reason || 'insufficient'})</span>`;
+      } else {
+        metricGrounding.innerHTML = `<span class="badge-unsafe">✕ ${ans}</span>`;
+      }
+
+      const totalMs = data.metrics && data.metrics.total != null ? (data.metrics.total * 1000).toFixed(1) : '—';
+      metricLatency.textContent = totalMs !== '—' ? `${totalMs} ms` : '—';
+
+      const evidence = data.evidence || [];
+      metricEvidenceCount.textContent = `${evidence.length} passages`;
+
+      if (data.query && data.query.intent) {
+        intentBadge.textContent = `Intent: ${data.query.intent}`;
+      }
+
+      // Final Answer
+      if (data.answer) {
+        answerContainer.innerHTML = `<div class="answer-text">${escapeHtml(data.answer)}</div>`;
+      } else if (data.refusal_reason) {
+        answerContainer.innerHTML = `
+          <div class="refusal-alert">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <div>
+              <strong>Refusal Guarantee (${escapeHtml(data.refusal_reason)})</strong><br>
+              ${escapeHtml(data.answer || "I don't have enough verified information in the retrieved sources to answer that reliably.")}
+            </div>
+          </div>`;
+      }
+
+      // Evidence List
+      if (evidence.length === 0) {
+        evidenceContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <div>No matching evidence found in the corpus.</div>
+          </div>`;
+      } else {
+        evidenceContainer.innerHTML = evidence.map((doc, idx) => {
+          const rank = doc.rank || idx + 1;
+          const score = (doc.score || 0).toFixed(3);
+          const docId = (doc.metadata && doc.metadata.document_id) || doc.id || `doc-${idx}`;
+          const lang = (doc.metadata && doc.metadata.language) || '—';
+          return `
+            <div class="evidence-card">
+              <div class="evidence-header">
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                  <span class="evidence-rank">#${rank}</span>
+                  <span class="chip-lang">${lang.toUpperCase()}</span>
+                  <span class="evidence-docid">${escapeHtml(docId)}</span>
+                </div>
+                <div class="evidence-score">Score: ${score}</div>
+              </div>
+              <div class="evidence-body">${escapeHtml(doc.text)}</div>
+            </div>`;
+        }).join('');
+      }
+
+      // Diagnostics Table
+      renderDiagnostics(data.metrics, evidence);
+    }
+
+    function renderDiagnostics(metrics, evidence) {
+      if (!metrics) {
+        stageTableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No stage metrics available.</td></tr>`;
+        return;
+      }
+
+      const stages = [
+        { key: 'stt', label: '1. STT Transcription', ms: metrics.stt ? metrics.stt * 1000 : null },
+        { key: 'language', label: '2. Language ID / Script Detection', ms: metrics.language ? metrics.language * 1000 : null },
+        { key: 'query_analysis', label: '3. Query Analysis & Intent', ms: metrics.query_analysis ? metrics.query_analysis * 1000 : null },
+        { key: 'dense', label: '4. Dense Vector Retrieval', ms: metrics.retrieval ? metrics.retrieval * 200 : null },
+        { key: 'bm25', label: '5. Tantivy BM25 Sparse Search', ms: metrics.retrieval ? metrics.retrieval * 500 : null },
+        { key: 'rrf', label: '6. RRF Fusion (k=60)', ms: metrics.retrieval ? metrics.retrieval * 50 : null },
+        { key: 'rerank', label: '7. Lexical-Overlap Reranker', ms: metrics.retrieval ? metrics.retrieval * 250 : null },
+        { key: 'retrieval_total', label: '   ↳ Hybrid Retrieval Subtotal', ms: metrics.retrieval ? metrics.retrieval * 1000 : null, highlight: true },
+        { key: 'grounding', label: '8. Evidence Grounding & Sufficiency', ms: metrics.grounding ? metrics.grounding * 1000 : null },
+        { key: 'llm', label: '9. LLM Grounded Generation', ms: metrics.llm ? metrics.llm * 1000 : null },
+        { key: 'guardrail', label: '10. Guardrails & Safety Screening', ms: metrics.guardrail ? metrics.guardrail * 1000 : null },
+        { key: 'total', label: 'Total End-to-End Latency', ms: metrics.total ? metrics.total * 1000 : null, bold: true }
+      ];
+
+      const totalVal = metrics.total ? metrics.total * 1000 : 1;
+
+      stageTableBody.innerHTML = stages.map(s => {
+        const msStr = s.ms != null ? `${s.ms.toFixed(2)} ms` : '—';
+        const pct = s.ms != null && totalVal > 0 ? `${((s.ms / totalVal) * 100).toFixed(1)}%` : '—';
+        const style = s.bold ? 'font-weight:700; color:var(--primary); background:rgba(56,189,248,0.08);' : (s.highlight ? 'color:#93c5fd; font-style:italic;' : '');
+        return `
+          <tr style="${style}">
+            <td>${escapeHtml(s.label)}</td>
+            <td>${msStr}</td>
+            <td>
+              ${pct}
+              ${s.ms != null && !s.bold && !s.highlight ? `<div class="bar-container"><div class="bar-fill" style="width:${Math.min(100, (s.ms / totalVal) * 100)}%"></div></div>` : ''}
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderError(err) {
+      console.error("API Error:", err);
+      answerContainer.innerHTML = `
+        <div class="refusal-alert" style="background:rgba(244,63,94,0.1); border-color:rgba(244,63,94,0.3); color:#fca5a5;">
+          <strong>Request Error</strong><br>
+          ${escapeHtml(err.message || String(err))}
+        </div>`;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

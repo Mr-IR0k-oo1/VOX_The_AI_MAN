@@ -203,10 +203,11 @@ Refusal reasons: `unsafe_input`, `off_topic`, `insufficient_context`,
 `weak_evidence`, `conflicting_evidence`, `unsupported_claim`,
 `unsafe_output`, `malformed_output`.
 
-## Frozen API (Phase 0)
+## Frozen API & Demo UI
 
 | Endpoint | Contract |
 |---|---|
+| `GET /` / `GET /demo` | Interactive Multilingual Voice AI Demo UI (Voice recording, LID, Grounding, Evidence, Engineering Diagnostics) |
 | `GET /health` | Liveness + uptime |
 | `GET /metrics` | Prometheus exposition |
 | `POST /v1/retrieve` | `Query` → `RetrievalResponse` (`{documents: [...]}`) |

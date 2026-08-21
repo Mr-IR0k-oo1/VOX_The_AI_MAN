@@ -237,3 +237,24 @@ async fn retrieve_should_serve_the_retrieval_boundary_directly() {
     assert_eq!(documents.len(), 2);
     assert!(documents[0]["score"].as_f64().is_some());
 }
+
+#[tokio::test]
+async fn demo_ui_should_serve_html_interface() {
+    let request = Request::builder()
+        .method("GET")
+        .uri("/")
+        .body(Body::empty())
+        .expect("request");
+    let response = app().oneshot(request).await.expect("response");
+    assert_eq!(response.status(), StatusCode::OK);
+    let bytes = response
+        .into_body()
+        .collect()
+        .await
+        .expect("body")
+        .to_bytes();
+    let html = String::from_utf8_lossy(&bytes);
+    assert!(html.contains("VOX — Multilingual Voice AI Demo"));
+    assert!(html.contains("Voice Query Interface"));
+    assert!(html.contains("Diagnostic Mode"));
+}

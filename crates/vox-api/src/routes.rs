@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use axum::extract::State;
 use axum::http::StatusCode;
-use axum::response::{IntoResponse, Response};
+use axum::response::{Html, IntoResponse, Response};
 use axum::Json;
 use serde_json::json;
 use vox_core::PipelineError;
@@ -19,6 +19,11 @@ use vox_types::{
 use crate::ids::new_request_id;
 use crate::metrics::init_metrics;
 use crate::state::AppState;
+
+/// Serves the single-page Demo UI (`GET /` and `GET /demo`).
+pub async fn demo_ui() -> impl IntoResponse {
+    Html(include_str!("demo.html"))
+}
 
 /// Liveness probe.
 pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
