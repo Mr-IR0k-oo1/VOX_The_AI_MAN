@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # ============================================================================
+  # VOX API Service (Gateway, STT, LID, Hybrid Retrieval, Grounding, LLM & UI)
+  # ============================================================================
+  vox-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vox-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - VOX_HOST=0.0.0.0
+      - VOX_PORT=8080
+      - RUST_LOG=info,vox=debug
+      - VOX_LOG_FORMAT=text
+      # Retrieval settings
+      - VOX_RETRIEVAL_MODE=oreo
+      - VOX_OREO_VECTOR_STORE=qdrant
+      - VOX_OREO_QDRANT_URL=http://qdrant:6333
+      - VOX_OREO_COLLECTION=vox-chunks
+      - VOX_OREO_TANTIVY_DIR=/data/tantivy
+      # Speech-to-text (set to `sarvam` and provide SARVAM_API_KEY for live Sarvam STT)
+      - VOX_STT_MODE=${VOX_STT_MODE:-mock}
+      - SARVAM_API_KEY=${SARVAM_API_KEY:-}
+      # LLM Generation (set to `openai` and provide LLM_API_KEY for OpenAI / any compatible API)
+      - VOX_LLM_MODE=${VOX_LLM_MODE:-extractive}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - VOX_LLM_MODEL=${VOX_LLM_MODEL:-gpt-4o-mini}
+      # Request timeouts (bounded SLAs)
+      - VOX_RETRIEVAL_TIMEOUT_MS=800
+      - VOX_SARVAM_TIMEOUT_MS=3000
+      - VOX_LLM_TIMEOUT_MS=8000
+      - VOX_OREO_QDRANT_TIMEOUT_MS=500
+    volumes:
+      - vox_data:/data
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    networks:
+      - vox_internal
+      - vox_public
+
+  # ============================================================================
+  # Qdrant Vector Database (Kept Private — No host ports published)
+  # ============================================================================
+  qdrant:
+    image: qdrant/qdrant:v1.10.1
+    container_name: vox-qdrant
+    restart: unless-stopped
+    expose:
+      - "6333"
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/localhost/6333' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 2s
+    networks:
+      - vox_internal
+
+networks:
+  # Isolated private backend network (Qdrant is accessible ONLY by vox-api)
+  vox_internal:
+    internal: true
+  # Public bridge network exposing port 8080 for VOX API and Demo UI
+  vox_public:
+    driver: bridge
+
+volumes:
+  vox_data:
+  qdrant_data:

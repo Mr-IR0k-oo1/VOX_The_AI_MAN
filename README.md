@@ -317,6 +317,22 @@ To run the multilingual validation suite and generate the machine-readable bench
 cargo run -p vox-bench -- multilingual benchmarks
 ```
 
+## Production Deployment (Docker & Compose)
+
+VOX is fully containerized and deployable via Docker and Docker Compose.
+
+```sh
+# 1. Start VOX API and private Qdrant vector database
+docker compose up -d --build
+
+# 2. Verify all 7 deployment checks (Health, UI, English, Tamil, Refusals, Voice)
+./scripts/verify_deployment.sh http://localhost:8080
+```
+
+- **Live Demo UI**: Open `http://localhost:8080/` or `http://localhost:8080/demo`
+- **Private Qdrant**: Qdrant runs on an isolated internal network (`vox_internal`, `internal: true`) with no host port exposition.
+- **Detailed Guide**: See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## Development
 
 ```sh

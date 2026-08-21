@@ -162,7 +162,7 @@ impl OreoConfig {
             }
             None => {}
         }
-        if let Some(raw) = source("VOX_OREO_QDRANT_URL") {
+        if let Some(raw) = source("VOX_OREO_QDRANT_URL").or_else(|| source("QDRANT_URL")) {
             config.qdrant_url = raw.trim().trim_end_matches('/').to_owned();
         }
         if let Some(raw) = source("VOX_OREO_COLLECTION") {

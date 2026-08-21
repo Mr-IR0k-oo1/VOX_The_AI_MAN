@@ -60,6 +60,7 @@ pub fn build_router(state: Arc<AppState>) -> Router {
 /// Returns [`ConfigError`] when an HTTP backend client or the embedded
 /// OREO engine cannot be built.
 pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
+    let mut oreo_engine_instance = None;
     let retrieval: Arc<dyn RetrievalClient> = match config.retrieval.mode {
         RetrievalMode::Mock => Arc::new(MockRetrievalClient::new(config.retrieval.mock_delay)),
         RetrievalMode::Http => {
@@ -77,9 +78,12 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
                 .oreo
                 .clone()
                 .ok_or_else(|| ConfigError::OreoEngine("oreo settings missing".into()))?;
-            let engine = vox_oreo::OreoEngine::new(oreo_config)
-                .map_err(|err| ConfigError::OreoEngine(err.to_string()))?;
-            Arc::new(EmbeddedOreoClient::new(Arc::new(engine)))
+            let engine = Arc::new(
+                vox_oreo::OreoEngine::new(oreo_config)
+                    .map_err(|err| ConfigError::OreoEngine(err.to_string()))?,
+            );
+            oreo_engine_instance = Some(Arc::clone(&engine));
+            Arc::new(EmbeddedOreoClient::new(engine))
         }
     };
 
@@ -142,6 +146,7 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
     Ok(AppState {
         pipeline: Arc::new(pipeline),
         retrieval,
+        oreo_engine: oreo_engine_instance,
         started_at: std::time::Instant::now(),
     })
 }

@@ -217,6 +217,7 @@ impl Config {
         let sarvam_api_key = if stt_mode == SttMode::Sarvam {
             Some(
                 source("VOX_SARVAM_API_KEY")
+                    .or_else(|| source("SARVAM_API_KEY"))
                     .filter(|v| !v.trim().is_empty())
                     .ok_or(ConfigError::MissingEnv("VOX_SARVAM_API_KEY"))?,
             )
@@ -237,6 +238,7 @@ impl Config {
         let llm_api_key = if llm_mode == LlmMode::OpenAi {
             Some(
                 source("VOX_LLM_API_KEY")
+                    .or_else(|| source("LLM_API_KEY"))
                     .filter(|v| !v.trim().is_empty())
                     .ok_or(ConfigError::MissingEnv("VOX_LLM_API_KEY"))?,
             )

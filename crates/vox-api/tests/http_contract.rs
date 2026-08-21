@@ -44,7 +44,8 @@ async fn oreo_app(tantivy_dir: &Path) -> axum::Router {
         .await
         .expect("index sample corpus");
 
-    let retrieval: Arc<dyn RetrievalClient> = Arc::new(EmbeddedOreoClient::new(engine));
+    let retrieval: Arc<dyn RetrievalClient> =
+        Arc::new(EmbeddedOreoClient::new(Arc::clone(&engine)));
     let stt: Arc<dyn SpeechRecognizer> = Arc::new(MockRecognizer::new());
     // The embedded engine's index contents are unknown at config time, so the
     // input-guard topic vocabulary stays empty (off-topic check disabled),
@@ -60,6 +61,7 @@ async fn oreo_app(tantivy_dir: &Path) -> axum::Router {
     build_router(Arc::new(AppState {
         pipeline,
         retrieval,
+        oreo_engine: Some(engine),
         started_at: std::time::Instant::now(),
     }))
 }

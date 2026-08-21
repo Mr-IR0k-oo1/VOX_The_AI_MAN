@@ -10,6 +10,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     logging::init_tracing(config.log_format);
 
     let state = Arc::new(build_state(&config)?);
+
+    if config.retrieval.mode == vox_api::RetrievalMode::Oreo {
+        tracing::info!(
+            "auto-indexing bundled multilingual sample corpus into embedded OREO engine"
+        );
+        if let Err(err) = state.index_sample_corpus().await {
+            tracing::warn!(%err, "failed to auto-index sample corpus (may already be populated)");
+        }
+    }
+
     let app = build_router(state);
 
     let addr = format!("{}:{}", config.host, config.port);
