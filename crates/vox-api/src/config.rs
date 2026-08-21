@@ -23,6 +23,15 @@ pub enum SttMode {
     Sarvam,
 }
 
+/// How the answer-generation backend is selected.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LlmMode {
+    /// Deterministic extractive baseline (default; no external dependency).
+    Extractive,
+    /// Any OpenAI-compatible chat-completions endpoint over HTTP.
+    OpenAi,
+}
+
 /// Log output format.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LogFormat {
@@ -62,6 +71,22 @@ pub struct SttConfig {
     pub sarvam_timeout: Duration,
 }
 
+/// Answer-generation backend settings.
+#[derive(Debug, Clone)]
+pub struct LlmConfig {
+    /// Which backend implementation to build.
+    pub mode: LlmMode,
+    /// API key for the OpenAI-compatible endpoint (required in `openai`
+    /// mode).
+    pub api_key: String,
+    /// Model identifier sent in the completion request.
+    pub model: String,
+    /// Base URL of the chat-completions API (`/chat/completions` appended).
+    pub base_url: String,
+    /// Per-request timeout for the generation call.
+    pub timeout: Duration,
+}
+
 /// Full runtime configuration.
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -75,6 +100,10 @@ pub struct Config {
     pub retrieval: RetrievalConfig,
     /// Speech-to-text backend settings.
     pub stt: SttConfig,
+    /// Answer-generation backend settings.
+    pub llm: LlmConfig,
+    /// Minimum best-evidence score for the preliminary answerability check.
+    pub grounding_min_score: f32,
 }
 
 /// Environment parsing failures.
@@ -166,6 +195,26 @@ impl Config {
             None
         };
 
+        let llm_mode = match source("VOX_LLM_MODE").as_deref() {
+            Some("openai") => LlmMode::OpenAi,
+            Some("extractive") | None => LlmMode::Extractive,
+            Some(other) => {
+                return Err(ConfigError::InvalidEnv {
+                    name: "VOX_LLM_MODE",
+                    value: other.to_owned(),
+                })
+            }
+        };
+        let llm_api_key = if llm_mode == LlmMode::OpenAi {
+            Some(
+                source("VOX_LLM_API_KEY")
+                    .filter(|v| !v.trim().is_empty())
+                    .ok_or(ConfigError::MissingEnv("VOX_LLM_API_KEY"))?,
+            )
+        } else {
+            None
+        };
+
         Ok(Self {
             host,
             port,
@@ -201,6 +250,15 @@ impl Config {
                     3000,
                 )?),
             },
+            llm: LlmConfig {
+                mode: llm_mode,
+                api_key: llm_api_key.unwrap_or_default(),
+                model: source("VOX_LLM_MODEL").unwrap_or_else(|| "gpt-4o-mini".to_owned()),
+                base_url: source("VOX_LLM_BASE_URL")
+                    .unwrap_or_else(|| "https://api.openai.com/v1".to_owned()),
+                timeout: Duration::from_millis(parse_env(&source, "VOX_LLM_TIMEOUT_MS", 8000)?),
+            },
+            grounding_min_score: parse_env(&source, "VOX_GROUNDING_MIN_SCORE", 0.30)?,
         })
     }
 }
@@ -241,6 +299,11 @@ mod tests {
         assert_eq!(config.stt.sarvam_model, "saarika:v2.5");
         assert_eq!(config.stt.sarvam_base_url, "https://api.sarvam.ai");
         assert_eq!(config.stt.sarvam_timeout, Duration::from_millis(3000));
+        assert_eq!(config.llm.mode, LlmMode::Extractive);
+        assert_eq!(config.llm.model, "gpt-4o-mini");
+        assert_eq!(config.llm.base_url, "https://api.openai.com/v1");
+        assert_eq!(config.llm.timeout, Duration::from_millis(8000));
+        assert!((config.grounding_min_score - 0.30).abs() < f32::EPSILON);
     }
 
     #[test]
@@ -291,6 +354,52 @@ mod tests {
         let config = Config::from_source(source).expect("parsed");
         assert_eq!(config.stt.mode, SttMode::Sarvam);
         assert_eq!(config.stt.sarvam_api_key, "test-key");
+    }
+
+    #[test]
+    fn from_source_should_require_api_key_in_openai_llm_mode() {
+        let source = source_from(&[("VOX_LLM_MODE", "openai")]);
+        assert!(matches!(
+            Config::from_source(source),
+            Err(ConfigError::MissingEnv("VOX_LLM_API_KEY"))
+        ));
+
+        let blank = source_from(&[("VOX_LLM_MODE", "openai"), ("VOX_LLM_API_KEY", " ")]);
+        assert!(matches!(
+            Config::from_source(blank),
+            Err(ConfigError::MissingEnv("VOX_LLM_API_KEY"))
+        ));
+    }
+
+    #[test]
+    fn from_source_should_accept_openai_mode_with_key_and_overrides() {
+        let source = source_from(&[
+            ("VOX_LLM_MODE", "openai"),
+            ("VOX_LLM_API_KEY", "sk-test"),
+            ("VOX_LLM_MODEL", "llama3:8b"),
+            ("VOX_LLM_BASE_URL", "http://localhost:11434/v1"),
+            ("VOX_LLM_TIMEOUT_MS", "2500"),
+            ("VOX_GROUNDING_MIN_SCORE", "0.5"),
+        ]);
+        let config = Config::from_source(source).expect("parsed");
+        assert_eq!(config.llm.mode, LlmMode::OpenAi);
+        assert_eq!(config.llm.api_key, "sk-test");
+        assert_eq!(config.llm.model, "llama3:8b");
+        assert_eq!(config.llm.base_url, "http://localhost:11434/v1");
+        assert_eq!(config.llm.timeout, Duration::from_millis(2500));
+        assert!((config.grounding_min_score - 0.5).abs() < f32::EPSILON);
+    }
+
+    #[test]
+    fn from_source_should_reject_unknown_llm_modes() {
+        let bad_llm = source_from(&[("VOX_LLM_MODE", "psychic")]);
+        assert!(matches!(
+            Config::from_source(bad_llm),
+            Err(ConfigError::InvalidEnv {
+                name: "VOX_LLM_MODE",
+                ..
+            })
+        ));
     }
 
     #[test]

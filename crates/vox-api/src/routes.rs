@@ -9,6 +9,7 @@ use axum::Json;
 use serde_json::json;
 use vox_core::PipelineError;
 use vox_ingest::IngestError;
+use vox_llm::LlmError;
 use vox_retrieval::RetrievalError;
 use vox_stt::SttError;
 use vox_types::{
@@ -105,6 +106,8 @@ pub enum ApiError {
     Stt(SttError),
     /// The retrieval boundary failed.
     Retrieval(RetrievalError),
+    /// The answer-generation boundary failed.
+    Llm(LlmError),
 }
 
 impl From<PipelineError> for ApiError {
@@ -114,6 +117,7 @@ impl From<PipelineError> for ApiError {
             PipelineError::Ingest(err) => Self::Ingest(err),
             PipelineError::Stt(err) => Self::Stt(err),
             PipelineError::Retrieval(err) => Self::Retrieval(err),
+            PipelineError::Llm(err) => Self::Llm(err),
         }
     }
 }
@@ -142,6 +146,12 @@ impl From<RetrievalError> for ApiError {
     }
 }
 
+impl From<LlmError> for ApiError {
+    fn from(err: LlmError) -> Self {
+        Self::Llm(err)
+    }
+}
+
 impl std::fmt::Display for ApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -149,6 +159,7 @@ impl std::fmt::Display for ApiError {
             ApiError::Ingest(err) => write!(f, "{err}"),
             ApiError::Stt(err) => write!(f, "{err}"),
             ApiError::Retrieval(err) => write!(f, "{err}"),
+            ApiError::Llm(err) => write!(f, "{err}"),
         }
     }
 }
@@ -170,6 +181,8 @@ impl IntoResponse for ApiError {
             }
             ApiError::Stt(SttError::Timeout { .. }) => (StatusCode::GATEWAY_TIMEOUT, "stt_timeout"),
             ApiError::Stt(_) => (StatusCode::BAD_GATEWAY, "stt_error"),
+            ApiError::Llm(LlmError::Timeout { .. }) => (StatusCode::GATEWAY_TIMEOUT, "llm_timeout"),
+            ApiError::Llm(_) => (StatusCode::BAD_GATEWAY, "llm_error"),
         };
         tracing::warn!(error = %self, status = %status, "request failed");
         (

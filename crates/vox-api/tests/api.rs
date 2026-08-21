@@ -45,7 +45,7 @@ async fn health_should_report_ok() {
 }
 
 #[tokio::test]
-async fn query_should_return_language_query_evidence_and_metrics() {
+async fn query_should_return_query_evidence_answer_and_metrics() {
     let payload = json!({
         "query": "What is artificial intelligence?",
         "language": "en",
@@ -66,15 +66,49 @@ async fn query_should_return_language_query_evidence_and_metrics() {
     );
     assert_eq!(body["query"]["intent"], "definition");
     assert_eq!(body["evidence"].as_array().expect("evidence").len(), 3);
+    assert_eq!(body["answerability"], "answerable");
     assert!(
-        body["metrics"]["total"].as_f64().is_some(),
-        "total latency expected"
+        body["answer"]
+            .as_str()
+            .expect("llm answer")
+            .contains("Artificial intelligence"),
+        "extractive answer must quote the evidence"
     );
-    assert!(
-        body["metrics"]["retrieval"].as_f64().is_some(),
-        "retrieval latency expected"
-    );
-    assert!(body.get("answer").is_none(), "no LLM in Phase 1");
+    for stage in [
+        "language",
+        "query_analysis",
+        "retrieval",
+        "grounding",
+        "llm",
+        "total",
+    ] {
+        assert!(
+            body["metrics"][stage].as_f64().is_some(),
+            "{stage} latency expected"
+        );
+    }
+}
+
+#[tokio::test]
+async fn query_should_validate_across_languages() {
+    // English (hint), Hindi (hint), Tamil (auto-detected from script).
+    let cases = [
+        (json!({"query": "What is GST?", "language": "en"}), "en"),
+        (json!({"query": "जीएसटी क्या है?", "language": "hi"}), "hi"),
+        (json!({"query": "குங்குமப்பூ என்றால் என்ன?"}), "ta"),
+    ];
+    for (payload, expected_language) in cases {
+        let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(body["language"], expected_language);
+        assert!(
+            body["answer"].as_str().is_some_and(|a| !a.is_empty()),
+            "expected a generated answer for {expected_language}"
+        );
+        assert!(!body["evidence"].as_array().expect("evidence").is_empty());
+        assert!(body["metrics"]["llm"].as_f64().is_some());
+        assert!(body["metrics"]["total"].as_f64().is_some());
+    }
 }
 
 #[tokio::test]
@@ -118,7 +152,10 @@ async fn voice_query_should_return_transcript_and_evidence() {
         .is_empty());
     assert!(body["language"].is_string());
     assert_eq!(body["evidence"].as_array().expect("evidence").len(), 2);
+    assert_eq!(body["answerability"], "answerable");
+    assert!(body["answer"].is_string());
     assert!(body["metrics"]["stt"].as_f64().is_some());
+    assert!(body["metrics"]["llm"].as_f64().is_some());
     assert!(body["metrics"]["total"].as_f64().is_some());
 }
 

@@ -10,7 +10,9 @@ workspace = true
 [dependencies]
 thiserror = { workspace = true }
 tracing = { workspace = true }
+vox-grounding = { workspace = true }
 vox-ingest = { workspace = true }
+vox-llm = { workspace = true }
 vox-retrieval = { workspace = true }
 vox-stt = { workspace = true }
 vox-types = { workspace = true }

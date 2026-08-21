@@ -18,6 +18,7 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 vox-core = { workspace = true }
 vox-ingest = { workspace = true }
+vox-llm = { workspace = true }
 vox-retrieval = { workspace = true }
 vox-stt = { workspace = true }
 vox-types = { workspace = true }

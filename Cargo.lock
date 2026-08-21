@@ -1512,6 +1512,7 @@ dependencies = [
  "tracing-subscriber",
  "vox-core",
  "vox-ingest",
+ "vox-llm",
  "vox-retrieval",
  "vox-stt",
  "vox-types",
@@ -1530,7 +1531,9 @@ dependencies = [
  "thiserror",
  "tokio",
  "tracing",
+ "vox-grounding",
  "vox-ingest",
+ "vox-llm",
  "vox-retrieval",
  "vox-stt",
  "vox-types",
@@ -1565,9 +1568,13 @@ name = "vox-llm"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "axum",
+ "reqwest",
+ "serde",
  "serde_json",
  "thiserror",
  "tokio",
+ "tracing",
  "vox-types",
 ]
 

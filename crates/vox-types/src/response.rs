@@ -2,6 +2,7 @@
 
 use serde::Serialize;
 
+use crate::decision::Answerability;
 use crate::document::RetrievedDocument;
 use crate::language::Language;
 use crate::latency::LatencyMetrics;
@@ -18,6 +19,11 @@ pub struct QueryResponse {
     pub query: Query,
     /// Mock/sample evidence retrieved for the query.
     pub evidence: Vec<RetrievedDocument>,
+    /// Preliminary evidence-sufficiency verdict from grounding preparation.
+    pub answerability: Answerability,
+    /// Generated answer; absent when generation produced nothing usable.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub answer: Option<String>,
     /// Per-stage latencies in milliseconds plus total.
     pub metrics: LatencyMetrics,
 }

@@ -79,6 +79,26 @@ impl Language {
             Language::Ur => "ur",
         }
     }
+
+    /// Human-readable language name, used in LLM prompt instructions.
+    #[must_use]
+    pub const fn display_name(self) -> &'static str {
+        match self {
+            Language::As => "Assamese",
+            Language::Bn => "Bengali",
+            Language::En => "English",
+            Language::Gu => "Gujarati",
+            Language::Hi => "Hindi",
+            Language::Kn => "Kannada",
+            Language::Ml => "Malayalam",
+            Language::Mr => "Marathi",
+            Language::Or => "Odia",
+            Language::Pa => "Punjabi",
+            Language::Ta => "Tamil",
+            Language::Te => "Telugu",
+            Language::Ur => "Urdu",
+        }
+    }
 }
 
 impl fmt::Display for Language {

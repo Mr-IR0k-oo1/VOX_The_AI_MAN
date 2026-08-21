@@ -2,6 +2,7 @@
 
 use thiserror::Error;
 use vox_ingest::IngestError;
+use vox_llm::LlmError;
 use vox_retrieval::RetrievalError;
 use vox_stt::SttError;
 use vox_types::ValidationError;
@@ -21,4 +22,7 @@ pub enum PipelineError {
     /// The retrieval boundary failed after retries.
     #[error(transparent)]
     Retrieval(#[from] RetrievalError),
+    /// The answer-generation boundary failed after retries.
+    #[error(transparent)]
+    Llm(#[from] LlmError),
 }

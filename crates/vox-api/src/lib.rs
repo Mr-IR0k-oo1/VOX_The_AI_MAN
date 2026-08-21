@@ -15,10 +15,11 @@ use std::sync::Arc;
 use axum::routing::{get, post};
 use axum::Router;
 use vox_core::VoxPipeline;
+use vox_llm::{ExtractiveProvider, LlmProvider, OpenAiCompatibleProvider};
 use vox_retrieval::{HttpRetrievalClient, MockRetrievalClient, RetrievalClient};
 use vox_stt::{MockRecognizer, SarvamRecognizer, SpeechRecognizer};
 
-pub use crate::config::{Config, ConfigError, LogFormat, RetrievalMode, SttMode};
+pub use crate::config::{Config, ConfigError, LlmMode, LogFormat, RetrievalMode, SttMode};
 pub use crate::state::AppState;
 
 /// The endpoints frozen in Phase 0, as `(method, path)` pairs.
@@ -80,15 +81,37 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
         }
     };
 
+    let llm: Arc<dyn LlmProvider> = match config.llm.mode {
+        LlmMode::Extractive => Arc::new(ExtractiveProvider),
+        LlmMode::OpenAi => {
+            let client = OpenAiCompatibleProvider::new(
+                config.llm.api_key.clone(),
+                config.llm.model.clone(),
+                config.llm.base_url.clone(),
+                config.llm.timeout,
+            )
+            .map_err(|err| ConfigError::HttpClient(err.to_string()))?;
+            Arc::new(client)
+        }
+    };
+
     tracing::info!(
         retrieval = retrieval.name(),
         stt = stt.name(),
+        llm = llm.name(),
         retrieval_timeout_ms = config.retrieval.timeout.as_millis() as u64,
         stt_timeout_ms = config.stt.sarvam_timeout.as_millis() as u64,
+        llm_timeout_ms = config.llm.timeout.as_millis() as u64,
+        grounding_min_score = config.grounding_min_score,
         "backends selected"
     );
 
-    let pipeline = VoxPipeline::new(Arc::clone(&stt), Arc::clone(&retrieval));
+    let pipeline = VoxPipeline::new(
+        Arc::clone(&stt),
+        Arc::clone(&retrieval),
+        Arc::clone(&llm),
+        config.grounding_min_score,
+    );
 
     Ok(AppState {
         pipeline: Arc::new(pipeline),
