@@ -15,7 +15,9 @@ use axum::routing::{get, post};
 use axum::Router;
 use vox_core::{PipelineConfig, VoiceRagPipeline};
 use vox_llm::{ExtractiveProvider, LlmProvider};
-use vox_retrieval::{HttpRetrievalClient, MockRetrievalClient, RetrievalClient};
+use vox_retrieval::{
+    EmbeddedOreoClient, HttpRetrievalClient, MockRetrievalClient, RetrievalClient,
+};
 use vox_stt::{SpeechRecognizer, StubSpeechRecognizer};
 
 pub use crate::config::{Config, ConfigError, LogFormat, RetrievalMode};
@@ -44,7 +46,8 @@ pub fn build_router(state: Arc<AppState>) -> Router {
 /// Builds [`AppState`] from `config`, selecting the backend implementations.
 ///
 /// # Errors
-/// Returns [`ConfigError`] when the HTTP retrieval backend cannot be built.
+/// Returns [`ConfigError`] when the HTTP retrieval backend or the embedded
+/// OREO engine cannot be built.
 pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
     let retrieval: Arc<dyn RetrievalClient> = match config.retrieval.mode {
         RetrievalMode::Mock => Arc::new(MockRetrievalClient::new(config.retrieval.mock_delay)),
@@ -56,6 +59,16 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
             )
             .map_err(|err| ConfigError::HttpClient(err.to_string()))?;
             Arc::new(client)
+        }
+        RetrievalMode::Oreo => {
+            let oreo_config = config
+                .retrieval
+                .oreo
+                .clone()
+                .ok_or_else(|| ConfigError::OreoEngine("oreo settings missing".into()))?;
+            let engine = vox_oreo::OreoEngine::new(oreo_config)
+                .map_err(|err| ConfigError::OreoEngine(err.to_string()))?;
+            Arc::new(EmbeddedOreoClient::new(Arc::new(engine)))
         }
     };
 

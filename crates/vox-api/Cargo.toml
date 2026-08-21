@@ -19,6 +19,12 @@ tracing-subscriber = { workspace = true }
 vox-core = { workspace = true }
 vox-ingest = { workspace = true }
 vox-llm = { workspace = true }
+vox-oreo = { workspace = true }
 vox-retrieval = { workspace = true }
 vox-stt = { workspace = true }
 vox-types = { workspace = true }
+
+[dev-dependencies]
+http-body-util = "0.1"
+tempfile = { workspace = true }
+tower = { workspace = true }

@@ -13,6 +13,8 @@ pub enum RetrievalMode {
     Mock,
     /// Real retrieval service over HTTP.
     Http,
+    /// The OREO retrieval engine, embedded in this process.
+    Oreo,
 }
 
 /// Log output format.
@@ -37,6 +39,8 @@ pub struct RetrievalConfig {
     pub retry: RetryPolicy,
     /// Artificial latency injected by the mock backend.
     pub mock_delay: Duration,
+    /// OREO engine settings; present in [`RetrievalMode::Oreo`].
+    pub oreo: Option<vox_oreo::OreoConfig>,
 }
 
 /// Full runtime configuration.
@@ -71,6 +75,12 @@ pub enum ConfigError {
     /// The HTTP client for the retrieval backend could not be built.
     #[error("failed to build retrieval http client: {0}")]
     HttpClient(String),
+    /// The embedded OREO engine could not be built.
+    #[error("failed to build oreo engine: {0}")]
+    OreoEngine(String),
+    /// An OREO engine setting failed to parse.
+    #[error("invalid oreo configuration: {0}")]
+    OreoConfig(String),
 }
 
 impl Config {
@@ -107,6 +117,7 @@ impl Config {
         let mode = match source("VOX_RETRIEVAL_MODE").as_deref() {
             Some("http") => RetrievalMode::Http,
             Some("mock") | None => RetrievalMode::Mock,
+            Some("oreo") => RetrievalMode::Oreo,
             Some(other) => {
                 return Err(ConfigError::InvalidEnv {
                     name: "VOX_RETRIEVAL_MODE",
@@ -118,6 +129,14 @@ impl Config {
             Some(
                 source("VOX_RETRIEVAL_BASE_URL")
                     .ok_or(ConfigError::MissingEnv("VOX_RETRIEVAL_BASE_URL"))?,
+            )
+        } else {
+            None
+        };
+        let oreo = if mode == RetrievalMode::Oreo {
+            Some(
+                vox_oreo::OreoConfig::from_source(&source)
+                    .map_err(|err| ConfigError::OreoConfig(err.to_string()))?,
             )
         } else {
             None
@@ -144,6 +163,7 @@ impl Config {
                     )?),
                 },
                 mock_delay: Duration::from_millis(parse_env(&source, "VOX_MOCK_DELAY_MS", 0)?),
+                oreo,
             },
             pipeline: PipelineConfig {
                 grounding_min_score: parse_env(&source, "VOX_GROUNDING_MIN_SCORE", 0.30)?,
