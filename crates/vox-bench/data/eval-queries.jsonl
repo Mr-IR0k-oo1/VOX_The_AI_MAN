@@ -1,0 +1,36 @@
+{"qid":"en-01","query":"What is GST and when was it introduced in India?","language":"en","relevant":["en-gst-001"]}
+{"qid":"en-02","query":"Who needs to register for GST and what returns must they file?","language":"en","relevant":["en-gst-002"]}
+{"qid":"en-03","query":"What is Aadhaar and who issues it?","language":"en","relevant":["en-aadhaar-001"]}
+{"qid":"en-04","query":"How do I update my Aadhaar address online?","language":"en","relevant":["en-aadhaar-002"]}
+{"qid":"en-05","query":"Which ITR form should a salaried individual file?","language":"en","relevant":["en-itrfiling-001"]}
+{"qid":"en-06","query":"What is the last date to file income tax returns?","language":"en","relevant":["en-itrfiling-002"]}
+{"qid":"en-07","query":"What is a PAN card used for?","language":"en","relevant":["en-pancard-001"]}
+{"qid":"en-08","query":"How do I apply for an Indian passport online?","language":"en","relevant":["en-passport-001"]}
+{"qid":"en-09","query":"Which vaccines are given free under India's immunisation programme?","language":"en","relevant":["en-vaccination-001"]}
+{"qid":"en-10","query":"How can I get a new Chennai metro water connection?","language":"en","relevant":["en-metro-001"]}
+{"qid":"en-11","query":"Aadhaar enrolment requirements and address update process","language":"en","relevant":["en-aadhaar-001","en-aadhaar-002"]}
+{"qid":"en-12","query":"Which taxes did GST subsume into a single framework?","language":"en","relevant":["en-gst-001"]}
+{"qid":"hi-01","query":"जीएसटी क्या है और भारत में कब लागू हुआ?","language":"hi","relevant":["hi-gst-001"]}
+{"qid":"hi-02","query":"जीएसटी पंजीकरण किन व्यवसायों के लिए अनिवार्य है?","language":"hi","relevant":["hi-gst-002"]}
+{"qid":"hi-03","query":"आधार क्या है और यह कौन जारी करता है?","language":"hi","relevant":["hi-aadhaar-001"]}
+{"qid":"hi-04","query":"आधार में पता ऑनलाइन कैसे अपडेट करें?","language":"hi","relevant":["hi-aadhaar-002"]}
+{"qid":"hi-05","query":"वेतनभोगी व्यक्तियों के लिए कौन सा आईटीआर फॉर्म लागू होता है?","language":"hi","relevant":["hi-itrfiling-001"]}
+{"qid":"hi-06","query":"भारतीय रेलवे में टिकट आरक्षण ऑनलाइन कैसे करें?","language":"hi","relevant":["hi-railway-001"]}
+{"qid":"hi-07","query":"तत्काल योजना में टिकट कैसे मिलता है?","language":"hi","relevant":["hi-railway-001"]}
+{"qid":"hi-08","query":"आधार नामांकन के लिए कौन से दस्तावेज़ चाहिए?","language":"hi","relevant":["hi-aadhaar-001"]}
+{"qid":"hi-09","query":"जीएसटीआर-1 और जीएसटीआर-3बी रिटर्न कब दाखिल करने होते हैं?","language":"hi","relevant":["hi-gst-002"]}
+{"qid":"hi-10","query":"आधार पता अपडेट की स्थिति कैसे देखें?","language":"hi","relevant":["hi-aadhaar-002"]}
+{"qid":"hi-11","query":"आईटीआर-1 सहज फॉर्म कब लागू होता है?","language":"hi","relevant":["hi-itrfiling-001"]}
+{"qid":"hi-12","query":"आधार नामांकन और पता अपडेट प्रक्रिया के बारे में बताइए","language":"hi","relevant":["hi-aadhaar-001","hi-aadhaar-002"]}
+{"qid":"ta-01","query":"ஜிஎஸ்டி என்றால் என்ன, இந்தியாவில் எப்போது அறிமுகப்படுத்தப்பட்டது?","language":"ta","relevant":["ta-gst-001"]}
+{"qid":"ta-02","query":"ஆதார் என்றால் என்ன, யார் வழங்குகிறார்கள்?","language":"ta","relevant":["ta-aadhaar-001"]}
+{"qid":"ta-03","query":"சென்னை மெட்ரோ நீர் இணைப்பு எப்படி பெறுவது?","language":"ta","relevant":["ta-water-001"]}
+{"qid":"ta-04","query":"தமிழ்நாடு பேருந்து பாஸ் யாருக்குக் கிடைக்கும்?","language":"ta","relevant":["ta-buspass-001"]}
+{"qid":"ta-05","query":"ஆதார் பதிவுக்கு என்ன ஆவணங்கள் தேவை?","language":"ta","relevant":["ta-aadhaar-001"]}
+{"qid":"ta-06","query":"ஜிஎஸ்டி எந்த வரிகளை ஒரே அமைப்பில் இணைத்தது?","language":"ta","relevant":["ta-gst-001"]}
+{"qid":"ta-07","query":"புதிய குடிநீர் இணைப்புக்கு எந்த எண் தேவை?","language":"ta","relevant":["ta-water-001"]}
+{"qid":"ta-08","query":"மாணவர்கள் பேருந்து பாஸ் எங்கே விண்ணப்பிக்கலாம்?","language":"ta","relevant":["ta-buspass-001"]}
+{"qid":"ta-09","query":"ஆதார் எண் எத்தனை இலக்கம் கொண்டது?","language":"ta","relevant":["ta-aadhaar-001"]}
+{"qid":"ta-10","query":"ஜிஎஸ்டி எந்த ஆண்டு அறிமுகப்படுத்தப்பட்டது?","language":"ta","relevant":["ta-gst-001"]}
+{"qid":"ta-11","query":"சொத்து வரி எண் எதற்குப் பயன்படுகிறது?","language":"ta","relevant":["ta-water-001"]}
+{"qid":"ta-12","query":"மாத பேருந்து பாஸ் விண்ணப்பிக்கும் முறை என்ன?","language":"ta","relevant":["ta-buspass-001"]}

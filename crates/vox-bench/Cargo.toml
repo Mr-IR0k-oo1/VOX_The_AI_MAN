@@ -1,8 +1,23 @@
 [package]
 name = "vox-bench"
-description = "Benchmarking utilities for VOX latency measurement"
+description = "VOX benchmarking: retrieval evaluation runner producing Phase 3 quality/latency baselines"
 version.workspace = true
 edition.workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true }
+vox-oreo = { workspace = true }
+vox-types = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52"
+
+[[bin]]
+name = "vox-bench"
+path = "src/main.rs"
