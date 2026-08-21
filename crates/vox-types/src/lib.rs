@@ -14,6 +14,7 @@ pub mod error;
 pub mod language;
 pub mod latency;
 pub mod query;
+pub mod response;
 pub mod voice;
 
 pub use answer::AnswerResponse;
@@ -24,4 +25,5 @@ pub use error::{ValidationError, MAX_TOP_K};
 pub use language::Language;
 pub use latency::{ms, LatencyMetrics};
 pub use query::{Query, QueryIntent};
+pub use response::QueryResponse;
 pub use voice::{Transcript, VoiceRequest, VoiceResponse};
