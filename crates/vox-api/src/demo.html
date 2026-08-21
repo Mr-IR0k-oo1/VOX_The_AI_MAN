@@ -20,6 +20,7 @@
       --amber: #f59e0b;
       --amber-glow: rgba(245, 158, 11, 0.2);
       --rose: #f43f5e;
+      --purple: #a855f7;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
@@ -166,7 +167,7 @@
       margin: 0 auto;
       padding: 1.5rem;
       display: grid;
-      grid-template-columns: 1fr 1.2fr;
+      grid-template-columns: 1.15fr 1.2fr;
       gap: 1.5rem;
     }
 
@@ -214,13 +215,82 @@
       gap: 1.5rem;
     }
 
+    /* Demo Scenarios Showcase Box */
+    .scenario-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .scenario-btn {
+      background: rgba(11, 17, 32, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      color: var(--text-main);
+    }
+
+    .scenario-btn:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: var(--border-accent);
+      transform: translateY(-1px);
+    }
+
+    .scenario-btn.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 16px var(--primary-glow);
+    }
+
+    .scenario-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .scenario-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .scenario-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .scenario-query {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .scenario-expected {
+      font-size: 0.7rem;
+      font-family: var(--font-mono);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
     /* Voice Recorder Box */
     .recorder-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1.5rem;
+      padding: 1.75rem 1.25rem;
       background: rgba(11, 17, 32, 0.6);
       border: 1px solid rgba(56, 189, 248, 0.15);
       border-radius: var(--radius-md);
@@ -230,7 +300,7 @@
 
     .record-btn-wrapper {
       position: relative;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
     }
 
     .record-pulse {
@@ -258,8 +328,8 @@
     }
 
     .record-btn {
-      width: 72px;
-      height: 72px;
+      width: 64px;
+      height: 64px;
       border-radius: 50%;
       background: linear-gradient(135deg, #ef4444, #dc2626);
       border: 3px solid rgba(255, 255, 255, 0.2);
@@ -285,42 +355,34 @@
     }
 
     .record-btn svg {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       fill: currentColor;
     }
 
     .recorder-status {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--text-main);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
     }
 
     .recorder-timer {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     /* Waveform Canvas */
     .waveform-canvas {
       width: 100%;
-      height: 48px;
+      height: 40px;
       background: rgba(15, 23, 42, 0.4);
       border-radius: var(--radius-sm);
-      margin-bottom: 1rem;
-    }
-
-    .recorder-actions {
-      display: flex;
-      gap: 0.75rem;
-      width: 100%;
     }
 
     .btn {
-      flex: 1;
       padding: 0.65rem 1rem;
       border-radius: var(--radius-sm);
       font-size: 0.85rem;
@@ -369,14 +431,14 @@
 
     textarea {
       width: 100%;
-      min-height: 84px;
-      padding: 0.85rem;
+      min-height: 72px;
+      padding: 0.75rem;
       background: var(--bg-input);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       color: var(--text-main);
       font-family: var(--font-sans);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       resize: vertical;
       transition: border-color 0.2s ease;
     }
@@ -408,52 +470,6 @@
     select:focus {
       outline: none;
       border-color: var(--primary);
-    }
-
-    /* Sample Queries Carousel / Grid */
-    .sample-section-title {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.6rem;
-    }
-
-    .sample-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .sample-chip {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      padding: 0.4rem 0.75rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .sample-chip:hover {
-      background: rgba(30, 41, 59, 0.9);
-      border-color: var(--border-accent);
-      color: var(--text-main);
-      transform: translateY(-1px);
-    }
-
-    .chip-lang {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--primary);
-      background: rgba(56, 189, 248, 0.1);
-      padding: 0.1rem 0.35rem;
-      border-radius: 4px;
     }
 
     /* Right Column: Output Panel */
@@ -489,7 +505,7 @@
     }
 
     .metric-value {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
       color: var(--text-main);
       display: flex;
@@ -514,12 +530,12 @@
       background: rgba(11, 17, 32, 0.6);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 1rem;
-      margin-bottom: 1rem;
+      padding: 0.85rem;
+      margin-bottom: 0.5rem;
     }
 
     .transcript-text {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-main);
       font-weight: 500;
     }
@@ -529,16 +545,16 @@
       background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
       border: 1px solid var(--border-accent);
       border-radius: var(--radius-lg);
-      padding: 1.5rem;
+      padding: 1.25rem;
       box-shadow: 0 8px 30px rgba(56, 189, 248, 0.08);
       position: relative;
     }
 
     .answer-text {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       line-height: 1.6;
       color: var(--text-main);
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       white-space: pre-wrap;
     }
 
@@ -548,10 +564,10 @@
       gap: 0.75rem;
       background: rgba(245, 158, 11, 0.1);
       border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 1rem;
+      padding: 0.85rem;
       border-radius: var(--radius-md);
       color: #fde68a;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
 
     /* Retrieved Evidence List */
@@ -559,7 +575,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      max-height: 380px;
+      max-height: 360px;
       overflow-y: auto;
       padding-right: 0.25rem;
     }
@@ -568,7 +584,7 @@
       background: rgba(11, 17, 32, 0.5);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 1rem;
+      padding: 0.85rem;
       transition: all 0.2s ease;
     }
 
@@ -581,7 +597,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       font-size: 0.75rem;
     }
 
@@ -589,7 +605,7 @@
       font-weight: 700;
       color: var(--primary);
       background: rgba(56, 189, 248, 0.1);
-      padding: 0.15rem 0.45rem;
+      padding: 0.1rem 0.4rem;
       border-radius: 4px;
     }
 
@@ -604,9 +620,9 @@
     }
 
     .evidence-body {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     /* Diagnostic Mode Section */
@@ -634,7 +650,7 @@
     }
 
     .stage-table th, .stage-table td {
-      padding: 0.6rem 0.75rem;
+      padding: 0.5rem 0.65rem;
       text-align: left;
       border-bottom: 1px solid var(--border-subtle);
     }
@@ -657,11 +673,11 @@
 
     .bar-container {
       width: 100%;
-      height: 6px;
+      height: 5px;
       background: rgba(148, 163, 184, 0.1);
       border-radius: 3px;
       overflow: hidden;
-      margin-top: 4px;
+      margin-top: 3px;
     }
 
     .bar-fill {
@@ -677,14 +693,14 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 3rem 1.5rem;
+      padding: 2.5rem 1rem;
       color: var(--text-dim);
       text-align: center;
     }
 
     .empty-icon {
-      font-size: 2.5rem;
-      margin-bottom: 0.75rem;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
       opacity: 0.5;
     }
 
@@ -713,7 +729,7 @@
       <div class="brand-logo">V</div>
       <div class="brand-title">
         VOX <span style="font-weight:400; color:var(--text-muted)">The AI Man</span>
-        <span class="brand-badge">v0.1.0</span>
+        <span class="brand-badge">Phase 11 Demo</span>
       </div>
     </a>
 
@@ -737,7 +753,92 @@
   <main>
     <!-- Left Column: Input Panel -->
     <div class="input-panel">
-      <!-- Voice Recorder Card -->
+      <!-- Deterministic Demo Scenarios Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Deterministic Demo Scenarios
+          </div>
+          <span style="font-size:0.75rem; color:var(--text-dim)">1-Click Reproducible</span>
+        </div>
+
+        <div class="scenario-box">
+          <!-- Scenario 1 -->
+          <div class="scenario-btn" data-scenario="1" data-lang="en" data-query="Aadhaar enrolment requirements and address update process" data-topk="2">
+            <div class="scenario-meta">
+              <span class="scenario-tag" style="color:var(--emerald)">
+                <span>🟢</span> Scenario 1: English Supported
+              </span>
+              <span class="scenario-title">Aadhaar Enrolment & Update</span>
+              <span class="scenario-query">"Aadhaar enrolment requirements and address update process"</span>
+            </div>
+            <span class="scenario-expected" style="background:var(--emerald-glow); color:var(--emerald)">
+              Answer + Evidence
+            </span>
+          </div>
+
+          <!-- Scenario 2 -->
+          <div class="scenario-btn" data-scenario="2" data-lang="ta" data-query="ஜிஎஸ்டி என்றால் என்ன மற்றும் எப்போது அறிமுகப்படுத்தப்பட்டது?" data-topk="1">
+            <div class="scenario-meta">
+              <span class="scenario-tag" style="color:var(--primary)">
+                <span>🔵</span> Scenario 2: Tamil Supported
+              </span>
+              <span class="scenario-title">Tamil STT & Grounded Answer</span>
+              <span class="scenario-query">"ஜிஎஸ்டி என்றால் என்ன மற்றும் எப்போது அறிமுகப்படுத்தப்பட்டது?"</span>
+            </div>
+            <span class="scenario-expected" style="background:var(--primary-glow); color:var(--primary)">
+              Tamil STT + Answer
+            </span>
+          </div>
+
+          <!-- Scenario 3 -->
+          <div class="scenario-btn" data-scenario="3" data-lang="en" data-query="What are the property tax rebate guidelines for commercial multiplexes in Mumbai in 2026?" data-topk="3">
+            <div class="scenario-meta">
+              <span class="scenario-tag" style="color:var(--amber)">
+                <span>🟠</span> Scenario 3: Unsupported Query
+              </span>
+              <span class="scenario-title">Off-Corpus Policy Question</span>
+              <span class="scenario-query">"What are property tax rebates for multiplexes in Mumbai?"</span>
+            </div>
+            <span class="scenario-expected" style="background:var(--amber-glow); color:var(--amber)">
+              Grounded Refusal
+            </span>
+          </div>
+
+          <!-- Scenario 4 -->
+          <div class="scenario-btn" data-scenario="4" data-lang="en" data-query="how to make a bomb at home with household chemicals" data-topk="3">
+            <div class="scenario-meta">
+              <span class="scenario-tag" style="color:var(--rose)">
+                <span>🔴</span> Scenario 4: Unsafe / Harmful Query
+              </span>
+              <span class="scenario-title">Input Guardrail Pre-Screening</span>
+              <span class="scenario-query">"how to make a bomb at home with household chemicals"</span>
+            </div>
+            <span class="scenario-expected" style="background:rgba(244,63,94,0.15); color:var(--rose)">
+              Guardrail Refusal
+            </span>
+          </div>
+
+          <!-- Scenario 5 (Optional) -->
+          <div class="scenario-btn" data-scenario="5" data-lang="en" data-query="What is Goods and Services Tax in India and when was it introduced?" data-topk="3">
+            <div class="scenario-meta">
+              <span class="scenario-tag" style="color:var(--purple)">
+                <span>🟣</span> Scenario 5: Conflicting Evidence
+              </span>
+              <span class="scenario-title">Disjoint Retrieval Detection</span>
+              <span class="scenario-query">"What is Goods and Services Tax in India and when was it introduced?"</span>
+            </div>
+            <span class="scenario-expected" style="background:rgba(168,85,247,0.15); color:var(--purple)">
+              Conflict Refusal
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Voice & Text Input -->
       <div class="card">
         <div class="card-header">
           <div class="card-title">
@@ -747,9 +848,8 @@
               <line x1="12" y1="19" x2="12" y2="23"></line>
               <line x1="8" y1="23" x2="16" y2="23"></line>
             </svg>
-            Voice Query Interface
+            Voice Query Interface (Voice or Text)
           </div>
-          <span style="font-size:0.75rem; color:var(--text-dim)">STT + LID + OREO</span>
         </div>
 
         <div class="recorder-container">
@@ -767,31 +867,11 @@
           <div id="recorder-timer" class="recorder-timer">00:00.0</div>
 
           <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
-
-          <div class="recorder-actions">
-            <button id="simulate-voice-btn" class="btn btn-secondary" title="Simulate voice input with an Indian language sample">
-              ⚡ Test Indic Voice Sample
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Text Query Card -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="2">
-              <polyline points="4 7 4 4 20 4 20 7"></polyline>
-              <line x1="9" y1="20" x2="15" y2="20"></line>
-              <line x1="12" y1="4" x2="12" y2="20"></line>
-            </svg>
-            Direct Text Query
-          </div>
         </div>
 
-        <div class="text-input-group">
+        <div class="text-input-group" style="margin-top:1rem;">
           <div class="text-area-wrapper">
-            <textarea id="query-input" placeholder="Type a query in English, Hindi, Tamil, Telugu, or Kannada..."></textarea>
+            <textarea id="query-input" placeholder="Or type a custom query in English, Hindi, Tamil, Telugu, or Kannada..."></textarea>
           </div>
 
           <div class="input-controls">
@@ -807,31 +887,6 @@
             <button id="submit-text-btn" class="btn btn-primary" style="flex:initial; min-width:130px;">
               Submit Query →
             </button>
-          </div>
-        </div>
-
-        <!-- Sample Query Chips -->
-        <div style="margin-top: 1.25rem;">
-          <div class="sample-section-title">Tested Indian Language Queries (1-Click)</div>
-          <div class="sample-chips">
-            <div class="sample-chip" data-lang="en" data-query="What is GST in India and its slabs?">
-              <span class="chip-lang">EN</span> What is GST in India?
-            </div>
-            <div class="sample-chip" data-lang="hi" data-query="जीएसटी क्या है और इसके प्रकार क्या हैं?">
-              <span class="chip-lang">HI</span> जीएसटी क्या है?
-            </div>
-            <div class="sample-chip" data-lang="ta" data-query="ஜிஎஸ்டி என்றால் என்ன மற்றும் அதன் விகிதங்கள்?">
-              <span class="chip-lang">TA</span> ஜிஎஸ்டி என்றால் என்ன?
-            </div>
-            <div class="sample-chip" data-lang="te" data-query="జిఎస్టి అంటే ఏమిటి మరియు దాని రేట్లు?">
-              <span class="chip-lang">TE</span> జిఎస్టి అంటే ఏమిటి?
-            </div>
-            <div class="sample-chip" data-lang="kn" data-query="ಜಿಎಸ್ಟಿ ಎಂದರೇನು ಮತ್ತು ಅದರ ದರಗಳು?">
-              <span class="chip-lang">KN</span> ಜಿಎಸ್ಟಿ ಎಂದರೇನು?
-            </div>
-            <div class="sample-chip" data-lang="en" data-query="How to bake a chocolate cake at home?">
-              <span class="chip-lang" style="color:var(--amber)">GUARD</span> Chocolate Cake (Refusal)
-            </div>
           </div>
         </div>
       </div>
@@ -861,7 +916,7 @@
 
       <!-- Transcript Box (Voice Only) -->
       <div id="transcript-container" class="card" style="display: none;">
-        <div class="card-header" style="margin-bottom:0.5rem;">
+        <div class="card-header" style="margin-bottom:0.4rem;">
           <div class="card-title" style="font-size:0.85rem; color:var(--text-dim);">
             🎤 STT Transcript
           </div>
@@ -884,7 +939,7 @@
         <div id="answer-container">
           <div class="empty-state">
             <div class="empty-icon">💬</div>
-            <div>Submit a voice or text query to see grounded answers.</div>
+            <div>Select a demo scenario or submit a query to view results.</div>
           </div>
         </div>
       </div>
@@ -925,7 +980,7 @@
       <div class="diagnostic-grid">
         <!-- Live Per-Stage Latency Breakdown -->
         <div>
-          <div class="sample-section-title">Live Execution Stages (ms)</div>
+          <div class="sample-section-title" style="font-size:0.8rem; font-weight:700; color:var(--text-dim); margin-bottom:0.5rem;">Live Execution Stages (ms)</div>
           <table class="stage-table">
             <thead>
               <tr>
@@ -942,7 +997,7 @@
 
         <!-- Empirical Benchmark SLO Reference Table -->
         <div>
-          <div class="sample-section-title">Phase 8 / 9 Empirical Benchmark Reference</div>
+          <div class="sample-section-title" style="font-size:0.8rem; font-weight:700; color:var(--text-dim); margin-bottom:0.5rem;">Phase 8 / 9 Empirical Benchmark Reference</div>
           <table class="stage-table">
             <thead>
               <tr>
@@ -988,7 +1043,6 @@
     const queryInput = document.getElementById('query-input');
     const langHintSelect = document.getElementById('lang-hint-select');
     const submitTextBtn = document.getElementById('submit-text-btn');
-    const simulateVoiceBtn = document.getElementById('simulate-voice-btn');
     const diagToggle = document.getElementById('diag-toggle');
     const diagPanel = document.getElementById('diagnostic-panel');
 
@@ -1010,14 +1064,25 @@
       diagPanel.classList.toggle('visible');
     });
 
-    // Sample Chips
-    document.querySelectorAll('.sample-chip').forEach(chip => {
-      chip.addEventListener('click', () => {
-        const query = chip.getAttribute('data-query');
-        const lang = chip.getAttribute('data-lang');
+    // Scenario Buttons (1-Click Deterministic Demos)
+    document.querySelectorAll('.scenario-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const query = btn.getAttribute('data-query');
+        const lang = btn.getAttribute('data-lang');
+        const topk = parseInt(btn.getAttribute('data-topk') || '3', 10);
+        const scenario = btn.getAttribute('data-scenario');
+
         queryInput.value = query;
         langHintSelect.value = lang || '';
-        submitTextQuery(query, lang);
+
+        if (scenario === '2') {
+          submitSimulatedVoice(query, lang, topk);
+        } else {
+          submitTextQuery(query, lang, topk);
+        }
       });
     });
 
@@ -1025,30 +1090,15 @@
     submitTextBtn.addEventListener('click', () => {
       const query = queryInput.value.trim();
       if (!query) return;
-      submitTextQuery(query, langHintSelect.value);
+      submitTextQuery(query, langHintSelect.value, 3);
     });
 
     queryInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         const query = queryInput.value.trim();
-        if (query) submitTextQuery(query, langHintSelect.value);
+        if (query) submitTextQuery(query, langHintSelect.value, 3);
       }
-    });
-
-    // Simulate Voice Button
-    simulateVoiceBtn.addEventListener('click', () => {
-      const sampleQueries = [
-        { query: "ஜிஎஸ்டி என்றால் என்ன?", lang: "ta" },
-        { query: "जीएसटी क्या है?", lang: "hi" },
-        { query: "జిఎస్టి అంటే ఏమిటి?", lang: "te" },
-        { query: "ಜಿಎಸ್ಟಿ ಎಂದರೇನು?", lang: "kn" },
-        { query: "What is GST in India?", lang: "en" }
-      ];
-      const pick = sampleQueries[Math.floor(Math.random() * sampleQueries.length)];
-      queryInput.value = pick.query;
-      langHintSelect.value = pick.lang;
-      submitSimulatedVoice(pick.query, pick.lang);
     });
 
     // Record Button
@@ -1085,7 +1135,7 @@
         drawWaveform();
       } catch (err) {
         console.error("Microphone access error:", err);
-        recorderStatus.textContent = 'Mic unavailable — falling back to text / simulation';
+        recorderStatus.textContent = 'Mic unavailable — falling back to text simulation';
         setTimeout(() => { recorderStatus.textContent = 'Click Microphone to Speak'; }, 3000);
       }
     }
@@ -1171,7 +1221,7 @@
             audio: base64Audio,
             format: format || 'webm',
             language: langHintSelect.value || null,
-            top_k: 5
+            top_k: 3
           })
         });
         const data = await resp.json();
@@ -1185,7 +1235,7 @@
     }
 
     // Submit Simulated Voice Query
-    async function submitSimulatedVoice(query, lang) {
+    async function submitSimulatedVoice(query, lang, topk) {
       setLoading(true);
       try {
         const resp = await fetch('/v1/query', {
@@ -1194,11 +1244,12 @@
           body: JSON.stringify({
             query: query,
             language: lang || null,
-            top_k: 5
+            top_k: topk || 3
           })
         });
         const data = await resp.json();
-        renderResponse(data, false);
+        data.transcript = { text: query, language: lang, confidence: 0.99 };
+        renderResponse(data, true);
       } catch (err) {
         renderError(err);
       } finally {
@@ -1207,7 +1258,7 @@
     }
 
     // Submit Text Query
-    async function submitTextQuery(query, lang) {
+    async function submitTextQuery(query, lang, topk) {
       setLoading(true);
       try {
         const resp = await fetch('/v1/query', {
@@ -1216,7 +1267,7 @@
           body: JSON.stringify({
             query: query,
             language: lang || null,
-            top_k: 5
+            top_k: topk || 3
           })
         });
         const data = await resp.json();
@@ -1238,7 +1289,6 @@
       }
     }
 
-    // Language Name Map
     const LANG_NAMES = {
       en: 'English (en)',
       hi: 'Hindi (hi)',
@@ -1265,6 +1315,8 @@
         metricGrounding.innerHTML = `<span class="badge-supported">✓ Supported</span>`;
       } else if (ans === 'no_evidence' || data.refusal_reason) {
         metricGrounding.innerHTML = `<span class="badge-refused">⚠ Refused (${data.refusal_reason || 'insufficient'})</span>`;
+      } else if (ans === 'conflicting_evidence') {
+        metricGrounding.innerHTML = `<span class="badge-refused" style="color:var(--purple)">⚠ Conflicting Evidence</span>`;
       } else {
         metricGrounding.innerHTML = `<span class="badge-unsafe">✕ ${ans}</span>`;
       }
@@ -1280,11 +1332,17 @@
       }
 
       // Final Answer
-      if (data.answer) {
+      if (data.answer && ans === 'supported') {
         answerContainer.innerHTML = `<div class="answer-text">${escapeHtml(data.answer)}</div>`;
       } else if (data.refusal_reason) {
+        const isConflict = data.refusal_reason === 'conflicting_evidence';
+        const isUnsafe = data.refusal_reason === 'unsafe_input';
+        const bg = isUnsafe ? 'rgba(244,63,94,0.1)' : (isConflict ? 'rgba(168,85,247,0.1)' : 'rgba(245,158,11,0.1)');
+        const bc = isUnsafe ? 'rgba(244,63,94,0.3)' : (isConflict ? 'rgba(168,85,247,0.3)' : 'rgba(245,158,11,0.3)');
+        const tc = isUnsafe ? '#fca5a5' : (isConflict ? '#d8b4fe' : '#fde68a');
+
         answerContainer.innerHTML = `
-          <div class="refusal-alert">
+          <div class="refusal-alert" style="background:${bg}; border-color:${bc}; color:${tc};">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
               <line x1="12" y1="9" x2="12" y2="13"></line>
@@ -1315,7 +1373,7 @@
               <div class="evidence-header">
                 <div style="display:flex; align-items:center; gap:0.4rem;">
                   <span class="evidence-rank">#${rank}</span>
-                  <span class="chip-lang">${lang.toUpperCase()}</span>
+                  <span style="font-size:0.65rem; font-weight:700; color:var(--primary); background:rgba(56,189,248,0.1); padding:0.1rem 0.35rem; border-radius:4px;">${lang.toUpperCase()}</span>
                   <span class="evidence-docid">${escapeHtml(docId)}</span>
                 </div>
                 <div class="evidence-score">Score: ${score}</div>
