@@ -11,6 +11,7 @@ members = [
     "crates/vox-llm",
     "crates/vox-guard",
     "crates/vox-bench",
+    "crates/vox-oreo",
 ]
 
 [workspace.package]
@@ -32,17 +33,23 @@ vox-grounding = { path = "crates/vox-grounding" }
 vox-llm = { path = "crates/vox-llm" }
 vox-guard = { path = "crates/vox-guard" }
 vox-bench = { path = "crates/vox-bench" }
+vox-oreo = { path = "crates/vox-oreo" }
 
 async-trait = "0.1"
 axum = "0.8"
+clap = { version = "4", features = ["derive"] }
+tantivy = "0.22"
+unicode-normalization = "0.1"
 base64 = "0.22"
 metrics = "0.24"
 metrics-exporter-prometheus = { version = "0.17", default-features = false }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tempfile = "3"
 thiserror = "2"
 tokio = { version = "1", features = ["full"] }
+tower = { version = "0.5", features = ["util"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 

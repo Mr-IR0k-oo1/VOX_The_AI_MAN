@@ -1,0 +1,25 @@
+[package]
+name = "vox-oreo"
+description = "OREO: independent multilingual retrieval engine (ingest, chunk, embed, Qdrant + Tantivy, hybrid RRF, rerank) serving POST /v1/retrieve"
+version.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+axum = { workspace = true }
+clap = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tantivy = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+unicode-normalization = { workspace = true }
+vox-types = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
