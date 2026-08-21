@@ -1,0 +1,80 @@
+{
+  "environment": {
+    "os": "windows",
+    "arch": "x86_64",
+    "cpu_model": "13th Gen Intel(R) Core(TM) i5-13420H",
+    "parallelism": 12,
+    "profile": "debug",
+    "measured_at_unix_secs": 1787302302,
+    "measured_at_date": "2026-08-21"
+  },
+  "configuration": {
+    "chunking": "sentence",
+    "embedding_dim": 256,
+    "vector_store": "memory",
+    "candidate_top": 20,
+    "final_top": 5,
+    "rrf_k": 60,
+    "reranker": "lexical_overlap",
+    "languages": [
+      "en",
+      "hi",
+      "ta"
+    ]
+  },
+  "dataset": {
+    "corpus_documents": 20,
+    "chunks_indexed": 20,
+    "queries": 36,
+    "languages": [
+      "en",
+      "hi",
+      "ta"
+    ],
+    "judgment_method": "hand-authored binary relevance judgments against the bundled sample corpus (crates/vox-bench/data/eval-queries.jsonl)"
+  },
+  "results": {
+    "mode": "dense+bm25_rrf+rerank",
+    "queries": 36,
+    "recall_at_5": 1.0,
+    "mrr": 1.0,
+    "stages": {
+      "embed": {
+        "mean": 0.06032037037037038,
+        "p50": 0.052849999999999994,
+        "p70": 0.0569,
+        "p100": 0.248
+      },
+      "dense": {
+        "mean": 0.13024166666666664,
+        "p50": 0.12,
+        "p70": 0.12578,
+        "p100": 0.3201
+      },
+      "sparse": {
+        "mean": 0.7735944444444445,
+        "p50": 0.7114499999999999,
+        "p70": 0.8158799999999999,
+        "p100": 2.5119000000000002
+      },
+      "fuse": {
+        "mean": 0.05775092592592591,
+        "p50": 0.0527,
+        "p70": 0.057589999999999995,
+        "p100": 0.1936
+      },
+      "rerank": {
+        "mean": 4.229825000000002,
+        "p50": 4.06565,
+        "p70": 4.219930000000001,
+        "p100": 11.6684
+      }
+    },
+    "total": {
+      "mean": 5.31784537037037,
+      "p50": 5.01155,
+      "p70": 5.302100000000001,
+      "p100": 14.9829
+    }
+  }
+}
