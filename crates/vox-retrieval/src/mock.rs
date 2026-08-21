@@ -53,7 +53,10 @@ impl RetrievalClient for MockRetrievalClient {
             })
             .collect();
 
-        Ok(RetrievalResponse { documents })
+        Ok(RetrievalResponse {
+            documents,
+            timings_ms: None,
+        })
     }
 }
 

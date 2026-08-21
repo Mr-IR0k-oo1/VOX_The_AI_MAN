@@ -27,6 +27,9 @@ pub enum RetrievalError {
     /// The upstream answered 2xx but the body violates the contract.
     #[error("invalid response from retrieval service: {0}")]
     InvalidResponse(&'static str),
+    /// The embedded retrieval engine failed internally.
+    #[error("retrieval engine failure: {0}")]
+    Engine(String),
 }
 
 impl RetrievalError {
@@ -42,6 +45,7 @@ impl RetrievalError {
                 status.is_server_error() || *status == reqwest::StatusCode::TOO_MANY_REQUESTS
             }
             RetrievalError::Validation(_) | RetrievalError::InvalidResponse(_) => false,
+            RetrievalError::Engine(_) => false,
         }
     }
 }
