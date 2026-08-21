@@ -16,6 +16,9 @@ use tower::ServiceExt;
 
 use vox_api::{build_router, AppState, Config};
 use vox_core::VoxPipeline;
+use vox_grounding::GroundingConfig;
+use vox_guard::GuardService;
+use vox_llm::ExtractiveProvider;
 use vox_retrieval::{EmbeddedOreoClient, RetrievalClient};
 use vox_stt::{MockRecognizer, SpeechRecognizer};
 
@@ -43,7 +46,16 @@ async fn oreo_app(tantivy_dir: &Path) -> axum::Router {
 
     let retrieval: Arc<dyn RetrievalClient> = Arc::new(EmbeddedOreoClient::new(engine));
     let stt: Arc<dyn SpeechRecognizer> = Arc::new(MockRecognizer::new());
-    let pipeline = Arc::new(VoxPipeline::new(Arc::clone(&stt), Arc::clone(&retrieval)));
+    // The embedded engine's index contents are unknown at config time, so the
+    // input-guard topic vocabulary stays empty (off-topic check disabled),
+    // mirroring production `build_state` behavior for non-mock backends.
+    let pipeline = Arc::new(VoxPipeline::new(
+        Arc::clone(&stt),
+        Arc::clone(&retrieval),
+        Arc::new(ExtractiveProvider),
+        GroundingConfig::default(),
+        Arc::new(GuardService::new(Vec::<String>::new())),
+    ));
 
     build_router(Arc::new(AppState {
         pipeline,

@@ -110,11 +110,12 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
     };
 
     // Input-guard topic vocabulary: the mock corpus knows its own domain;
-    // an HTTP backend's domain is unknown, so off-topic checking is disabled
+    // the HTTP and embedded-OREO backends index whatever corpus they were
+    // given, which config cannot know, so off-topic checking is disabled
     // (empty vocabulary) until a real corpus manifest supplies it.
     let guards = Arc::new(GuardService::new(match config.retrieval.mode {
         RetrievalMode::Mock => MockRetrievalClient::topic_vocabulary(),
-        RetrievalMode::Http => Vec::new(),
+        RetrievalMode::Http | RetrievalMode::Oreo => Vec::new(),
     }));
 
     tracing::info!(

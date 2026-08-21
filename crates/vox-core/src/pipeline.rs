@@ -462,6 +462,7 @@ mod tests {
                     rank: 1,
                     metadata: Value::Null,
                 }],
+                timings_ms: None,
             })
         }
     }
@@ -494,6 +495,7 @@ mod tests {
                         metadata: Value::Null,
                     },
                 ],
+                timings_ms: None,
             })
         }
     }
@@ -723,7 +725,10 @@ mod tests {
                 "empty"
             }
             async fn retrieve(&self, _: Query) -> Result<RetrievalResponse, RetrievalError> {
-                Ok(RetrievalResponse { documents: vec![] })
+                Ok(RetrievalResponse {
+                    documents: vec![],
+                    timings_ms: None,
+                })
             }
         }
 
