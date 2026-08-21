@@ -116,6 +116,18 @@ impl OreoEngine {
         )
     }
 
+    /// The dense leg alone (embed + vector search), for ablation benchmarks.
+    #[must_use]
+    pub fn dense_retriever(&self) -> Arc<DenseRetriever> {
+        Arc::clone(&self.dense)
+    }
+
+    /// The sparse (BM25) leg alone, for ablation benchmarks.
+    #[must_use]
+    pub fn sparse_retriever(&self) -> Arc<SparseRetriever> {
+        Arc::clone(&self.sparse)
+    }
+
     /// Runs the full offline pipeline over a corpus file/directory.
     ///
     /// # Errors
