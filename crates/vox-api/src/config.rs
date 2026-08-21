@@ -3,7 +3,7 @@
 use std::time::Duration;
 
 use thiserror::Error;
-use vox_pipeline::PipelineConfig;
+use vox_core::PipelineConfig;
 use vox_retrieval::RetryPolicy;
 
 /// How the retrieval backend is selected.
@@ -90,9 +90,7 @@ impl Config {
     ///
     /// # Errors
     /// Same contract as [`Config::from_env`].
-    pub fn from_source(
-        source: impl Fn(&str) -> Option<String>,
-    ) -> Result<Self, ConfigError> {
+    pub fn from_source(source: impl Fn(&str) -> Option<String>) -> Result<Self, ConfigError> {
         let host = source("VOX_HOST").unwrap_or_else(|| "0.0.0.0".to_owned());
         let port = parse_env(&source, "VOX_PORT", 8080)?;
         let log_format = match source("VOX_LOG_FORMAT").as_deref() {
@@ -145,11 +143,7 @@ impl Config {
                         50,
                     )?),
                 },
-                mock_delay: Duration::from_millis(parse_env(
-                    &source,
-                    "VOX_MOCK_DELAY_MS",
-                    0,
-                )?),
+                mock_delay: Duration::from_millis(parse_env(&source, "VOX_MOCK_DELAY_MS", 0)?),
             },
             pipeline: PipelineConfig {
                 grounding_min_score: parse_env(&source, "VOX_GROUNDING_MIN_SCORE", 0.30)?,
@@ -165,10 +159,10 @@ fn parse_env<T: std::str::FromStr>(
 ) -> Result<T, ConfigError> {
     match source(name) {
         None => Ok(default),
-        Some(raw) => raw.trim().parse::<T>().map_err(|_| ConfigError::InvalidEnv {
-            name,
-            value: raw,
-        }),
+        Some(raw) => raw
+            .trim()
+            .parse::<T>()
+            .map_err(|_| ConfigError::InvalidEnv { name, value: raw }),
     }
 }
 
@@ -177,11 +171,8 @@ mod tests {
     use super::*;
     use std::collections::HashMap;
 
-    fn source_from(pairs: &[(&str, &str)]) -> impl Fn(&str) -> Option<String> + '_ {
-        let map: HashMap<&str, String> = pairs
-            .iter()
-            .map(|(k, v)| (*k, (*v).to_owned()))
-            .collect();
+    fn source_from<'a>(pairs: &'a [(&'a str, &'a str)]) -> impl Fn(&str) -> Option<String> + 'a {
+        let map: HashMap<&str, String> = pairs.iter().map(|(k, v)| (*k, (*v).to_owned())).collect();
         move |name| map.get(name).cloned()
     }
 
@@ -244,7 +235,10 @@ mod tests {
         let source = source_from(&[("VOX_PORT", "not-a-port")]);
         assert!(matches!(
             Config::from_source(source),
-            Err(ConfigError::InvalidEnv { name: "VOX_PORT", .. })
+            Err(ConfigError::InvalidEnv {
+                name: "VOX_PORT",
+                ..
+            })
         ));
     }
 }

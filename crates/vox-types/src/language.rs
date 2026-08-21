@@ -5,7 +5,7 @@ use std::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::CoreError;
+use crate::error::ValidationError;
 
 /// Languages VOX currently accepts, identified by ISO 639-1 code.
 ///
@@ -88,13 +88,13 @@ impl fmt::Display for Language {
 }
 
 impl FromStr for Language {
-    type Err = CoreError;
+    type Err = ValidationError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Language::ALL
             .into_iter()
             .find(|lang| lang.code() == s)
-            .ok_or_else(|| CoreError::UnsupportedLanguage(s.to_owned()))
+            .ok_or_else(|| ValidationError::UnsupportedLanguage(s.to_owned()))
     }
 }
 
@@ -112,7 +112,7 @@ mod tests {
     fn parse_should_reject_unknown_codes_with_the_offending_value() {
         assert_eq!(
             "xx".parse::<Language>(),
-            Err(CoreError::UnsupportedLanguage("xx".to_owned()))
+            Err(ValidationError::UnsupportedLanguage("xx".to_owned()))
         );
     }
 

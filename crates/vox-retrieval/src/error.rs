@@ -1,14 +1,14 @@
 //! Error type for the retrieval boundary.
 
 use thiserror::Error;
-use vox_core::CoreError;
+use vox_types::ValidationError;
 
 /// Failures that can occur when talking to a retrieval backend.
 #[derive(Debug, Error)]
 pub enum RetrievalError {
     /// The request violated input rules and was never sent upstream.
     #[error(transparent)]
-    Validation(#[from] CoreError),
+    Validation(#[from] ValidationError),
     /// The upstream call exceeded its per-attempt timeout.
     #[error("retrieval request timed out after {timeout_ms} ms")]
     Timeout {
@@ -39,7 +39,7 @@ impl RetrievalError {
         match self {
             RetrievalError::Network(_) | RetrievalError::Timeout { .. } => true,
             RetrievalError::HttpStatus { status } => {
-                status.is_server_error() || status == StatusCode::TOO_MANY_REQUESTS
+                status.is_server_error() || *status == reqwest::StatusCode::TOO_MANY_REQUESTS
             }
             RetrievalError::Validation(_) | RetrievalError::InvalidResponse(_) => false,
         }

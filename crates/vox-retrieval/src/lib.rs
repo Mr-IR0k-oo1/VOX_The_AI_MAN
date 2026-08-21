@@ -9,7 +9,7 @@ pub mod http;
 pub mod mock;
 
 use async_trait::async_trait;
-use vox_core::{RetrieveRequest, RetrieveResponse};
+use vox_types::{Query, RetrievalResponse};
 
 pub use crate::error::RetrievalError;
 pub use crate::http::{HttpRetrievalClient, RetryPolicy};
@@ -29,8 +29,5 @@ pub trait RetrievalClient: Send + Sync {
     /// # Errors
     /// Returns [`RetrievalError`] on validation failure, network failure,
     /// timeout, non-success upstream status, or a contract-violating body.
-    async fn retrieve(
-        &self,
-        request: RetrieveRequest,
-    ) -> Result<RetrieveResponse, RetrievalError>;
+    async fn retrieve(&self, request: Query) -> Result<RetrievalResponse, RetrievalError>;
 }

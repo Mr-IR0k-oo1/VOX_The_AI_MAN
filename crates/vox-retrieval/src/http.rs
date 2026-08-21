@@ -3,7 +3,7 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use vox_core::{RetrieveRequest, RetrieveResponse};
+use vox_types::{Query, RetrievalResponse};
 
 use crate::error::RetrievalError;
 use crate::RetrievalClient;
@@ -49,9 +49,7 @@ impl HttpRetrievalClient {
         timeout: Duration,
         retry: RetryPolicy,
     ) -> Result<Self, reqwest::Error> {
-        let http = reqwest::Client::builder()
-            .timeout(timeout)
-            .build()?;
+        let http = reqwest::Client::builder().timeout(timeout).build()?;
         Ok(Self {
             base_url: base_url.into().trim_end_matches('/').to_owned(),
             timeout,
@@ -64,10 +62,7 @@ impl HttpRetrievalClient {
         format!("{}/v1/retrieve", self.base_url)
     }
 
-    async fn attempt_once(
-        &self,
-        request: &RetrieveRequest,
-    ) -> Result<RetrieveResponse, RetrievalError> {
+    async fn attempt_once(&self, request: &Query) -> Result<RetrievalResponse, RetrievalError> {
         request.validate()?;
 
         let response = self
@@ -83,23 +78,21 @@ impl HttpRetrievalClient {
             return Err(RetrievalError::HttpStatus { status });
         }
 
-        let body: RetrieveResponse = response
+        let body: RetrievalResponse = response
             .json()
             .await
             .map_err(map_transport_error(self.timeout))?;
 
         // A NaN score would silently defeat every threshold comparison
         // downstream (grounding check), so reject it at the boundary.
-        if body.results.iter().any(|chunk| !chunk.score.is_finite()) {
+        if body.documents.iter().any(|doc| !doc.score.is_finite()) {
             return Err(RetrievalError::InvalidResponse("non-finite score"));
         }
         Ok(body)
     }
 }
 
-fn map_transport_error(
-    timeout: Duration,
-) -> impl Fn(reqwest::Error) -> RetrievalError + Send {
+fn map_transport_error(timeout: Duration) -> impl Fn(reqwest::Error) -> RetrievalError + Send {
     move |err| {
         if err.is_timeout() {
             RetrievalError::Timeout {
@@ -117,21 +110,14 @@ impl RetrievalClient for HttpRetrievalClient {
         "http"
     }
 
-    async fn retrieve(
-        &self,
-        request: RetrieveRequest,
-    ) -> Result<RetrieveResponse, RetrievalError> {
+    async fn retrieve(&self, request: Query) -> Result<RetrievalResponse, RetrievalError> {
         let mut attempt: u32 = 0;
         loop {
             match self.attempt_once(&request).await {
                 Ok(response) => return Ok(response),
                 Err(err) if err.is_retryable() && attempt < self.retry.max_retries => {
                     attempt += 1;
-                    tracing::warn!(
-                        attempt,
-                        error = %err,
-                        "retryable retrieval failure, retrying"
-                    );
+                    tracing::warn!(attempt, error = %err, "retryable retrieval failure, retrying");
                     tokio::time::sleep(self.retry.backoff * attempt).await;
                 }
                 Err(err) => return Err(err),

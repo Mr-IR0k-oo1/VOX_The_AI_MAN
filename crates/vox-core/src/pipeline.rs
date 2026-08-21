@@ -5,12 +5,13 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use tracing::instrument;
-use vox_core::{ms, AnswerResponse, Language, RetrieveRequest, StageTimings};
+use vox_grounding::assess;
+use vox_guard::{decide, evaluate_answer};
+use vox_llm::LlmProvider;
 use vox_retrieval::RetrievalClient;
+use vox_types::{ms, AnswerResponse, GuardrailDecision, Language, LatencyMetrics, Query};
 
 use crate::error::PipelineError;
-use crate::guardrail::{evaluate_answer, evaluate_grounding, GuardrailVerdict};
-use crate::llm::LlmClient;
 
 /// Tunables for [`VoiceRagPipeline`].
 #[derive(Debug, Clone, Copy)]
@@ -31,7 +32,7 @@ impl Default for PipelineConfig {
 /// explicit refusal.
 pub struct VoiceRagPipeline {
     retrieval: Arc<dyn RetrievalClient>,
-    llm: Arc<dyn LlmClient>,
+    llm: Arc<dyn LlmProvider>,
     config: PipelineConfig,
 }
 
@@ -40,7 +41,7 @@ impl VoiceRagPipeline {
     #[must_use]
     pub fn new(
         retrieval: Arc<dyn RetrievalClient>,
-        llm: Arc<dyn LlmClient>,
+        llm: Arc<dyn LlmProvider>,
         config: PipelineConfig,
     ) -> Self {
         Self {
@@ -56,10 +57,14 @@ impl VoiceRagPipeline {
     /// Returns [`PipelineError`] on invalid input, retrieval failure after
     /// retries, or generation failure. Refusals are returned as successful
     /// responses with `grounded = false`.
-    #[instrument(name = "pipeline.run", skip_all, fields(query_len = request.query.len(), language = %request.language))]
-    pub async fn run(&self, request: RetrieveRequest) -> Result<AnswerResponse, PipelineError> {
+    #[instrument(
+        name = "pipeline.run",
+        skip_all,
+        fields(query_len = request.query.len(), language = %request.language)
+    )]
+    pub async fn run(&self, request: Query) -> Result<AnswerResponse, PipelineError> {
         let started = Instant::now();
-        let mut timings = StageTimings::default();
+        let mut timings = LatencyMetrics::default();
 
         request.validate()?;
         let echoed_query = request.query.clone();
@@ -72,25 +77,20 @@ impl VoiceRagPipeline {
         timings.query_analysis = Some(analysis);
 
         let stage = Instant::now();
-        let retrieve_request = RetrieveRequest {
+        let retrieve_query = Query {
             query: normalized_query.clone(),
-            language,
-            top_k: request.top_k,
+            ..request
         };
-        let evidence = self
-            .retrieval
-            .retrieve(retrieve_request)
-            .await?
-            .results;
+        let evidence = self.retrieval.retrieve(retrieve_query).await?.documents;
         timings.retrieval = Some(ms(stage.elapsed()));
 
         let stage = Instant::now();
-        let grounding = evaluate_grounding(&evidence, self.config.grounding_min_score);
+        let answerability = assess(&evidence, self.config.grounding_min_score);
         timings.grounding = Some(ms(stage.elapsed()));
 
-        let (answer, grounded, refusal_reason) = match grounding {
-            GuardrailVerdict::Refuse { reason } => (String::new(), false, Some(reason)),
-            GuardrailVerdict::Allow => {
+        let (answer, grounded, refusal_reason) = match decide(answerability) {
+            GuardrailDecision::Refuse { reason } => (String::new(), false, Some(reason)),
+            GuardrailDecision::Allow => {
                 let stage = Instant::now();
                 let output = self
                     .llm
@@ -104,8 +104,8 @@ impl VoiceRagPipeline {
                 timings.guardrail = Some(ms(stage.elapsed()));
 
                 match verdict {
-                    GuardrailVerdict::Allow => (answer, true, None),
-                    GuardrailVerdict::Refuse { reason } => (String::new(), false, Some(reason)),
+                    GuardrailDecision::Allow => (answer, true, None),
+                    GuardrailDecision::Refuse { reason } => (String::new(), false, Some(reason)),
                 }
             }
         };
@@ -113,7 +113,7 @@ impl VoiceRagPipeline {
         timings.total = Some(ms(started.elapsed()));
         tracing::info!(
             grounded,
-            evidence_chunks = evidence.len(),
+            evidence_documents = evidence.len(),
             backend = self.retrieval.name(),
             generator = self.llm.name(),
             total_ms = timings.total.unwrap_or_default(),
@@ -125,7 +125,7 @@ impl VoiceRagPipeline {
             language,
             answer,
             grounded,
-            refusal_reason: refusal_reason.map(str::to_owned),
+            refusal_reason,
             timings_ms: timings,
         })
     }
@@ -133,8 +133,9 @@ impl VoiceRagPipeline {
 
 /// Normalizes whitespace in the query and reports the stage duration.
 ///
-/// Phase 1 scope: collapse whitespace. Script transliteration, intent
-/// detection, and entity extraction land with query analysis proper.
+/// Phase 0 scope: collapse whitespace. Script transliteration, intent
+/// detection (populating [`QueryIntent`]), and entity extraction land with
+/// query analysis proper.
 fn analyze_query(query: &str) -> (String, f64) {
     let stage = Instant::now();
     let mut normalized = String::with_capacity(query.len());
@@ -154,11 +155,11 @@ mod tests {
     use std::time::Duration;
 
     use async_trait::async_trait;
-    use vox_core::{CoreError, Language, RetrievedChunk, RetrieveResponse};
-    use vox_retrieval::{RetrievalError, RetrievalClient};
+    use vox_llm::{LlmError, LlmOutput};
+    use vox_retrieval::{MockRetrievalClient, RetrievalError};
+    use vox_types::{QueryIntent, RetrievalResponse, RetrievedDocument, ValidationError};
 
     use super::*;
-    use crate::llm::{ExtractiveLlmClient, LlmOutput};
 
     struct EmptyRetrievalClient;
 
@@ -168,11 +169,10 @@ mod tests {
             "empty"
         }
 
-        async fn retrieve(
-            &self,
-            _request: RetrieveRequest,
-        ) -> Result<RetrieveResponse, RetrievalError> {
-            Ok(RetrieveResponse { results: Vec::new() })
+        async fn retrieve(&self, _request: Query) -> Result<RetrievalResponse, RetrievalError> {
+            Ok(RetrievalResponse {
+                documents: Vec::new(),
+            })
         }
     }
 
@@ -184,18 +184,15 @@ mod tests {
             "failing"
         }
 
-        async fn retrieve(
-            &self,
-            _request: RetrieveRequest,
-        ) -> Result<RetrieveResponse, RetrievalError> {
-            Err(RetrievalError::Validation(CoreError::EmptyQuery))
+        async fn retrieve(&self, _request: Query) -> Result<RetrievalResponse, RetrievalError> {
+            Err(RetrievalError::Validation(ValidationError::EmptyQuery))
         }
     }
 
-    struct EmptyLlmClient;
+    struct EmptyLlmProvider;
 
     #[async_trait]
-    impl LlmClient for EmptyLlmClient {
+    impl LlmProvider for EmptyLlmProvider {
         fn name(&self) -> &'static str {
             "empty"
         }
@@ -204,8 +201,8 @@ mod tests {
             &self,
             _query: &str,
             _language: Language,
-            _evidence: &[RetrievedChunk],
-        ) -> Result<LlmOutput, PipelineError> {
+            _evidence: &[RetrievedDocument],
+        ) -> Result<LlmOutput, LlmError> {
             Ok(LlmOutput {
                 answer: String::new(),
             })
@@ -214,17 +211,18 @@ mod tests {
 
     fn mock_pipeline() -> VoiceRagPipeline {
         VoiceRagPipeline::new(
-            Arc::new(vox_retrieval::MockRetrievalClient::new(Duration::ZERO)),
-            Arc::new(ExtractiveLlmClient),
+            Arc::new(MockRetrievalClient::new(Duration::ZERO)),
+            Arc::new(vox_llm::ExtractiveProvider),
             PipelineConfig::default(),
         )
     }
 
-    fn request(query: &str) -> RetrieveRequest {
-        RetrieveRequest {
+    fn request(query: &str) -> Query {
+        Query {
             query: query.to_owned(),
             language: Language::Ta,
             top_k: 3,
+            intent: QueryIntent::Unknown,
         }
     }
 
@@ -260,7 +258,7 @@ mod tests {
     async fn run_should_refuse_when_evidence_is_empty() {
         let pipeline = VoiceRagPipeline::new(
             Arc::new(EmptyRetrievalClient),
-            Arc::new(ExtractiveLlmClient),
+            Arc::new(vox_llm::ExtractiveProvider),
             PipelineConfig::default(),
         );
 
@@ -278,8 +276,8 @@ mod tests {
     #[tokio::test]
     async fn run_should_refuse_empty_generations_via_guardrail() {
         let pipeline = VoiceRagPipeline::new(
-            Arc::new(vox_retrieval::MockRetrievalClient::new(Duration::ZERO)),
-            Arc::new(EmptyLlmClient),
+            Arc::new(MockRetrievalClient::new(Duration::ZERO)),
+            Arc::new(EmptyLlmProvider),
             PipelineConfig::default(),
         );
 
@@ -297,7 +295,7 @@ mod tests {
             .expect_err("should fail validation");
         assert!(matches!(
             err,
-            PipelineError::Validation(CoreError::EmptyQuery)
+            PipelineError::Validation(ValidationError::EmptyQuery)
         ));
     }
 
@@ -305,7 +303,7 @@ mod tests {
     async fn run_should_propagate_retrieval_errors() {
         let pipeline = VoiceRagPipeline::new(
             Arc::new(FailingRetrievalClient),
-            Arc::new(ExtractiveLlmClient),
+            Arc::new(vox_llm::ExtractiveProvider),
             PipelineConfig::default(),
         );
 

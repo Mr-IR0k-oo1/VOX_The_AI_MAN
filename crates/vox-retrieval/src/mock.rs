@@ -3,7 +3,7 @@
 use std::time::Duration;
 
 use async_trait::async_trait;
-use vox_core::{RetrievedChunk, RetrieveRequest, RetrieveResponse};
+use vox_types::{Query, RetrievalResponse, RetrievedDocument};
 
 use crate::error::RetrievalError;
 use crate::RetrievalClient;
@@ -33,18 +33,15 @@ impl RetrievalClient for MockRetrievalClient {
         "mock"
     }
 
-    async fn retrieve(
-        &self,
-        request: RetrieveRequest,
-    ) -> Result<RetrieveResponse, RetrievalError> {
+    async fn retrieve(&self, request: Query) -> Result<RetrievalResponse, RetrievalError> {
         request.validate()?;
         if !self.delay.is_zero() {
             tokio::time::sleep(self.delay).await;
         }
 
         let query = request.query.trim();
-        let results = (0..usize::from(request.top_k))
-            .map(|i| RetrievedChunk {
+        let documents = (0..usize::from(request.top_k))
+            .map(|i| RetrievedDocument {
                 id: format!("mock-{i:04}"),
                 text: format!("Mock evidence chunk {i} relevant to: {query}"),
                 score: 0.95 - i as f32 * 0.05,
@@ -56,7 +53,7 @@ impl RetrievalClient for MockRetrievalClient {
             })
             .collect();
 
-        Ok(RetrieveResponse { results })
+        Ok(RetrievalResponse { documents })
     }
 }
 
@@ -64,28 +61,37 @@ impl RetrievalClient for MockRetrievalClient {
 mod tests {
     use std::time::Duration;
 
-    use vox_core::Language;
+    use vox_types::{Language, Query, QueryIntent, ValidationError};
 
     use super::*;
+
+    fn request(query: &str, top_k: u8) -> Query {
+        Query {
+            query: query.to_owned(),
+            language: Language::Ta,
+            top_k,
+            intent: QueryIntent::Unknown,
+        }
+    }
 
     #[tokio::test]
     async fn retrieve_should_return_deterministic_ranked_results() {
         let client = MockRetrievalClient::new(Duration::ZERO);
-        let request = RetrieveRequest {
-            query: "  what is gst  ".to_owned(),
-            language: Language::Ta,
-            top_k: 3,
-        };
+        let first = client
+            .retrieve(request("  what is gst  ", 3))
+            .await
+            .expect("first call");
+        let second = client
+            .retrieve(request("  what is gst  ", 3))
+            .await
+            .expect("second call");
 
-        let first = client.retrieve(request.clone()).await.expect("first call");
-        let second = client.retrieve(request).await.expect("second call");
-
-        assert_eq!(first.results.len(), 3);
-        assert_eq!(first.results[0].rank, 1);
-        assert_eq!(first.results[2].id, "mock-0002");
-        assert_eq!(first.results, second.results);
+        assert_eq!(first.documents.len(), 3);
+        assert_eq!(first.documents[0].rank, 1);
+        assert_eq!(first.documents[2].id, "mock-0002");
+        assert_eq!(first.documents, second.documents);
         assert_eq!(
-            first.results[0].text,
+            first.documents[0].text,
             "Mock evidence chunk 0 relevant to: what is gst"
         );
     }
@@ -93,16 +99,13 @@ mod tests {
     #[tokio::test]
     async fn retrieve_should_reject_invalid_input_without_delay() {
         let client = MockRetrievalClient::new(Duration::from_secs(60));
-        let request = RetrieveRequest {
-            query: "   ".to_owned(),
-            language: Language::Ta,
-            top_k: 3,
-        };
-
-        let err = client.retrieve(request).await.expect_err("should reject");
+        let err = client
+            .retrieve(request("   ", 3))
+            .await
+            .expect_err("should reject");
         assert!(matches!(
             err,
-            RetrievalError::Validation(CoreError::EmptyQuery)
+            RetrievalError::Validation(ValidationError::EmptyQuery)
         ));
     }
 }

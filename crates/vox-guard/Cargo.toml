@@ -1,0 +1,11 @@
+[package]
+name = "vox-guard"
+description = "Guardrail decisions for VOX answers and evidence verdicts"
+version.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+vox-types = { workspace = true }

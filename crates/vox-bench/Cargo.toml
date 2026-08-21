@@ -1,0 +1,8 @@
+[package]
+name = "vox-bench"
+description = "Benchmarking utilities for VOX latency measurement"
+version.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true

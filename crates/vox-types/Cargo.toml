@@ -1,0 +1,13 @@
+[package]
+name = "vox-types"
+description = "Shared domain types and wire contracts for VOX"
+version.workspace = true
+edition.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

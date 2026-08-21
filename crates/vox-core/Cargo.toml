@@ -1,6 +1,6 @@
 [package]
 name = "vox-core"
-description = "Shared domain types and validation for VOX"
+description = "VOX pipeline orchestration: language, retrieval, grounding, generation, guardrails"
 version.workspace = true
 edition.workspace = true
 
@@ -8,6 +8,15 @@ edition.workspace = true
 workspace = true
 
 [dependencies]
-serde = { workspace = true }
-serde_json = { workspace = true }
 thiserror = { workspace = true }
+tracing = { workspace = true }
+vox-guard = { workspace = true }
+vox-grounding = { workspace = true }
+vox-llm = { workspace = true }
+vox-retrieval = { workspace = true }
+vox-types = { workspace = true }
+
+[dev-dependencies]
+async-trait = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }

@@ -1,9 +1,21 @@
-//! Answer generation backends.
+//! Answer-generation substitution boundary for VOX.
+//!
+//! The pipeline depends only on [`LlmProvider`]; one implementation lives
+//! behind this trait per provider, and the pipeline never talks to an LLM SDK
+//! directly. Phase 0 ships a deterministic extractive stub so latency and
+//! refusal behavior can be validated before provider integration.
 
 use async_trait::async_trait;
-use vox_core::{Language, RetrievedChunk};
+use thiserror::Error;
+use vox_types::{Language, RetrievedDocument};
 
-use crate::error::PipelineError;
+/// Failures raised by an answer-generation backend.
+#[derive(Debug, Error)]
+pub enum LlmError {
+    /// The backend failed to produce any output.
+    #[error("llm backend failed: {0}")]
+    Backend(String),
+}
 
 /// Output of the generation stage.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -13,30 +25,26 @@ pub struct LlmOutput {
 }
 
 /// Substitution boundary for answer generation.
-///
-/// One implementation per provider behind this trait; the pipeline never
-/// talks to an LLM SDK directly.
 #[async_trait]
-pub trait LlmClient: Send + Sync {
+pub trait LlmProvider: Send + Sync {
     /// Backend name used in logs and metrics.
     fn name(&self) -> &'static str;
 
     /// Generates an answer for `query` grounded in `evidence`.
     ///
-    /// Implementations receive already-validated evidence and must not
-    /// invent facts beyond it; grounding is enforced by the caller's
-    /// guardrail pass.
+    /// Implementations receive already-validated evidence and must not invent
+    /// facts beyond it; grounding is enforced by the caller's guardrail pass.
     ///
     /// # Errors
-    /// Returns [`PipelineError::Llm`] when the backend fails to produce any
-    /// output. An empty output is reported as success and handled by the
-    /// guardrail as a refusal.
+    /// Returns [`LlmError`] when the backend fails to produce any output. An
+    /// empty output is reported as success and handled by the guardrail as a
+    /// refusal.
     async fn generate(
         &self,
         query: &str,
         language: Language,
-        evidence: &[RetrievedChunk],
-    ) -> Result<LlmOutput, PipelineError>;
+        evidence: &[RetrievedDocument],
+    ) -> Result<LlmOutput, LlmError>;
 }
 
 /// Deterministic extractive baseline used until a real provider is wired in.
@@ -45,13 +53,13 @@ pub trait LlmClient: Send + Sync {
 /// is intentionally naive — it exists so latency measurement and refusal
 /// behavior can be validated before provider integration.
 #[derive(Debug, Clone, Copy, Default)]
-pub struct ExtractiveLlmClient;
+pub struct ExtractiveProvider;
 
 const MAX_SNIPPET_CHARS: usize = 280;
 const SENTENCE_TERMINATORS: [char; 4] = ['.', '!', '?', '।'];
 
 #[async_trait]
-impl LlmClient for ExtractiveLlmClient {
+impl LlmProvider for ExtractiveProvider {
     fn name(&self) -> &'static str {
         "extractive-stub"
     }
@@ -60,12 +68,10 @@ impl LlmClient for ExtractiveLlmClient {
         &self,
         _query: &str,
         _language: Language,
-        evidence: &[RetrievedChunk],
-    ) -> Result<LlmOutput, PipelineError> {
-        let best = evidence
-            .iter()
-            .max_by(|a, b| a.score.total_cmp(&b.score));
-        let answer = best.map_or_else(String::new, |chunk| first_sentences(&chunk.text, 2));
+        evidence: &[RetrievedDocument],
+    ) -> Result<LlmOutput, LlmError> {
+        let best = evidence.iter().max_by(|a, b| a.score.total_cmp(&b.score));
+        let answer = best.map_or_else(String::new, |doc| first_sentences(&doc.text, 2));
         Ok(LlmOutput { answer })
     }
 }
@@ -102,6 +108,36 @@ fn first_sentences(text: &str, count: usize) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use serde_json::Value;
+
+    fn doc(score: f32, text: &str) -> RetrievedDocument {
+        RetrievedDocument {
+            id: "d1".to_owned(),
+            text: text.to_owned(),
+            score,
+            rank: 1,
+            metadata: Value::Null,
+        }
+    }
+
+    #[tokio::test]
+    async fn extractive_should_answer_from_the_best_scoring_document() {
+        let evidence = [doc(0.4, "weaker"), doc(0.9, "GST is a tax. It has slabs!")];
+        let out = ExtractiveProvider
+            .generate("what is gst", Language::En, &evidence)
+            .await
+            .expect("generate");
+        assert_eq!(out.answer, "GST is a tax. It has slabs!");
+    }
+
+    #[tokio::test]
+    async fn extractive_should_return_empty_output_without_evidence() {
+        let out = ExtractiveProvider
+            .generate("q", Language::En, &[])
+            .await
+            .expect("generate");
+        assert_eq!(out.answer, "");
+    }
 
     #[test]
     fn first_sentences_should_keep_two_terminated_sentences() {
@@ -111,7 +147,10 @@ mod tests {
 
     #[test]
     fn first_sentences_should_fall_back_to_full_text_without_terminators() {
-        assert_eq!(first_sentences("no terminators at all", 2), "no terminators at all");
+        assert_eq!(
+            first_sentences("no terminators at all", 2),
+            "no terminators at all"
+        );
     }
 
     #[test]

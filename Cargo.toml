@@ -1,10 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/vox-types",
     "crates/vox-core",
-    "crates/vox-retrieval",
-    "crates/vox-pipeline",
     "crates/vox-api",
+    "crates/vox-stt",
+    "crates/vox-retrieval",
+    "crates/vox-ingest",
+    "crates/vox-grounding",
+    "crates/vox-llm",
+    "crates/vox-guard",
+    "crates/vox-bench",
 ]
 
 [workspace.package]
@@ -16,12 +22,20 @@ missing_docs = "warn"
 unsafe_code = "forbid"
 
 [workspace.dependencies]
+vox-types = { path = "crates/vox-types" }
 vox-core = { path = "crates/vox-core" }
+vox-api = { path = "crates/vox-api" }
+vox-stt = { path = "crates/vox-stt" }
 vox-retrieval = { path = "crates/vox-retrieval" }
-vox-pipeline = { path = "crates/vox-pipeline" }
+vox-ingest = { path = "crates/vox-ingest" }
+vox-grounding = { path = "crates/vox-grounding" }
+vox-llm = { path = "crates/vox-llm" }
+vox-guard = { path = "crates/vox-guard" }
+vox-bench = { path = "crates/vox-bench" }
 
 async-trait = "0.1"
 axum = "0.8"
+base64 = "0.22"
 metrics = "0.24"
 metrics-exporter-prometheus = { version = "0.17", default-features = false }
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
@@ -29,7 +43,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
 tokio = { version = "1", features = ["full"] }
-tower = { version = "0.5", features = ["util"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
