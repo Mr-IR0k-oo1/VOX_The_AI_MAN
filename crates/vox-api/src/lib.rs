@@ -17,7 +17,7 @@ use axum::Router;
 use vox_core::VoxPipeline;
 use vox_guard::GuardService;
 use vox_llm::{ExtractiveProvider, LlmProvider, OpenAiCompatibleProvider};
-use vox_retrieval::{HttpRetrievalClient, MockRetrievalClient, RetrievalClient};
+use vox_retrieval::{MockRetrievalClient, OREORetrievalClient, RetrievalClient};
 use vox_stt::{MockRecognizer, SarvamRecognizer, SpeechRecognizer};
 
 pub use crate::config::{Config, ConfigError, LlmMode, LogFormat, RetrievalMode, SttMode};
@@ -58,7 +58,7 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
     let retrieval: Arc<dyn RetrievalClient> = match config.retrieval.mode {
         RetrievalMode::Mock => Arc::new(MockRetrievalClient::new(config.retrieval.mock_delay)),
         RetrievalMode::Http => {
-            let client = HttpRetrievalClient::new(
+            let client = OREORetrievalClient::new(
                 config.retrieval.base_url.clone(),
                 config.retrieval.timeout,
                 config.retrieval.retry,

@@ -238,7 +238,7 @@ impl Config {
                     800,
                 )?),
                 retry: RetryPolicy {
-                    max_retries: parse_env(&source, "VOX_RETRIEVAL_MAX_RETRIES", 2)?,
+                    max_retries: parse_env(&source, "VOX_RETRIEVAL_MAX_RETRIES", 1)?,
                     backoff: Duration::from_millis(parse_env(
                         &source,
                         "VOX_RETRIEVAL_BACKOFF_MS",

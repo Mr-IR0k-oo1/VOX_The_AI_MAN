@@ -7,13 +7,15 @@ with per-stage latency metrics. VOX refuses to answer — with a stable reason
 code and a localized grounded-refusal message — whenever the evidence does
 not support it.
 
-## Status: Phase 5 — Grounding and guardrails
+## Status: Phase 6 — OREO retrieval integration
 
-The pipeline runs end-to-end independently of OREO:
+The pipeline runs end-to-end and reaches the real retrieval service through
+configuration alone (`VOX_RETRIEVAL_MODE=http`); the mock backend remains the
+default for local development and tests:
 
 ```
 voice/text → input guard → STT → language detection → query analysis
-           → mock retrieval → grounding (evidence sufficiency)
+           → OREO /v1/retrieve → grounding (evidence sufficiency)
            → evidence guard → LLM → output guard → response (+ latency metrics)
 ```
 
@@ -30,8 +32,12 @@ voice/text → input guard → STT → language detection → query analysis
   off-topic questions are refused against the configured topic vocabulary
   (disabled automatically when running against an HTTP backend whose domain
   is unknown).
-- **Retrieval**: deterministic `MockRetrievalClient` with a small canned
-  corpus. Qdrant/Tantivy/OREO integration is deliberately deferred.
+- **Retrieval**: `OREORetrievalClient` speaks the frozen
+  `POST /v1/retrieve` JSON contract over reqwest with a per-attempt timeout,
+  one safe retry (network errors, timeouts, 5xx, 429 only), and strict
+  response validation (non-finite scores and malformed bodies are rejected).
+  `MockRetrievalClient` (deterministic canned corpus) is selected by default;
+  nothing couples to Qdrant/Tantivy internals.
 - **Grounding**: deterministic lexical scoring of evidence sufficiency —
   *relevance* (best single-document coverage of the query terms), *coverage*
   (union coverage), and *consistency* (do relevant documents agree?) — mapped
@@ -69,7 +75,7 @@ Not yet implemented (deliberately): real retrieval service, UI, deployment.
 | `vox-core` | Pipeline orchestration: guards → STT → language → analysis → retrieval → grounding → generation, per-stage timings |
 | `vox-api` | Axum server exposing the frozen v1 endpoints; config, logging, metrics |
 | `vox-stt` | `SpeechRecognizer` trait + mock + Sarvam HTTP backend |
-| `vox-retrieval` | `RetrievalClient` trait + mock backend + HTTP client for OREO (timeouts, bounded retries) |
+| `vox-retrieval` | `RetrievalClient` trait + `OREORetrievalClient` (reqwest, timeout, one safe retry) + deterministic mock backend |
 | `vox-ingest` | Voice ingestion boundary: base64 decode, size caps, container sniffing |
 | `vox-grounding` | Evidence-sufficiency scoring → `Answerability`; answer verification against evidence |
 | `vox-llm` | `LlmProvider` trait, prompt construction, extractive baseline + OpenAI-compatible provider |
@@ -167,10 +173,10 @@ See [.env.example](.env.example).
 |---|---|---|
 | `VOX_HOST` / `VOX_PORT` | `0.0.0.0` / `8080` | Bind address |
 | `VOX_LOG_FORMAT` | `text` | `text` or `json` (level via `RUST_LOG`) |
-| `VOX_RETRIEVAL_MODE` | `mock` | `mock` or `http` |
+| `VOX_RETRIEVAL_MODE` | `mock` | `mock` or `http` (OREO service) |
 | `VOX_RETRIEVAL_BASE_URL` | — | Required when mode is `http` (OREO service) |
 | `VOX_RETRIEVAL_TIMEOUT_MS` | `800` | Per-attempt timeout for `/v1/retrieve` |
-| `VOX_RETRIEVAL_MAX_RETRIES` | `2` | Retries on network errors, timeouts, 5xx, 429 only |
+| `VOX_RETRIEVAL_MAX_RETRIES` | `1` | One safe retry on network errors, timeouts, 5xx, 429 only |
 | `VOX_RETRIEVAL_BACKOFF_MS` | `50` | Linear backoff base between attempts |
 | `VOX_MOCK_DELAY_MS` | `0` | Simulated latency injected by the mock backend |
 | `VOX_STT_MODE` | `mock` | `mock` or `sarvam` |
