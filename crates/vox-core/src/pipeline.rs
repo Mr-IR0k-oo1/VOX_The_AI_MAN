@@ -245,14 +245,17 @@ impl VoxPipeline {
         metrics.retrieval = Some(ms(stage.elapsed()));
         let evidence = response.documents;
 
-        // Grounding stage: evidence-sufficiency scoring.
+        // Grounding stage: evidence-sufficiency scoring. The evidence index
+        // is built once and reused for answer verification below.
         let stage = Instant::now();
         let grounding_input = if query.normalized_text.is_empty() {
             query.text.clone()
         } else {
             query.normalized_text.clone()
         };
-        let assessment = vox_grounding::assess(&grounding_input, &evidence, &self.grounding);
+        let evidence_index = vox_grounding::EvidenceIndex::new(&evidence);
+        let assessment =
+            vox_grounding::assess_indexed(&grounding_input, &evidence_index, &self.grounding);
         metrics.grounding = Some(ms(stage.elapsed()));
 
         // Evidence guard: refuse before spending a generation call.
@@ -286,7 +289,7 @@ impl VoxPipeline {
 
             let answer = generated.answer.trim().to_owned();
             let verification =
-                vox_grounding::verify_answer(&answer, &request.evidence, &self.grounding);
+                vox_grounding::verify_answer_indexed(&answer, &evidence_index, &self.grounding);
 
             let stage = Instant::now();
             let decision = self.guards.check_output(&answer, &verification);

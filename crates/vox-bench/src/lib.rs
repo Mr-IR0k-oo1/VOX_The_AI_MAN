@@ -1,9 +1,9 @@
 //! Benchmarking utilities for VOX.
 //!
-//! Phase 0 freezes the crate boundary only; scenario harnesses (per-endpoint
-//! latency sweeps against real backends) land with the benchmarking phase.
-//! Percentile math lives here so API and pipeline reporting can share one
-//! implementation.
+//! Percentile math and sample summarization live here so API reporting and
+//! the `vox-bench` harness share one implementation.
+
+use serde::Serialize;
 
 /// Computes the `quantile` (in `0.0..=1.0`) of an ascending-sorted sample.
 ///
@@ -24,6 +24,43 @@ pub fn percentile(sorted: &[f64], quantile: f64) -> Option<f64> {
     let hi = (lo + 1).min(n - 1);
     let frac = pos - lo as f64;
     Some(sorted[lo] + (sorted[hi] - sorted[lo]) * frac)
+}
+
+/// Descriptive statistics for one latency series, in milliseconds.
+///
+/// `median_ms` and `p50_ms` carry the same value by definition; both fields
+/// exist because reports reference either term.
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct SampleSummary {
+    /// Number of samples the summary was computed over.
+    pub count: usize,
+    /// Arithmetic mean.
+    pub mean_ms: f64,
+    /// Median (same value as `p50_ms`).
+    pub median_ms: f64,
+    /// 50th percentile (linear interpolation).
+    pub p50_ms: f64,
+    /// 70th percentile (linear interpolation).
+    pub p70_ms: f64,
+    /// Maximum observed latency.
+    pub p100_ms: f64,
+}
+
+/// Summarizes a latency series (unsorted input is fine).
+#[must_use]
+pub fn summarize(samples: &[f64]) -> Option<SampleSummary> {
+    let mut sorted = samples.to_vec();
+    sorted.sort_by(f64::total_cmp);
+    let n = sorted.len();
+    let p50 = percentile(&sorted, 0.5)?;
+    Some(SampleSummary {
+        count: n,
+        mean_ms: sorted.iter().sum::<f64>() / n as f64,
+        median_ms: p50,
+        p50_ms: p50,
+        p70_ms: percentile(&sorted, 0.7)?,
+        p100_ms: *sorted.last()?,
+    })
 }
 
 #[cfg(test)]
@@ -60,5 +97,21 @@ mod tests {
         let sample: Vec<f64> = (1..=100).map(f64::from).collect();
         assert_eq!(percentile(&sample, 0.50), Some(50.5));
         assert_eq!(percentile(&sample, 0.95), Some(95.05));
+    }
+
+    #[test]
+    fn summarize_should_report_mean_median_and_percentiles() {
+        let summary = summarize(&[5.0, 1.0, 9.0, 3.0]).expect("non-empty");
+        assert_eq!(summary.count, 4);
+        assert!((summary.mean_ms - 4.5).abs() < 1e-9);
+        assert!((summary.p50_ms - 4.0).abs() < 1e-9);
+        assert_eq!(summary.median_ms, summary.p50_ms);
+        assert!((summary.p100_ms - 9.0).abs() < 1e-9);
+        assert!(summary.p50_ms <= summary.p70_ms && summary.p70_ms <= summary.p100_ms);
+    }
+
+    #[test]
+    fn summarize_should_return_none_for_empty_input() {
+        assert!(summarize(&[]).is_none());
     }
 }

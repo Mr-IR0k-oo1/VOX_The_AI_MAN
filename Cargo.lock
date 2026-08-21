@@ -1523,6 +1523,18 @@ dependencies = [
 [[package]]
 name = "vox-bench"
 version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tokio",
+ "vox-core",
+ "vox-grounding",
+ "vox-guard",
+ "vox-llm",
+ "vox-retrieval",
+ "vox-stt",
+ "vox-types",
+]
 
 [[package]]
 name = "vox-core"

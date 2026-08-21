@@ -1,8 +1,24 @@
 [package]
 name = "vox-bench"
-description = "Benchmarking utilities for VOX latency measurement"
+description = "Benchmarking utilities and latency harness for VOX"
 version.workspace = true
 edition.workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+vox-core = { workspace = true }
+vox-grounding = { workspace = true }
+vox-guard = { workspace = true }
+vox-llm = { workspace = true }
+vox-retrieval = { workspace = true }
+vox-stt = { workspace = true }
+vox-types = { workspace = true }
+
+[[bin]]
+name = "vox-bench"
+path = "src/main.rs"

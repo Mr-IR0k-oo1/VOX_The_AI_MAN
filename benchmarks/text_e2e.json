@@ -1,0 +1,5580 @@
+{
+  "level": "L1",
+  "description": "query -> analysis -> retrieval -> grounding -> LLM -> guardrails",
+  "generated_at_unix_secs": 1787305174,
+  "profile": "release",
+  "rounds": 100,
+  "warmup_rounds": 10,
+  "scenarios": [
+    "supported_en",
+    "supported_hi",
+    "supported_ta",
+    "unsupported_itr",
+    "offtopic_cricket"
+  ],
+  "backends": {
+    "llm": "extractive",
+    "retrieval": "mock",
+    "stt": "mock"
+  },
+  "runs": [
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.042083999999999996,
+      "stages": {
+        "grounding": 0.017075000000000003,
+        "guardrail": 0.009086,
+        "language": 0.000044999999999999996,
+        "llm": 0.00115,
+        "query_analysis": 0.001399,
+        "retrieval": 0.004109
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.066165,
+      "stages": {
+        "grounding": 0.031507999999999994,
+        "guardrail": 0.015635,
+        "language": 0.000019,
+        "llm": 0.0007840000000000001,
+        "query_analysis": 0.0009390000000000001,
+        "retrieval": 0.002162
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.08831399999999999,
+      "stages": {
+        "grounding": 0.039522,
+        "guardrail": 0.019798,
+        "language": 0.000063,
+        "llm": 0.0005549999999999999,
+        "query_analysis": 0.002019,
+        "retrieval": 0.0024820000000000003
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.01628,
+      "stages": {
+        "grounding": 0.010176000000000001,
+        "guardrail": 0.0018139999999999999,
+        "language": 0.000019,
+        "query_analysis": 0.000648,
+        "retrieval": 0.0014500000000000001
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.002517,
+      "stages": {
+        "guardrail": 0.001803,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.025858,
+      "stages": {
+        "grounding": 0.011636,
+        "guardrail": 0.005664,
+        "language": 0.000019,
+        "llm": 0.000658,
+        "query_analysis": 0.000599,
+        "retrieval": 0.001402
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.06633599999999999,
+      "stages": {
+        "grounding": 0.029151,
+        "guardrail": 0.017352,
+        "language": 0.000018,
+        "llm": 0.000616,
+        "query_analysis": 0.000775,
+        "retrieval": 0.001613
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.086205,
+      "stages": {
+        "grounding": 0.044780999999999994,
+        "guardrail": 0.019789,
+        "language": 0.000058,
+        "llm": 0.000445,
+        "query_analysis": 0.002187,
+        "retrieval": 0.0025689999999999997
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.014299,
+      "stages": {
+        "grounding": 0.009462,
+        "guardrail": 0.0013390000000000001,
+        "language": 0.000018,
+        "query_analysis": 0.000517,
+        "retrieval": 0.001384
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001832,
+      "stages": {
+        "guardrail": 0.001333,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.023434999999999997,
+      "stages": {
+        "grounding": 0.01124,
+        "guardrail": 0.004602,
+        "language": 0.000022,
+        "llm": 0.000595,
+        "query_analysis": 0.000599,
+        "retrieval": 0.001315
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.059039999999999995,
+      "stages": {
+        "grounding": 0.028558,
+        "guardrail": 0.01427,
+        "language": 0.000018,
+        "llm": 0.000506,
+        "query_analysis": 0.000671,
+        "retrieval": 0.001411
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077063,
+      "stages": {
+        "grounding": 0.037979,
+        "guardrail": 0.019161,
+        "language": 0.000042,
+        "llm": 0.00038500000000000003,
+        "query_analysis": 0.0015179999999999998,
+        "retrieval": 0.0019080000000000002
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.013311,
+      "stages": {
+        "grounding": 0.00901,
+        "guardrail": 0.001189,
+        "language": 0.000018,
+        "query_analysis": 0.00045,
+        "retrieval": 0.001217
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001645,
+      "stages": {
+        "guardrail": 0.001174,
+        "language": 0.000021
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.023320999999999998,
+      "stages": {
+        "grounding": 0.011056,
+        "guardrail": 0.0046099999999999995,
+        "language": 0.000018,
+        "llm": 0.000589,
+        "query_analysis": 0.000553,
+        "retrieval": 0.001225
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.058273000000000005,
+      "stages": {
+        "grounding": 0.028133,
+        "guardrail": 0.013954,
+        "language": 0.00002,
+        "llm": 0.000571,
+        "query_analysis": 0.000606,
+        "retrieval": 0.001302
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077592,
+      "stages": {
+        "grounding": 0.03808,
+        "guardrail": 0.019528,
+        "language": 0.000043,
+        "llm": 0.000493,
+        "query_analysis": 0.001411,
+        "retrieval": 0.0020099999999999996
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.0123,
+      "stages": {
+        "grounding": 0.008043000000000002,
+        "guardrail": 0.001152,
+        "language": 0.000029999999999999997,
+        "query_analysis": 0.00053,
+        "retrieval": 0.0012309999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001782,
+      "stages": {
+        "guardrail": 0.001294,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.02482,
+      "stages": {
+        "grounding": 0.01148,
+        "guardrail": 0.004810999999999999,
+        "language": 0.000019,
+        "llm": 0.000626,
+        "query_analysis": 0.0006349999999999999,
+        "retrieval": 0.001299
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.058893,
+      "stages": {
+        "grounding": 0.028447,
+        "guardrail": 0.014107,
+        "language": 0.000019,
+        "llm": 0.000522,
+        "query_analysis": 0.000721,
+        "retrieval": 0.001651
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.076484,
+      "stages": {
+        "grounding": 0.037727,
+        "guardrail": 0.019137,
+        "language": 0.000044,
+        "llm": 0.000435,
+        "query_analysis": 0.001297,
+        "retrieval": 0.0017549999999999998
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.012724999999999998,
+      "stages": {
+        "grounding": 0.008787999999999999,
+        "guardrail": 0.001091,
+        "language": 0.000019,
+        "query_analysis": 0.000433,
+        "retrieval": 0.001112
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001557,
+      "stages": {
+        "guardrail": 0.00116,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.022527,
+      "stages": {
+        "grounding": 0.010783,
+        "guardrail": 0.004482,
+        "language": 0.000019,
+        "llm": 0.00043,
+        "query_analysis": 0.000538,
+        "retrieval": 0.001084
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.058627,
+      "stages": {
+        "grounding": 0.027672,
+        "guardrail": 0.014371000000000002,
+        "language": 0.000019,
+        "llm": 0.000532,
+        "query_analysis": 0.000675,
+        "retrieval": 0.001689
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.079153,
+      "stages": {
+        "grounding": 0.038369,
+        "guardrail": 0.019189,
+        "language": 0.000043,
+        "llm": 0.0005549999999999999,
+        "query_analysis": 0.001449,
+        "retrieval": 0.0029579999999999997
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.012916,
+      "stages": {
+        "grounding": 0.008234,
+        "guardrail": 0.000955,
+        "language": 0.000018,
+        "query_analysis": 0.000363,
+        "retrieval": 0.001883
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001351,
+      "stages": {
+        "guardrail": 0.0009620000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.023657,
+      "stages": {
+        "grounding": 0.010834,
+        "guardrail": 0.004814,
+        "language": 0.000019,
+        "llm": 0.000394,
+        "query_analysis": 0.000482,
+        "retrieval": 0.002003
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.065599,
+      "stages": {
+        "grounding": 0.034019,
+        "guardrail": 0.014089999999999998,
+        "language": 0.000029,
+        "llm": 0.000544,
+        "query_analysis": 0.000599,
+        "retrieval": 0.0019920000000000003
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077908,
+      "stages": {
+        "grounding": 0.037907,
+        "guardrail": 0.019153,
+        "language": 0.000041,
+        "llm": 0.0005740000000000001,
+        "query_analysis": 0.001269,
+        "retrieval": 0.002705
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.012123,
+      "stages": {
+        "grounding": 0.007912,
+        "guardrail": 0.001068,
+        "language": 0.00002,
+        "query_analysis": 0.00032599999999999996,
+        "retrieval": 0.001299
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001399,
+      "stages": {
+        "guardrail": 0.000975,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021333,
+      "stages": {
+        "grounding": 0.009782,
+        "guardrail": 0.004351000000000001,
+        "language": 0.000018,
+        "llm": 0.000383,
+        "query_analysis": 0.000457,
+        "retrieval": 0.001193
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.057178,
+      "stages": {
+        "grounding": 0.027124,
+        "guardrail": 0.013800999999999999,
+        "language": 0.000017,
+        "llm": 0.000453,
+        "query_analysis": 0.000523,
+        "retrieval": 0.001371
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077165,
+      "stages": {
+        "grounding": 0.037889000000000006,
+        "guardrail": 0.01913,
+        "language": 0.000043,
+        "llm": 0.000365,
+        "query_analysis": 0.001163,
+        "retrieval": 0.0019429999999999998
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.012269,
+      "stages": {
+        "grounding": 0.008412,
+        "guardrail": 0.000768,
+        "language": 0.000018,
+        "query_analysis": 0.00028000000000000003,
+        "retrieval": 0.001404
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001444,
+      "stages": {
+        "guardrail": 0.001085,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020102000000000002,
+      "stages": {
+        "grounding": 0.009237,
+        "guardrail": 0.004207,
+        "language": 0.000018,
+        "llm": 0.00035600000000000003,
+        "query_analysis": 0.00047599999999999997,
+        "retrieval": 0.001054
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.055426,
+      "stages": {
+        "grounding": 0.026573000000000003,
+        "guardrail": 0.013456999999999998,
+        "language": 0.000028,
+        "llm": 0.00042500000000000003,
+        "query_analysis": 0.0005489999999999999,
+        "retrieval": 0.001615
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074817,
+      "stages": {
+        "grounding": 0.036415,
+        "guardrail": 0.018964,
+        "language": 0.000046,
+        "llm": 0.00039200000000000004,
+        "query_analysis": 0.001205,
+        "retrieval": 0.0016300000000000002
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011248,
+      "stages": {
+        "grounding": 0.007497,
+        "guardrail": 0.000816,
+        "language": 0.000018,
+        "query_analysis": 0.000499,
+        "retrieval": 0.001142
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001275,
+      "stages": {
+        "guardrail": 0.000959,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021364,
+      "stages": {
+        "grounding": 0.010285,
+        "guardrail": 0.004155,
+        "language": 0.00002,
+        "llm": 0.000274,
+        "query_analysis": 0.000455,
+        "retrieval": 0.001298
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056107000000000004,
+      "stages": {
+        "grounding": 0.02646,
+        "guardrail": 0.013688,
+        "language": 0.000018,
+        "llm": 0.00041600000000000003,
+        "query_analysis": 0.000591,
+        "retrieval": 0.001337
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.075069,
+      "stages": {
+        "grounding": 0.036924,
+        "guardrail": 0.018715,
+        "language": 0.000046,
+        "llm": 0.00042899999999999997,
+        "query_analysis": 0.001155,
+        "retrieval": 0.001984
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011516,
+      "stages": {
+        "grounding": 0.008077,
+        "guardrail": 0.00089,
+        "language": 0.000017,
+        "query_analysis": 0.00033099999999999997,
+        "retrieval": 0.001026
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001582,
+      "stages": {
+        "guardrail": 0.001248,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020689000000000003,
+      "stages": {
+        "grounding": 0.009717,
+        "guardrail": 0.004184,
+        "language": 0.000019,
+        "llm": 0.000314,
+        "query_analysis": 0.00053,
+        "retrieval": 0.001258
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.055584,
+      "stages": {
+        "grounding": 0.026487,
+        "guardrail": 0.013405,
+        "language": 0.000029,
+        "llm": 0.00031800000000000003,
+        "query_analysis": 0.00051,
+        "retrieval": 0.0013880000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07454100000000001,
+      "stages": {
+        "grounding": 0.036649,
+        "guardrail": 0.018855,
+        "language": 0.00004,
+        "llm": 0.000365,
+        "query_analysis": 0.001094,
+        "retrieval": 0.0017549999999999998
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.013313,
+      "stages": {
+        "grounding": 0.009313,
+        "guardrail": 0.000871,
+        "language": 0.00002,
+        "query_analysis": 0.000315,
+        "retrieval": 0.0012
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0015910000000000002,
+      "stages": {
+        "guardrail": 0.001168,
+        "language": 0.000027
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.026329,
+      "stages": {
+        "grounding": 0.012379,
+        "guardrail": 0.0053029999999999996,
+        "language": 0.000017,
+        "llm": 0.000321,
+        "query_analysis": 0.000588,
+        "retrieval": 0.001276
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.07432799999999999,
+      "stages": {
+        "grounding": 0.034437,
+        "guardrail": 0.02073,
+        "language": 0.000019,
+        "llm": 0.00062,
+        "query_analysis": 0.0007549999999999999,
+        "retrieval": 0.0018080000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.114827,
+      "stages": {
+        "grounding": 0.059552999999999995,
+        "guardrail": 0.022749000000000002,
+        "language": 0.000039,
+        "llm": 0.000584,
+        "query_analysis": 0.001801,
+        "retrieval": 0.0036669999999999997
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.017952,
+      "stages": {
+        "grounding": 0.011058,
+        "guardrail": 0.0015099999999999998,
+        "language": 0.000019,
+        "query_analysis": 0.000563,
+        "retrieval": 0.002693
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0022819999999999997,
+      "stages": {
+        "guardrail": 0.001675,
+        "language": 0.000023
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.029809,
+      "stages": {
+        "grounding": 0.013532,
+        "guardrail": 0.0063230000000000005,
+        "language": 0.000024999999999999998,
+        "llm": 0.0005290000000000001,
+        "query_analysis": 0.000468,
+        "retrieval": 0.00182
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.078253,
+      "stages": {
+        "grounding": 0.036288,
+        "guardrail": 0.018855,
+        "language": 0.000029999999999999997,
+        "llm": 0.000517,
+        "query_analysis": 0.000703,
+        "retrieval": 0.001902
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.111972,
+      "stages": {
+        "grounding": 0.053205999999999996,
+        "guardrail": 0.028525,
+        "language": 0.000041,
+        "llm": 0.00052,
+        "query_analysis": 0.001923,
+        "retrieval": 0.003466
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.016662,
+      "stages": {
+        "grounding": 0.011029,
+        "guardrail": 0.00124,
+        "language": 0.000024,
+        "query_analysis": 0.00046499999999999997,
+        "retrieval": 0.001741
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0016330000000000001,
+      "stages": {
+        "guardrail": 0.000979,
+        "language": 0.00002
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.02869,
+      "stages": {
+        "grounding": 0.013611999999999999,
+        "guardrail": 0.005827,
+        "language": 0.000019,
+        "llm": 0.000408,
+        "query_analysis": 0.000526,
+        "retrieval": 0.001534
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.081566,
+      "stages": {
+        "grounding": 0.039177000000000003,
+        "guardrail": 0.019526999999999996,
+        "language": 0.000029999999999999997,
+        "llm": 0.0005859999999999999,
+        "query_analysis": 0.000905,
+        "retrieval": 0.00243
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.09966799999999999,
+      "stages": {
+        "grounding": 0.048775,
+        "guardrail": 0.02602,
+        "language": 0.000026000000000000002,
+        "llm": 0.0004969999999999999,
+        "query_analysis": 0.0015489999999999998,
+        "retrieval": 0.002649
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.015645,
+      "stages": {
+        "grounding": 0.009971,
+        "guardrail": 0.001491,
+        "language": 0.000022,
+        "query_analysis": 0.000428,
+        "retrieval": 0.0018470000000000001
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.002029,
+      "stages": {
+        "guardrail": 0.0014219999999999999,
+        "language": 0.00002
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.027051,
+      "stages": {
+        "grounding": 0.012398000000000001,
+        "guardrail": 0.005974999999999999,
+        "language": 0.000019,
+        "llm": 0.000435,
+        "query_analysis": 0.000505,
+        "retrieval": 0.0013930000000000001
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.057231000000000004,
+      "stages": {
+        "grounding": 0.027146,
+        "guardrail": 0.013689,
+        "language": 0.000027,
+        "llm": 0.00037099999999999996,
+        "query_analysis": 0.000599,
+        "retrieval": 0.001809
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074979,
+      "stages": {
+        "grounding": 0.036517999999999995,
+        "guardrail": 0.019038,
+        "language": 0.000024999999999999998,
+        "llm": 0.000335,
+        "query_analysis": 0.001157,
+        "retrieval": 0.001959
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011148,
+      "stages": {
+        "grounding": 0.0077919999999999994,
+        "guardrail": 0.000706,
+        "language": 0.000018,
+        "query_analysis": 0.000286,
+        "retrieval": 0.00108
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0015799999999999998,
+      "stages": {
+        "guardrail": 0.0012109999999999998,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.02172,
+      "stages": {
+        "grounding": 0.010094,
+        "guardrail": 0.004739,
+        "language": 0.000019,
+        "llm": 0.000286,
+        "query_analysis": 0.000406,
+        "retrieval": 0.001093
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.06622700000000001,
+      "stages": {
+        "grounding": 0.036504999999999996,
+        "guardrail": 0.014022,
+        "language": 0.000027,
+        "llm": 0.00035400000000000004,
+        "query_analysis": 0.000511,
+        "retrieval": 0.001314
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074501,
+      "stages": {
+        "grounding": 0.036399,
+        "guardrail": 0.018969,
+        "language": 0.000024999999999999998,
+        "llm": 0.000376,
+        "query_analysis": 0.001105,
+        "retrieval": 0.001713
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010387,
+      "stages": {
+        "grounding": 0.007169,
+        "guardrail": 0.0006839999999999999,
+        "language": 0.000018,
+        "query_analysis": 0.000294,
+        "retrieval": 0.00103
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001442,
+      "stages": {
+        "guardrail": 0.001077,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021579,
+      "stages": {
+        "grounding": 0.009538999999999999,
+        "guardrail": 0.0048189999999999995,
+        "language": 0.000019,
+        "llm": 0.000299,
+        "query_analysis": 0.000414,
+        "retrieval": 0.0010270000000000001
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056369,
+      "stages": {
+        "grounding": 0.026944000000000003,
+        "guardrail": 0.013839,
+        "language": 0.000028,
+        "llm": 0.000337,
+        "query_analysis": 0.000553,
+        "retrieval": 0.001361
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.086685,
+      "stages": {
+        "grounding": 0.048408999999999994,
+        "guardrail": 0.019154,
+        "language": 0.000026000000000000002,
+        "llm": 0.00038700000000000003,
+        "query_analysis": 0.001124,
+        "retrieval": 0.001676
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011977999999999999,
+      "stages": {
+        "grounding": 0.008284999999999999,
+        "guardrail": 0.000961,
+        "language": 0.000019,
+        "query_analysis": 0.000341,
+        "retrieval": 0.001178
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001321,
+      "stages": {
+        "guardrail": 0.000986,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.025428000000000003,
+      "stages": {
+        "grounding": 0.010668,
+        "guardrail": 0.004937,
+        "language": 0.000018,
+        "llm": 0.000361,
+        "query_analysis": 0.00043099999999999996,
+        "retrieval": 0.0014169999999999999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.067042,
+      "stages": {
+        "grounding": 0.032406000000000004,
+        "guardrail": 0.014698000000000001,
+        "language": 0.000028,
+        "llm": 0.000516,
+        "query_analysis": 0.000585,
+        "retrieval": 0.00143
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.078718,
+      "stages": {
+        "grounding": 0.037349,
+        "guardrail": 0.021928,
+        "language": 0.000024,
+        "llm": 0.00035800000000000003,
+        "query_analysis": 0.001194,
+        "retrieval": 0.002007
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.014828,
+      "stages": {
+        "grounding": 0.010149,
+        "guardrail": 0.0011610000000000001,
+        "language": 0.00002,
+        "query_analysis": 0.000325,
+        "retrieval": 0.001726
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.002042,
+      "stages": {
+        "guardrail": 0.001624,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.027353,
+      "stages": {
+        "grounding": 0.012091,
+        "guardrail": 0.006448,
+        "language": 0.000017,
+        "llm": 0.000587,
+        "query_analysis": 0.000517,
+        "retrieval": 0.0013319999999999999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.057316,
+      "stages": {
+        "grounding": 0.027506,
+        "guardrail": 0.013901,
+        "language": 0.000027,
+        "llm": 0.000494,
+        "query_analysis": 0.0005700000000000001,
+        "retrieval": 0.001395
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.076042,
+      "stages": {
+        "grounding": 0.037391,
+        "guardrail": 0.019135,
+        "language": 0.000024999999999999998,
+        "llm": 0.000486,
+        "query_analysis": 0.001143,
+        "retrieval": 0.001807
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011582,
+      "stages": {
+        "grounding": 0.008083,
+        "guardrail": 0.001005,
+        "language": 0.000019,
+        "query_analysis": 0.000327,
+        "retrieval": 0.000967
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00137,
+      "stages": {
+        "guardrail": 0.0009969999999999998,
+        "language": 0.00002
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020701999999999998,
+      "stages": {
+        "grounding": 0.00963,
+        "guardrail": 0.004332,
+        "language": 0.000018,
+        "llm": 0.000432,
+        "query_analysis": 0.000432,
+        "retrieval": 0.001088
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.055715,
+      "stages": {
+        "grounding": 0.026909,
+        "guardrail": 0.013455,
+        "language": 0.000027,
+        "llm": 0.000451,
+        "query_analysis": 0.0004969999999999999,
+        "retrieval": 0.0012419999999999998
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.075301,
+      "stages": {
+        "grounding": 0.036946,
+        "guardrail": 0.019126999999999998,
+        "language": 0.000024,
+        "llm": 0.000513,
+        "query_analysis": 0.001081,
+        "retrieval": 0.001799
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.01082,
+      "stages": {
+        "grounding": 0.007537,
+        "guardrail": 0.0008190000000000001,
+        "language": 0.000017,
+        "query_analysis": 0.000286,
+        "retrieval": 0.000992
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012610000000000002,
+      "stages": {
+        "guardrail": 0.000913,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.022859,
+      "stages": {
+        "grounding": 0.009502,
+        "guardrail": 0.004388,
+        "language": 0.000017,
+        "llm": 0.00038,
+        "query_analysis": 0.000433,
+        "retrieval": 0.001138
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056759000000000004,
+      "stages": {
+        "grounding": 0.026729000000000003,
+        "guardrail": 0.014071,
+        "language": 0.000028,
+        "llm": 0.000342,
+        "query_analysis": 0.0005139999999999999,
+        "retrieval": 0.001477
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07447,
+      "stages": {
+        "grounding": 0.036815,
+        "guardrail": 0.018923,
+        "language": 0.000024999999999999998,
+        "llm": 0.000471,
+        "query_analysis": 0.001018,
+        "retrieval": 0.001621
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011105,
+      "stages": {
+        "grounding": 0.007213000000000001,
+        "guardrail": 0.001105,
+        "language": 0.000019,
+        "query_analysis": 0.00046699999999999997,
+        "retrieval": 0.001114
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001245,
+      "stages": {
+        "guardrail": 0.0009069999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019826999999999997,
+      "stages": {
+        "grounding": 0.009092999999999999,
+        "guardrail": 0.003939,
+        "language": 0.000018,
+        "llm": 0.00033999999999999997,
+        "query_analysis": 0.000457,
+        "retrieval": 0.001123
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.057376,
+      "stages": {
+        "grounding": 0.028123000000000002,
+        "guardrail": 0.013480999999999998,
+        "language": 0.000018,
+        "llm": 0.000328,
+        "query_analysis": 0.000552,
+        "retrieval": 0.001356
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07935199999999999,
+      "stages": {
+        "grounding": 0.041027,
+        "guardrail": 0.019138000000000002,
+        "language": 0.000024999999999999998,
+        "llm": 0.00043799999999999997,
+        "query_analysis": 0.0010580000000000001,
+        "retrieval": 0.001951
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011654999999999999,
+      "stages": {
+        "grounding": 0.007958999999999999,
+        "guardrail": 0.001006,
+        "language": 0.000018,
+        "query_analysis": 0.000299,
+        "retrieval": 0.000902
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001319,
+      "stages": {
+        "guardrail": 0.000859,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.023451999999999997,
+      "stages": {
+        "grounding": 0.008969,
+        "guardrail": 0.005802,
+        "language": 0.000017,
+        "llm": 0.000324,
+        "query_analysis": 0.000483,
+        "retrieval": 0.00119
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.075116,
+      "stages": {
+        "grounding": 0.04086,
+        "guardrail": 0.017731999999999998,
+        "language": 0.000021,
+        "llm": 0.000281,
+        "query_analysis": 0.00073,
+        "retrieval": 0.001995
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.116921,
+      "stages": {
+        "grounding": 0.05807,
+        "guardrail": 0.027586999999999997,
+        "language": 0.000024999999999999998,
+        "llm": 0.0007700000000000001,
+        "query_analysis": 0.0018759999999999998,
+        "retrieval": 0.002836
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.016496,
+      "stages": {
+        "grounding": 0.011286000000000001,
+        "guardrail": 0.001054,
+        "language": 0.000027,
+        "query_analysis": 0.000435,
+        "retrieval": 0.0018670000000000002
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.002154,
+      "stages": {
+        "guardrail": 0.0016589999999999999,
+        "language": 0.000027
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.02316,
+      "stages": {
+        "grounding": 0.010147,
+        "guardrail": 0.004861,
+        "language": 0.00002,
+        "llm": 0.000329,
+        "query_analysis": 0.00062,
+        "retrieval": 0.0019309999999999998
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056462000000000005,
+      "stages": {
+        "grounding": 0.026304,
+        "guardrail": 0.014078,
+        "language": 0.000028,
+        "llm": 0.00035999999999999997,
+        "query_analysis": 0.0005859999999999999,
+        "retrieval": 0.0014780000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077416,
+      "stages": {
+        "grounding": 0.039347,
+        "guardrail": 0.018966,
+        "language": 0.000026000000000000002,
+        "llm": 0.00054,
+        "query_analysis": 0.001096,
+        "retrieval": 0.0017430000000000002
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011576999999999999,
+      "stages": {
+        "grounding": 0.007734,
+        "guardrail": 0.000843,
+        "language": 0.00002,
+        "query_analysis": 0.00032,
+        "retrieval": 0.001183
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001344,
+      "stages": {
+        "guardrail": 0.0009490000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019993,
+      "stages": {
+        "grounding": 0.008834999999999999,
+        "guardrail": 0.004056,
+        "language": 0.000017,
+        "llm": 0.00042300000000000004,
+        "query_analysis": 0.000405,
+        "retrieval": 0.001037
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056775,
+      "stages": {
+        "grounding": 0.025983,
+        "guardrail": 0.0146,
+        "language": 0.000027,
+        "llm": 0.000306,
+        "query_analysis": 0.000532,
+        "retrieval": 0.00128
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.075621,
+      "stages": {
+        "grounding": 0.036665,
+        "guardrail": 0.019827,
+        "language": 0.000035000000000000004,
+        "llm": 0.000433,
+        "query_analysis": 0.001072,
+        "retrieval": 0.0017000000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010178,
+      "stages": {
+        "grounding": 0.0068260000000000005,
+        "guardrail": 0.000735,
+        "language": 0.000018,
+        "query_analysis": 0.000276,
+        "retrieval": 0.0009609999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001163,
+      "stages": {
+        "guardrail": 0.000797,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019164,
+      "stages": {
+        "grounding": 0.008467,
+        "guardrail": 0.003921,
+        "language": 0.000018,
+        "llm": 0.000336,
+        "query_analysis": 0.000402,
+        "retrieval": 0.001143
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.054068,
+      "stages": {
+        "grounding": 0.0258,
+        "guardrail": 0.013257,
+        "language": 0.000024999999999999998,
+        "llm": 0.00039000000000000005,
+        "query_analysis": 0.000493,
+        "retrieval": 0.001247
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074288,
+      "stages": {
+        "grounding": 0.036770000000000004,
+        "guardrail": 0.018862,
+        "language": 0.000026000000000000002,
+        "llm": 0.000394,
+        "query_analysis": 0.001034,
+        "retrieval": 0.001601
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010444,
+      "stages": {
+        "grounding": 0.007089,
+        "guardrail": 0.000738,
+        "language": 0.000019,
+        "query_analysis": 0.000241,
+        "retrieval": 0.000944
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001256,
+      "stages": {
+        "guardrail": 0.0009040000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021081,
+      "stages": {
+        "grounding": 0.010750999999999998,
+        "guardrail": 0.003819,
+        "language": 0.000017,
+        "llm": 0.000297,
+        "query_analysis": 0.00038700000000000003,
+        "retrieval": 0.001132
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05404,
+      "stages": {
+        "grounding": 0.025449,
+        "guardrail": 0.013315999999999998,
+        "language": 0.000027,
+        "llm": 0.000306,
+        "query_analysis": 0.000564,
+        "retrieval": 0.001267
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074352,
+      "stages": {
+        "grounding": 0.036511,
+        "guardrail": 0.018954000000000002,
+        "language": 0.000024999999999999998,
+        "llm": 0.000478,
+        "query_analysis": 0.001044,
+        "retrieval": 0.001641
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.01048,
+      "stages": {
+        "grounding": 0.007104,
+        "guardrail": 0.000697,
+        "language": 0.000018,
+        "query_analysis": 0.00028900000000000003,
+        "retrieval": 0.001002
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011710000000000002,
+      "stages": {
+        "guardrail": 0.000822,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019596,
+      "stages": {
+        "grounding": 0.008702000000000001,
+        "guardrail": 0.004128000000000001,
+        "language": 0.000018,
+        "llm": 0.000282,
+        "query_analysis": 0.000427,
+        "retrieval": 0.001023
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056424,
+      "stages": {
+        "grounding": 0.027195,
+        "guardrail": 0.013581,
+        "language": 0.000019,
+        "llm": 0.000377,
+        "query_analysis": 0.000501,
+        "retrieval": 0.001259
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.11831,
+      "stages": {
+        "grounding": 0.056699,
+        "guardrail": 0.028551000000000003,
+        "language": 0.000028,
+        "llm": 0.000673,
+        "query_analysis": 0.001718,
+        "retrieval": 0.0024609999999999996
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.017224,
+      "stages": {
+        "grounding": 0.012149,
+        "guardrail": 0.001262,
+        "language": 0.000021,
+        "query_analysis": 0.00048400000000000006,
+        "retrieval": 0.001405
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001966,
+      "stages": {
+        "guardrail": 0.001483,
+        "language": 0.000023
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.026542,
+      "stages": {
+        "grounding": 0.013553,
+        "guardrail": 0.004495,
+        "language": 0.000022,
+        "llm": 0.000339,
+        "query_analysis": 0.000638,
+        "retrieval": 0.001704
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056197,
+      "stages": {
+        "grounding": 0.027027,
+        "guardrail": 0.013709,
+        "language": 0.00002,
+        "llm": 0.000379,
+        "query_analysis": 0.000597,
+        "retrieval": 0.001431
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07665799999999999,
+      "stages": {
+        "grounding": 0.036918999999999993,
+        "guardrail": 0.021051,
+        "language": 0.000026000000000000002,
+        "llm": 0.000419,
+        "query_analysis": 0.001085,
+        "retrieval": 0.001639
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.012931,
+      "stages": {
+        "grounding": 0.008950999999999999,
+        "guardrail": 0.0007799999999999999,
+        "language": 0.000018,
+        "query_analysis": 0.000388,
+        "retrieval": 0.0012729999999999998
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0018169999999999998,
+      "stages": {
+        "guardrail": 0.001389,
+        "language": 0.000026000000000000002
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.023523000000000002,
+      "stages": {
+        "grounding": 0.011477000000000001,
+        "guardrail": 0.00427,
+        "language": 0.000023,
+        "llm": 0.000303,
+        "query_analysis": 0.000435,
+        "retrieval": 0.001343
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052905999999999995,
+      "stages": {
+        "grounding": 0.024838,
+        "guardrail": 0.013328000000000001,
+        "language": 0.000017,
+        "llm": 0.000378,
+        "query_analysis": 0.0005239999999999999,
+        "retrieval": 0.001341
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07277499999999999,
+      "stages": {
+        "grounding": 0.035777,
+        "guardrail": 0.018269999999999998,
+        "language": 0.000024999999999999998,
+        "llm": 0.000346,
+        "query_analysis": 0.001003,
+        "retrieval": 0.0016849999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010604,
+      "stages": {
+        "grounding": 0.007036,
+        "guardrail": 0.000911,
+        "language": 0.000017,
+        "query_analysis": 0.000284,
+        "retrieval": 0.001022
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011409999999999999,
+      "stages": {
+        "guardrail": 0.000816,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020941,
+      "stages": {
+        "grounding": 0.010022,
+        "guardrail": 0.004286,
+        "language": 0.000018,
+        "llm": 0.000278,
+        "query_analysis": 0.000402,
+        "retrieval": 0.001121
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056054,
+      "stages": {
+        "grounding": 0.027861,
+        "guardrail": 0.013372,
+        "language": 0.000027,
+        "llm": 0.000328,
+        "query_analysis": 0.0005489999999999999,
+        "retrieval": 0.001356
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071856,
+      "stages": {
+        "grounding": 0.035163,
+        "guardrail": 0.018351,
+        "language": 0.000024,
+        "llm": 0.000377,
+        "query_analysis": 0.001013,
+        "retrieval": 0.001702
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009996999999999999,
+      "stages": {
+        "grounding": 0.006843,
+        "guardrail": 0.000691,
+        "language": 0.000018,
+        "query_analysis": 0.000234,
+        "retrieval": 0.000979
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001174,
+      "stages": {
+        "guardrail": 0.000797,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018688,
+      "stages": {
+        "grounding": 0.00796,
+        "guardrail": 0.004123,
+        "language": 0.00002,
+        "llm": 0.000298,
+        "query_analysis": 0.00036899999999999997,
+        "retrieval": 0.001065
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.054089,
+      "stages": {
+        "grounding": 0.026185,
+        "guardrail": 0.013271,
+        "language": 0.000018,
+        "llm": 0.000312,
+        "query_analysis": 0.000504,
+        "retrieval": 0.001374
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071271,
+      "stages": {
+        "grounding": 0.035137,
+        "guardrail": 0.017984,
+        "language": 0.000023,
+        "llm": 0.00039799999999999997,
+        "query_analysis": 0.0010479999999999999,
+        "retrieval": 0.001551
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009996,
+      "stages": {
+        "grounding": 0.006668,
+        "guardrail": 0.000706,
+        "language": 0.000018,
+        "query_analysis": 0.000266,
+        "retrieval": 0.001085
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001112,
+      "stages": {
+        "guardrail": 0.000778,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019336,
+      "stages": {
+        "grounding": 0.008143,
+        "guardrail": 0.004394,
+        "language": 0.000018,
+        "llm": 0.000274,
+        "query_analysis": 0.000397,
+        "retrieval": 0.0011459999999999999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.060604,
+      "stages": {
+        "grounding": 0.032423,
+        "guardrail": 0.013149000000000001,
+        "language": 0.000018,
+        "llm": 0.000402,
+        "query_analysis": 0.000525,
+        "retrieval": 0.001463
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074646,
+      "stages": {
+        "grounding": 0.037523,
+        "guardrail": 0.018256,
+        "language": 0.00004,
+        "llm": 0.00035999999999999997,
+        "query_analysis": 0.001201,
+        "retrieval": 0.0021
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010577000000000001,
+      "stages": {
+        "grounding": 0.007025,
+        "guardrail": 0.0009339999999999999,
+        "language": 0.000017,
+        "query_analysis": 0.000298,
+        "retrieval": 0.000992
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00124,
+      "stages": {
+        "guardrail": 0.0008759999999999999,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020134,
+      "stages": {
+        "grounding": 0.008562,
+        "guardrail": 0.004743,
+        "language": 0.000017,
+        "llm": 0.000389,
+        "query_analysis": 0.000375,
+        "retrieval": 0.0012699999999999999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053447,
+      "stages": {
+        "grounding": 0.024992999999999998,
+        "guardrail": 0.013248000000000001,
+        "language": 0.000018,
+        "llm": 0.000317,
+        "query_analysis": 0.000579,
+        "retrieval": 0.00143
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.078034,
+      "stages": {
+        "grounding": 0.041386,
+        "guardrail": 0.018136,
+        "language": 0.000039,
+        "llm": 0.00039499999999999995,
+        "query_analysis": 0.001154,
+        "retrieval": 0.001749
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010134,
+      "stages": {
+        "grounding": 0.006501,
+        "guardrail": 0.001035,
+        "language": 0.000017,
+        "query_analysis": 0.000281,
+        "retrieval": 0.0010789999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001226,
+      "stages": {
+        "guardrail": 0.0008870000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019979,
+      "stages": {
+        "grounding": 0.008757,
+        "guardrail": 0.004495,
+        "language": 0.00002,
+        "llm": 0.000338,
+        "query_analysis": 0.00037099999999999996,
+        "retrieval": 0.001165
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052024999999999995,
+      "stages": {
+        "grounding": 0.024322,
+        "guardrail": 0.012996,
+        "language": 0.000017,
+        "llm": 0.00039000000000000005,
+        "query_analysis": 0.000599,
+        "retrieval": 0.001397
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.074807,
+      "stages": {
+        "grounding": 0.037469999999999996,
+        "guardrail": 0.018681,
+        "language": 0.000024,
+        "llm": 0.000313,
+        "query_analysis": 0.001096,
+        "retrieval": 0.001928
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011052000000000001,
+      "stages": {
+        "grounding": 0.0074340000000000005,
+        "guardrail": 0.000833,
+        "language": 0.000017,
+        "query_analysis": 0.000275,
+        "retrieval": 0.00128
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001178,
+      "stages": {
+        "guardrail": 0.000789,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019368000000000003,
+      "stages": {
+        "grounding": 0.008357,
+        "guardrail": 0.0044659999999999995,
+        "language": 0.000017,
+        "llm": 0.00030199999999999997,
+        "query_analysis": 0.000471,
+        "retrieval": 0.001096
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052481,
+      "stages": {
+        "grounding": 0.024539,
+        "guardrail": 0.013191,
+        "language": 0.000026000000000000002,
+        "llm": 0.00037,
+        "query_analysis": 0.00053,
+        "retrieval": 0.001309
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071952,
+      "stages": {
+        "grounding": 0.035969,
+        "guardrail": 0.018027,
+        "language": 0.000024,
+        "llm": 0.000314,
+        "query_analysis": 0.0011149999999999999,
+        "retrieval": 0.0015710000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009727,
+      "stages": {
+        "grounding": 0.0065,
+        "guardrail": 0.000741,
+        "language": 0.000018,
+        "query_analysis": 0.00025600000000000004,
+        "retrieval": 0.0009519999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001237,
+      "stages": {
+        "guardrail": 0.000867,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019889,
+      "stages": {
+        "grounding": 0.009352,
+        "guardrail": 0.004227,
+        "language": 0.000017,
+        "llm": 0.000286,
+        "query_analysis": 0.000378,
+        "retrieval": 0.001081
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053159,
+      "stages": {
+        "grounding": 0.024938000000000002,
+        "guardrail": 0.013423000000000001,
+        "language": 0.000026000000000000002,
+        "llm": 0.00032,
+        "query_analysis": 0.000513,
+        "retrieval": 0.001527
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071856,
+      "stages": {
+        "grounding": 0.035257,
+        "guardrail": 0.018171,
+        "language": 0.000024,
+        "llm": 0.000357,
+        "query_analysis": 0.0010580000000000001,
+        "retrieval": 0.001733
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.01032,
+      "stages": {
+        "grounding": 0.006836,
+        "guardrail": 0.000747,
+        "language": 0.000017,
+        "query_analysis": 0.000397,
+        "retrieval": 0.0012100000000000001
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001263,
+      "stages": {
+        "guardrail": 0.000928,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018516,
+      "stages": {
+        "grounding": 0.008011,
+        "guardrail": 0.004311,
+        "language": 0.000018,
+        "llm": 0.000281,
+        "query_analysis": 0.000383,
+        "retrieval": 0.001081
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.054352,
+      "stages": {
+        "grounding": 0.026145,
+        "guardrail": 0.013386,
+        "language": 0.000026000000000000002,
+        "llm": 0.000325,
+        "query_analysis": 0.000482,
+        "retrieval": 0.001475
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072144,
+      "stages": {
+        "grounding": 0.03555,
+        "guardrail": 0.018238,
+        "language": 0.000024999999999999998,
+        "llm": 0.000365,
+        "query_analysis": 0.001037,
+        "retrieval": 0.001781
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009836000000000001,
+      "stages": {
+        "grounding": 0.006543,
+        "guardrail": 0.00073,
+        "language": 0.000018,
+        "query_analysis": 0.000263,
+        "retrieval": 0.001006
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011149999999999999,
+      "stages": {
+        "guardrail": 0.000754,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019296,
+      "stages": {
+        "grounding": 0.007876999999999999,
+        "guardrail": 0.004141000000000001,
+        "language": 0.000018,
+        "llm": 0.000275,
+        "query_analysis": 0.000402,
+        "retrieval": 0.001374
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052023,
+      "stages": {
+        "grounding": 0.024308,
+        "guardrail": 0.013251,
+        "language": 0.000018,
+        "llm": 0.000363,
+        "query_analysis": 0.000504,
+        "retrieval": 0.001254
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07336999999999999,
+      "stages": {
+        "grounding": 0.036872,
+        "guardrail": 0.018206,
+        "language": 0.000024999999999999998,
+        "llm": 0.000327,
+        "query_analysis": 0.001034,
+        "retrieval": 0.001829
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009868,
+      "stages": {
+        "grounding": 0.006544,
+        "guardrail": 0.000727,
+        "language": 0.000017,
+        "query_analysis": 0.00035800000000000003,
+        "retrieval": 0.001044
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012029999999999999,
+      "stages": {
+        "guardrail": 0.000821,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018677000000000003,
+      "stages": {
+        "grounding": 0.007839,
+        "guardrail": 0.004438,
+        "language": 0.000017,
+        "llm": 0.000265,
+        "query_analysis": 0.000378,
+        "retrieval": 0.001043
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05232,
+      "stages": {
+        "grounding": 0.024236999999999998,
+        "guardrail": 0.013238999999999999,
+        "language": 0.000026000000000000002,
+        "llm": 0.000321,
+        "query_analysis": 0.000535,
+        "retrieval": 0.001374
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.076785,
+      "stages": {
+        "grounding": 0.034964,
+        "guardrail": 0.023721000000000003,
+        "language": 0.000024999999999999998,
+        "llm": 0.00028900000000000003,
+        "query_analysis": 0.001037,
+        "retrieval": 0.0015999999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.011911,
+      "stages": {
+        "grounding": 0.00757,
+        "guardrail": 0.0009279999999999999,
+        "language": 0.00002,
+        "query_analysis": 0.000542,
+        "retrieval": 0.001482
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001137,
+      "stages": {
+        "guardrail": 0.000756,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019073,
+      "stages": {
+        "grounding": 0.008027,
+        "guardrail": 0.004268,
+        "language": 0.000018,
+        "llm": 0.00026399999999999997,
+        "query_analysis": 0.000373,
+        "retrieval": 0.001251
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053515,
+      "stages": {
+        "grounding": 0.025664,
+        "guardrail": 0.013121999999999998,
+        "language": 0.000018,
+        "llm": 0.000261,
+        "query_analysis": 0.000541,
+        "retrieval": 0.0014789999999999998
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071337,
+      "stages": {
+        "grounding": 0.034882,
+        "guardrail": 0.018121,
+        "language": 0.000024,
+        "llm": 0.000284,
+        "query_analysis": 0.001023,
+        "retrieval": 0.00193
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010406,
+      "stages": {
+        "grounding": 0.00711,
+        "guardrail": 0.000733,
+        "language": 0.000018,
+        "query_analysis": 0.000322,
+        "retrieval": 0.0010979999999999998
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001142,
+      "stages": {
+        "guardrail": 0.0007840000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.017913,
+      "stages": {
+        "grounding": 0.007699,
+        "guardrail": 0.004167,
+        "language": 0.000018,
+        "llm": 0.000263,
+        "query_analysis": 0.00039499999999999995,
+        "retrieval": 0.001011
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051533,
+      "stages": {
+        "grounding": 0.023878,
+        "guardrail": 0.013202,
+        "language": 0.000029,
+        "llm": 0.000305,
+        "query_analysis": 0.00051,
+        "retrieval": 0.0012180000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07244199999999999,
+      "stages": {
+        "grounding": 0.036402000000000004,
+        "guardrail": 0.018118,
+        "language": 0.000024,
+        "llm": 0.000322,
+        "query_analysis": 0.001038,
+        "retrieval": 0.0016950000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009727,
+      "stages": {
+        "grounding": 0.006472,
+        "guardrail": 0.000802,
+        "language": 0.000017,
+        "query_analysis": 0.000296,
+        "retrieval": 0.000886
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012610000000000002,
+      "stages": {
+        "guardrail": 0.000883,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018654,
+      "stages": {
+        "grounding": 0.008001,
+        "guardrail": 0.004254000000000001,
+        "language": 0.000019,
+        "llm": 0.000286,
+        "query_analysis": 0.000378,
+        "retrieval": 0.00107
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051947,
+      "stages": {
+        "grounding": 0.024158000000000002,
+        "guardrail": 0.0132,
+        "language": 0.000019,
+        "llm": 0.000317,
+        "query_analysis": 0.000533,
+        "retrieval": 0.001404
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070754,
+      "stages": {
+        "grounding": 0.034786000000000004,
+        "guardrail": 0.017904,
+        "language": 0.000024,
+        "llm": 0.000382,
+        "query_analysis": 0.0010470000000000002,
+        "retrieval": 0.001593
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.01,
+      "stages": {
+        "grounding": 0.006537,
+        "guardrail": 0.000955,
+        "language": 0.000017,
+        "query_analysis": 0.00031600000000000004,
+        "retrieval": 0.001031
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011400000000000002,
+      "stages": {
+        "guardrail": 0.0007840000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.042138999999999996,
+      "stages": {
+        "grounding": 0.031801,
+        "guardrail": 0.0040030000000000005,
+        "language": 0.000018,
+        "llm": 0.00026199999999999997,
+        "query_analysis": 0.00036199999999999996,
+        "retrieval": 0.001088
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05189,
+      "stages": {
+        "grounding": 0.024329999999999997,
+        "guardrail": 0.013108,
+        "language": 0.000026000000000000002,
+        "llm": 0.000306,
+        "query_analysis": 0.000541,
+        "retrieval": 0.00131
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070776,
+      "stages": {
+        "grounding": 0.03465,
+        "guardrail": 0.018001,
+        "language": 0.000023,
+        "llm": 0.000273,
+        "query_analysis": 0.00098,
+        "retrieval": 0.001581
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009935999999999999,
+      "stages": {
+        "grounding": 0.006618,
+        "guardrail": 0.000709,
+        "language": 0.000026000000000000002,
+        "query_analysis": 0.000266,
+        "retrieval": 0.00105
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011149999999999999,
+      "stages": {
+        "guardrail": 0.000787,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018893999999999998,
+      "stages": {
+        "grounding": 0.00784,
+        "guardrail": 0.004332,
+        "language": 0.000017,
+        "llm": 0.000253,
+        "query_analysis": 0.000355,
+        "retrieval": 0.001144
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052033,
+      "stages": {
+        "grounding": 0.024238,
+        "guardrail": 0.013102,
+        "language": 0.000019,
+        "llm": 0.000344,
+        "query_analysis": 0.000475,
+        "retrieval": 0.001465
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071394,
+      "stages": {
+        "grounding": 0.034956999999999995,
+        "guardrail": 0.018131,
+        "language": 0.000023,
+        "llm": 0.000233,
+        "query_analysis": 0.001,
+        "retrieval": 0.0017620000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010017999999999999,
+      "stages": {
+        "grounding": 0.006672,
+        "guardrail": 0.0008829999999999999,
+        "language": 0.000017,
+        "query_analysis": 0.000258,
+        "retrieval": 0.0010279999999999998
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0013230000000000002,
+      "stages": {
+        "guardrail": 0.000942,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018635,
+      "stages": {
+        "grounding": 0.007915,
+        "guardrail": 0.004645000000000001,
+        "language": 0.000018,
+        "llm": 0.00025100000000000003,
+        "query_analysis": 0.000379,
+        "retrieval": 0.001014
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053127999999999995,
+      "stages": {
+        "grounding": 0.024878,
+        "guardrail": 0.013325,
+        "language": 0.000026000000000000002,
+        "llm": 0.000394,
+        "query_analysis": 0.0004969999999999999,
+        "retrieval": 0.001299
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07174,
+      "stages": {
+        "grounding": 0.035474,
+        "guardrail": 0.018184000000000002,
+        "language": 0.000024,
+        "llm": 0.000299,
+        "query_analysis": 0.001022,
+        "retrieval": 0.0016840000000000002
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009947,
+      "stages": {
+        "grounding": 0.006559000000000001,
+        "guardrail": 0.000704,
+        "language": 0.000018,
+        "query_analysis": 0.00025600000000000004,
+        "retrieval": 0.001159
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011719999999999999,
+      "stages": {
+        "guardrail": 0.000828,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021065,
+      "stages": {
+        "grounding": 0.008029999999999999,
+        "guardrail": 0.004229,
+        "language": 0.000017,
+        "llm": 0.000263,
+        "query_analysis": 0.000361,
+        "retrieval": 0.001116
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053175,
+      "stages": {
+        "grounding": 0.025483,
+        "guardrail": 0.013137,
+        "language": 0.000019,
+        "llm": 0.000303,
+        "query_analysis": 0.000506,
+        "retrieval": 0.001372
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071591,
+      "stages": {
+        "grounding": 0.03499,
+        "guardrail": 0.018099,
+        "language": 0.000024,
+        "llm": 0.000301,
+        "query_analysis": 0.001008,
+        "retrieval": 0.00203
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009568,
+      "stages": {
+        "grounding": 0.0061909999999999995,
+        "guardrail": 0.000721,
+        "language": 0.000019,
+        "query_analysis": 0.000274,
+        "retrieval": 0.001134
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001799,
+      "stages": {
+        "guardrail": 0.001252,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019901000000000002,
+      "stages": {
+        "grounding": 0.008257,
+        "guardrail": 0.004676,
+        "language": 0.000018,
+        "llm": 0.000268,
+        "query_analysis": 0.000448,
+        "retrieval": 0.001212
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052067999999999996,
+      "stages": {
+        "grounding": 0.02423,
+        "guardrail": 0.0132,
+        "language": 0.000017,
+        "llm": 0.00028700000000000004,
+        "query_analysis": 0.000504,
+        "retrieval": 0.0015489999999999998
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.073486,
+      "stages": {
+        "grounding": 0.036927,
+        "guardrail": 0.018484,
+        "language": 0.000024,
+        "llm": 0.000308,
+        "query_analysis": 0.000983,
+        "retrieval": 0.001646
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010027999999999999,
+      "stages": {
+        "grounding": 0.006725,
+        "guardrail": 0.000855,
+        "language": 0.000018,
+        "query_analysis": 0.000277,
+        "retrieval": 0.000958
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001286,
+      "stages": {
+        "guardrail": 0.000946,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018227,
+      "stages": {
+        "grounding": 0.007622,
+        "guardrail": 0.004481,
+        "language": 0.000017,
+        "llm": 0.000275,
+        "query_analysis": 0.00038500000000000003,
+        "retrieval": 0.000957
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051584,
+      "stages": {
+        "grounding": 0.024052,
+        "guardrail": 0.013184999999999999,
+        "language": 0.000027,
+        "llm": 0.000284,
+        "query_analysis": 0.00054,
+        "retrieval": 0.001281
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07104200000000001,
+      "stages": {
+        "grounding": 0.034783,
+        "guardrail": 0.01841,
+        "language": 0.000024,
+        "llm": 0.000325,
+        "query_analysis": 0.000993,
+        "retrieval": 0.0015379999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009393,
+      "stages": {
+        "grounding": 0.006261,
+        "guardrail": 0.000618,
+        "language": 0.000017,
+        "query_analysis": 0.00024400000000000002,
+        "retrieval": 0.001034
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001131,
+      "stages": {
+        "guardrail": 0.000789,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018161,
+      "stages": {
+        "grounding": 0.0074540000000000006,
+        "guardrail": 0.004142,
+        "language": 0.00002,
+        "llm": 0.000261,
+        "query_analysis": 0.000393,
+        "retrieval": 0.001069
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052791000000000005,
+      "stages": {
+        "grounding": 0.025449,
+        "guardrail": 0.013028000000000001,
+        "language": 0.000019,
+        "llm": 0.000252,
+        "query_analysis": 0.000491,
+        "retrieval": 0.001209
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070861,
+      "stages": {
+        "grounding": 0.03481,
+        "guardrail": 0.018055,
+        "language": 0.000024,
+        "llm": 0.00026199999999999997,
+        "query_analysis": 0.000992,
+        "retrieval": 0.001681
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009796000000000001,
+      "stages": {
+        "grounding": 0.00671,
+        "guardrail": 0.000646,
+        "language": 0.000016000000000000003,
+        "query_analysis": 0.000241,
+        "retrieval": 0.000937
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001152,
+      "stages": {
+        "guardrail": 0.00083,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018697000000000002,
+      "stages": {
+        "grounding": 0.007763,
+        "guardrail": 0.0043619999999999996,
+        "language": 0.000016000000000000003,
+        "llm": 0.00027,
+        "query_analysis": 0.000353,
+        "retrieval": 0.001012
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052353,
+      "stages": {
+        "grounding": 0.024596,
+        "guardrail": 0.013113,
+        "language": 0.000017,
+        "llm": 0.000298,
+        "query_analysis": 0.000486,
+        "retrieval": 0.001308
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072341,
+      "stages": {
+        "grounding": 0.036632,
+        "guardrail": 0.01779,
+        "language": 0.000024999999999999998,
+        "llm": 0.000255,
+        "query_analysis": 0.0009760000000000001,
+        "retrieval": 0.0016950000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009522,
+      "stages": {
+        "grounding": 0.006341,
+        "guardrail": 0.0006349999999999999,
+        "language": 0.000018,
+        "query_analysis": 0.00025699999999999996,
+        "retrieval": 0.001043
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001124,
+      "stages": {
+        "guardrail": 0.000779,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018017000000000002,
+      "stages": {
+        "grounding": 0.007657,
+        "guardrail": 0.004295,
+        "language": 0.000017,
+        "llm": 0.000271,
+        "query_analysis": 0.00035600000000000003,
+        "retrieval": 0.000975
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052429,
+      "stages": {
+        "grounding": 0.024533,
+        "guardrail": 0.013177,
+        "language": 0.000027,
+        "llm": 0.00031,
+        "query_analysis": 0.000536,
+        "retrieval": 0.001428
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070862,
+      "stages": {
+        "grounding": 0.034838,
+        "guardrail": 0.018111,
+        "language": 0.000024,
+        "llm": 0.000277,
+        "query_analysis": 0.0010049999999999998,
+        "retrieval": 0.0016279999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009849,
+      "stages": {
+        "grounding": 0.0066630000000000005,
+        "guardrail": 0.000691,
+        "language": 0.000018,
+        "query_analysis": 0.00032599999999999996,
+        "retrieval": 0.000917
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001065,
+      "stages": {
+        "guardrail": 0.0007549999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018227,
+      "stages": {
+        "grounding": 0.007739,
+        "guardrail": 0.003988,
+        "language": 0.000018,
+        "llm": 0.00026,
+        "query_analysis": 0.000376,
+        "retrieval": 0.0010979999999999998
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.078359,
+      "stages": {
+        "grounding": 0.025429999999999998,
+        "guardrail": 0.038139000000000006,
+        "language": 0.000027,
+        "llm": 0.000311,
+        "query_analysis": 0.000511,
+        "retrieval": 0.0014169999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07111200000000001,
+      "stages": {
+        "grounding": 0.034997,
+        "guardrail": 0.018073,
+        "language": 0.000024,
+        "llm": 0.000255,
+        "query_analysis": 0.0010240000000000002,
+        "retrieval": 0.0018989999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009687999999999999,
+      "stages": {
+        "grounding": 0.006442000000000001,
+        "guardrail": 0.0006540000000000001,
+        "language": 0.000017,
+        "query_analysis": 0.00029,
+        "retrieval": 0.000902
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001539,
+      "stages": {
+        "guardrail": 0.001199,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019074,
+      "stages": {
+        "grounding": 0.007922,
+        "guardrail": 0.00464,
+        "language": 0.000017,
+        "llm": 0.000266,
+        "query_analysis": 0.00036199999999999996,
+        "retrieval": 0.001154
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052082,
+      "stages": {
+        "grounding": 0.024687,
+        "guardrail": 0.013033999999999999,
+        "language": 0.000024999999999999998,
+        "llm": 0.000304,
+        "query_analysis": 0.000485,
+        "retrieval": 0.001217
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072629,
+      "stages": {
+        "grounding": 0.036538999999999995,
+        "guardrail": 0.018036,
+        "language": 0.000024,
+        "llm": 0.00029099999999999997,
+        "query_analysis": 0.001003,
+        "retrieval": 0.001681
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009761,
+      "stages": {
+        "grounding": 0.006372,
+        "guardrail": 0.000937,
+        "language": 0.000018,
+        "query_analysis": 0.000283,
+        "retrieval": 0.000898
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00128,
+      "stages": {
+        "guardrail": 0.0009519999999999999,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018306,
+      "stages": {
+        "grounding": 0.007643,
+        "guardrail": 0.003958,
+        "language": 0.000019,
+        "llm": 0.00024200000000000003,
+        "query_analysis": 0.00035400000000000004,
+        "retrieval": 0.001457
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052266,
+      "stages": {
+        "grounding": 0.024068,
+        "guardrail": 0.01339,
+        "language": 0.000027,
+        "llm": 0.00028900000000000003,
+        "query_analysis": 0.0005239999999999999,
+        "retrieval": 0.001377
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072731,
+      "stages": {
+        "grounding": 0.036677,
+        "guardrail": 0.017995,
+        "language": 0.000024,
+        "llm": 0.000275,
+        "query_analysis": 0.0009710000000000001,
+        "retrieval": 0.001813
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009441,
+      "stages": {
+        "grounding": 0.006265,
+        "guardrail": 0.0007210000000000001,
+        "language": 0.000019,
+        "query_analysis": 0.000237,
+        "retrieval": 0.00092
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011480000000000001,
+      "stages": {
+        "guardrail": 0.00081,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018385000000000002,
+      "stages": {
+        "grounding": 0.007875,
+        "guardrail": 0.004276,
+        "language": 0.000019,
+        "llm": 0.000232,
+        "query_analysis": 0.000377,
+        "retrieval": 0.001116
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052197,
+      "stages": {
+        "grounding": 0.024270999999999997,
+        "guardrail": 0.013204,
+        "language": 0.000026000000000000002,
+        "llm": 0.00025400000000000005,
+        "query_analysis": 0.000541,
+        "retrieval": 0.00134
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071869,
+      "stages": {
+        "grounding": 0.035426000000000006,
+        "guardrail": 0.018231,
+        "language": 0.000024,
+        "llm": 0.000245,
+        "query_analysis": 0.0010040000000000001,
+        "retrieval": 0.001796
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010179,
+      "stages": {
+        "grounding": 0.007014,
+        "guardrail": 0.000705,
+        "language": 0.00002,
+        "query_analysis": 0.000273,
+        "retrieval": 0.001042
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001181,
+      "stages": {
+        "guardrail": 0.0008269999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.017964,
+      "stages": {
+        "grounding": 0.007551,
+        "guardrail": 0.004228,
+        "language": 0.000018,
+        "llm": 0.00025600000000000004,
+        "query_analysis": 0.00037099999999999996,
+        "retrieval": 0.000972
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053368,
+      "stages": {
+        "grounding": 0.025689,
+        "guardrail": 0.013222999999999999,
+        "language": 0.000029,
+        "llm": 0.000282,
+        "query_analysis": 0.000511,
+        "retrieval": 0.0012729999999999998
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07115300000000001,
+      "stages": {
+        "grounding": 0.035006,
+        "guardrail": 0.018086,
+        "language": 0.000024999999999999998,
+        "llm": 0.000248,
+        "query_analysis": 0.001019,
+        "retrieval": 0.001737
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009534,
+      "stages": {
+        "grounding": 0.00629,
+        "guardrail": 0.000666,
+        "language": 0.000018,
+        "query_analysis": 0.000298,
+        "retrieval": 0.001019
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00105,
+      "stages": {
+        "guardrail": 0.000741,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018282,
+      "stages": {
+        "grounding": 0.007771999999999999,
+        "guardrail": 0.004196,
+        "language": 0.000018,
+        "llm": 0.000252,
+        "query_analysis": 0.00035400000000000004,
+        "retrieval": 0.001191
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051595,
+      "stages": {
+        "grounding": 0.02403,
+        "guardrail": 0.01308,
+        "language": 0.000026000000000000002,
+        "llm": 0.000267,
+        "query_analysis": 0.00052,
+        "retrieval": 0.0013030000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.08898600000000001,
+      "stages": {
+        "grounding": 0.043059,
+        "guardrail": 0.024773999999999997,
+        "language": 0.000024,
+        "llm": 0.00033,
+        "query_analysis": 0.000991,
+        "retrieval": 0.001676
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.013949,
+      "stages": {
+        "grounding": 0.009337,
+        "guardrail": 0.001108,
+        "language": 0.000019,
+        "query_analysis": 0.00039000000000000005,
+        "retrieval": 0.001583
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001751,
+      "stages": {
+        "guardrail": 0.001183,
+        "language": 0.000021
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.029436999999999998,
+      "stages": {
+        "grounding": 0.014771,
+        "guardrail": 0.006377,
+        "language": 0.000019,
+        "llm": 0.000474,
+        "query_analysis": 0.000563,
+        "retrieval": 0.001287
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.06741699999999999,
+      "stages": {
+        "grounding": 0.034075999999999995,
+        "guardrail": 0.017699,
+        "language": 0.000037,
+        "llm": 0.000321,
+        "query_analysis": 0.000744,
+        "retrieval": 0.0018440000000000002
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07188499999999999,
+      "stages": {
+        "grounding": 0.035172999999999996,
+        "guardrail": 0.018114,
+        "language": 0.000037,
+        "llm": 0.00029,
+        "query_analysis": 0.001094,
+        "retrieval": 0.001956
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010265999999999999,
+      "stages": {
+        "grounding": 0.006583,
+        "guardrail": 0.00077,
+        "language": 0.000018,
+        "query_analysis": 0.00029299999999999997,
+        "retrieval": 0.0012
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001204,
+      "stages": {
+        "guardrail": 0.0008309999999999999,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018749,
+      "stages": {
+        "grounding": 0.007526,
+        "guardrail": 0.004231,
+        "language": 0.000019,
+        "llm": 0.000225,
+        "query_analysis": 0.000363,
+        "retrieval": 0.001178
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05166,
+      "stages": {
+        "grounding": 0.024258000000000002,
+        "guardrail": 0.013117,
+        "language": 0.000017,
+        "llm": 0.000286,
+        "query_analysis": 0.000526,
+        "retrieval": 0.001296
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077028,
+      "stages": {
+        "grounding": 0.040762,
+        "guardrail": 0.018063,
+        "language": 0.000036,
+        "llm": 0.00025699999999999996,
+        "query_analysis": 0.001026,
+        "retrieval": 0.0016920000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010154,
+      "stages": {
+        "grounding": 0.006959,
+        "guardrail": 0.000721,
+        "language": 0.000019,
+        "query_analysis": 0.00025100000000000003,
+        "retrieval": 0.001043
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00119,
+      "stages": {
+        "guardrail": 0.00086,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018019,
+      "stages": {
+        "grounding": 0.007717000000000001,
+        "guardrail": 0.004287,
+        "language": 0.000017,
+        "llm": 0.00028900000000000003,
+        "query_analysis": 0.000365,
+        "retrieval": 0.0009599999999999999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051975,
+      "stages": {
+        "grounding": 0.024395,
+        "guardrail": 0.013093,
+        "language": 0.000026000000000000002,
+        "llm": 0.00029,
+        "query_analysis": 0.000547,
+        "retrieval": 0.0012
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070892,
+      "stages": {
+        "grounding": 0.034926,
+        "guardrail": 0.018098,
+        "language": 0.000036,
+        "llm": 0.000243,
+        "query_analysis": 0.0010350000000000001,
+        "retrieval": 0.0016619999999999998
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009373,
+      "stages": {
+        "grounding": 0.006195999999999999,
+        "guardrail": 0.000746,
+        "language": 0.000019,
+        "query_analysis": 0.000247,
+        "retrieval": 0.000923
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001229,
+      "stages": {
+        "guardrail": 0.000884,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018555000000000002,
+      "stages": {
+        "grounding": 0.007727,
+        "guardrail": 0.004299,
+        "language": 0.000017,
+        "llm": 0.000276,
+        "query_analysis": 0.00046499999999999997,
+        "retrieval": 0.001169
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052801,
+      "stages": {
+        "grounding": 0.025535,
+        "guardrail": 0.012919,
+        "language": 0.000018,
+        "llm": 0.000258,
+        "query_analysis": 0.0004969999999999999,
+        "retrieval": 0.001213
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071726,
+      "stages": {
+        "grounding": 0.035419,
+        "guardrail": 0.018305000000000002,
+        "language": 0.000036,
+        "llm": 0.00028500000000000004,
+        "query_analysis": 0.0010350000000000001,
+        "retrieval": 0.001691
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.00975,
+      "stages": {
+        "grounding": 0.006574,
+        "guardrail": 0.000762,
+        "language": 0.000018,
+        "query_analysis": 0.000286,
+        "retrieval": 0.0009379999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011170000000000002,
+      "stages": {
+        "guardrail": 0.000756,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018045000000000002,
+      "stages": {
+        "grounding": 0.007717000000000001,
+        "guardrail": 0.004324,
+        "language": 0.000017,
+        "llm": 0.00028000000000000003,
+        "query_analysis": 0.000377,
+        "retrieval": 0.000973
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052835,
+      "stages": {
+        "grounding": 0.02552,
+        "guardrail": 0.013105,
+        "language": 0.000017,
+        "llm": 0.000235,
+        "query_analysis": 0.000495,
+        "retrieval": 0.001219
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071093,
+      "stages": {
+        "grounding": 0.034998,
+        "guardrail": 0.01813,
+        "language": 0.000024,
+        "llm": 0.00025899999999999995,
+        "query_analysis": 0.000992,
+        "retrieval": 0.001625
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009741999999999999,
+      "stages": {
+        "grounding": 0.0064930000000000005,
+        "guardrail": 0.000701,
+        "language": 0.000019,
+        "query_analysis": 0.000283,
+        "retrieval": 0.001008
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001062,
+      "stages": {
+        "guardrail": 0.0007549999999999999,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018111,
+      "stages": {
+        "grounding": 0.007476,
+        "guardrail": 0.004063,
+        "language": 0.000017,
+        "llm": 0.00026,
+        "query_analysis": 0.000381,
+        "retrieval": 0.001069
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051616999999999996,
+      "stages": {
+        "grounding": 0.024128999999999998,
+        "guardrail": 0.013231,
+        "language": 0.000017,
+        "llm": 0.000263,
+        "query_analysis": 0.00047999999999999996,
+        "retrieval": 0.001312
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071239,
+      "stages": {
+        "grounding": 0.035250000000000004,
+        "guardrail": 0.018098,
+        "language": 0.000036,
+        "llm": 0.000375,
+        "query_analysis": 0.000984,
+        "retrieval": 0.001564
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010017999999999999,
+      "stages": {
+        "grounding": 0.006777,
+        "guardrail": 0.000766,
+        "language": 0.000017,
+        "query_analysis": 0.000246,
+        "retrieval": 0.000965
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001219,
+      "stages": {
+        "guardrail": 0.0009040000000000001,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018472,
+      "stages": {
+        "grounding": 0.0076760000000000005,
+        "guardrail": 0.003959,
+        "language": 0.000018,
+        "llm": 0.00028700000000000004,
+        "query_analysis": 0.00038500000000000003,
+        "retrieval": 0.001161
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053713,
+      "stages": {
+        "grounding": 0.026188,
+        "guardrail": 0.013006,
+        "language": 0.000017,
+        "llm": 0.00026399999999999997,
+        "query_analysis": 0.00047700000000000005,
+        "retrieval": 0.0014169999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.0741,
+      "stages": {
+        "grounding": 0.035105,
+        "guardrail": 0.018256,
+        "language": 0.000038,
+        "llm": 0.000401,
+        "query_analysis": 0.0010470000000000002,
+        "retrieval": 0.001681
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009264,
+      "stages": {
+        "grounding": 0.006197,
+        "guardrail": 0.00068,
+        "language": 0.000019,
+        "query_analysis": 0.000274,
+        "retrieval": 0.0008449999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001132,
+      "stages": {
+        "guardrail": 0.000794,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018149,
+      "stages": {
+        "grounding": 0.00752,
+        "guardrail": 0.004144,
+        "language": 0.00002,
+        "llm": 0.00026399999999999997,
+        "query_analysis": 0.000419,
+        "retrieval": 0.001133
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051687000000000004,
+      "stages": {
+        "grounding": 0.024239999999999998,
+        "guardrail": 0.012788,
+        "language": 0.000017,
+        "llm": 0.000246,
+        "query_analysis": 0.000522,
+        "retrieval": 0.0014190000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072185,
+      "stages": {
+        "grounding": 0.036171999999999996,
+        "guardrail": 0.018128,
+        "language": 0.000024,
+        "llm": 0.000305,
+        "query_analysis": 0.000995,
+        "retrieval": 0.001812
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009769000000000002,
+      "stages": {
+        "grounding": 0.0066370000000000005,
+        "guardrail": 0.000759,
+        "language": 0.000017,
+        "query_analysis": 0.00025400000000000005,
+        "retrieval": 0.000849
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001252,
+      "stages": {
+        "guardrail": 0.0009339999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.01859,
+      "stages": {
+        "grounding": 0.007866999999999999,
+        "guardrail": 0.004394,
+        "language": 0.000019,
+        "llm": 0.00027,
+        "query_analysis": 0.000394,
+        "retrieval": 0.001219
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052316,
+      "stages": {
+        "grounding": 0.024696,
+        "guardrail": 0.013035999999999999,
+        "language": 0.000027,
+        "llm": 0.00029099999999999997,
+        "query_analysis": 0.0005549999999999999,
+        "retrieval": 0.0012640000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071314,
+      "stages": {
+        "grounding": 0.035198,
+        "guardrail": 0.018118000000000002,
+        "language": 0.000026000000000000002,
+        "llm": 0.000342,
+        "query_analysis": 0.001003,
+        "retrieval": 0.001629
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010233,
+      "stages": {
+        "grounding": 0.006828,
+        "guardrail": 0.000811,
+        "language": 0.000018,
+        "query_analysis": 0.000384,
+        "retrieval": 0.0009540000000000001
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001165,
+      "stages": {
+        "guardrail": 0.0008139999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.01897,
+      "stages": {
+        "grounding": 0.007875,
+        "guardrail": 0.004375,
+        "language": 0.000017,
+        "llm": 0.000305,
+        "query_analysis": 0.000374,
+        "retrieval": 0.001122
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05388,
+      "stages": {
+        "grounding": 0.025886,
+        "guardrail": 0.013088,
+        "language": 0.000018,
+        "llm": 0.00032599999999999996,
+        "query_analysis": 0.000495,
+        "retrieval": 0.001527
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072568,
+      "stages": {
+        "grounding": 0.035837,
+        "guardrail": 0.018304,
+        "language": 0.000024,
+        "llm": 0.000313,
+        "query_analysis": 0.001074,
+        "retrieval": 0.001964
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010283,
+      "stages": {
+        "grounding": 0.006936,
+        "guardrail": 0.000788,
+        "language": 0.000018,
+        "query_analysis": 0.00035999999999999997,
+        "retrieval": 0.001029
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001214,
+      "stages": {
+        "guardrail": 0.000859,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018439999999999998,
+      "stages": {
+        "grounding": 0.007748,
+        "guardrail": 0.00428,
+        "language": 0.000017,
+        "llm": 0.000305,
+        "query_analysis": 0.000389,
+        "retrieval": 0.001045
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053615,
+      "stages": {
+        "grounding": 0.025641999999999998,
+        "guardrail": 0.013389999999999999,
+        "language": 0.000027,
+        "llm": 0.000297,
+        "query_analysis": 0.000521,
+        "retrieval": 0.0012720000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071399,
+      "stages": {
+        "grounding": 0.035059,
+        "guardrail": 0.01814,
+        "language": 0.000024999999999999998,
+        "llm": 0.00032300000000000004,
+        "query_analysis": 0.001043,
+        "retrieval": 0.00168
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.00987,
+      "stages": {
+        "grounding": 0.00653,
+        "guardrail": 0.0006910000000000001,
+        "language": 0.000019,
+        "query_analysis": 0.00035,
+        "retrieval": 0.001052
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011799999999999998,
+      "stages": {
+        "guardrail": 0.000865,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019089,
+      "stages": {
+        "grounding": 0.007928,
+        "guardrail": 0.0042,
+        "language": 0.000017,
+        "llm": 0.000272,
+        "query_analysis": 0.000386,
+        "retrieval": 0.0011200000000000001
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052386999999999996,
+      "stages": {
+        "grounding": 0.024571,
+        "guardrail": 0.013175,
+        "language": 0.000019,
+        "llm": 0.00025899999999999995,
+        "query_analysis": 0.000499,
+        "retrieval": 0.0012640000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071308,
+      "stages": {
+        "grounding": 0.035147,
+        "guardrail": 0.018171,
+        "language": 0.000024999999999999998,
+        "llm": 0.000267,
+        "query_analysis": 0.001003,
+        "retrieval": 0.001725
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010112000000000001,
+      "stages": {
+        "grounding": 0.006959,
+        "guardrail": 0.000745,
+        "language": 0.000018,
+        "query_analysis": 0.000294,
+        "retrieval": 0.000972
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001096,
+      "stages": {
+        "guardrail": 0.000776,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020774,
+      "stages": {
+        "grounding": 0.009595999999999999,
+        "guardrail": 0.004594,
+        "language": 0.000017,
+        "llm": 0.00035600000000000003,
+        "query_analysis": 0.000368,
+        "retrieval": 0.000895
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052247,
+      "stages": {
+        "grounding": 0.024335,
+        "guardrail": 0.013373000000000001,
+        "language": 0.000027,
+        "llm": 0.000275,
+        "query_analysis": 0.0005780000000000001,
+        "retrieval": 0.001217
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070938,
+      "stages": {
+        "grounding": 0.035108,
+        "guardrail": 0.017951,
+        "language": 0.000024,
+        "llm": 0.000275,
+        "query_analysis": 0.0010240000000000002,
+        "retrieval": 0.001585
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009802,
+      "stages": {
+        "grounding": 0.006599,
+        "guardrail": 0.00075,
+        "language": 0.000018,
+        "query_analysis": 0.000275,
+        "retrieval": 0.000928
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001085,
+      "stages": {
+        "guardrail": 0.000734,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.022274000000000002,
+      "stages": {
+        "grounding": 0.007593,
+        "guardrail": 0.007979,
+        "language": 0.000019,
+        "llm": 0.000261,
+        "query_analysis": 0.000372,
+        "retrieval": 0.001012
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053085,
+      "stages": {
+        "grounding": 0.024579,
+        "guardrail": 0.013511,
+        "language": 0.000019,
+        "llm": 0.00028900000000000003,
+        "query_analysis": 0.000532,
+        "retrieval": 0.0014219999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072811,
+      "stages": {
+        "grounding": 0.03693,
+        "guardrail": 0.017995999999999998,
+        "language": 0.000024,
+        "llm": 0.000301,
+        "query_analysis": 0.0010350000000000001,
+        "retrieval": 0.00162
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.00983,
+      "stages": {
+        "grounding": 0.006716,
+        "guardrail": 0.000717,
+        "language": 0.000019,
+        "query_analysis": 0.000263,
+        "retrieval": 0.00092
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001589,
+      "stages": {
+        "guardrail": 0.001256,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018986,
+      "stages": {
+        "grounding": 0.008006,
+        "guardrail": 0.004606000000000001,
+        "language": 0.000018,
+        "llm": 0.000281,
+        "query_analysis": 0.00035999999999999997,
+        "retrieval": 0.0010040000000000001
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052335,
+      "stages": {
+        "grounding": 0.024578,
+        "guardrail": 0.013169,
+        "language": 0.000024,
+        "llm": 0.00033299999999999996,
+        "query_analysis": 0.000504,
+        "retrieval": 0.001325
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071412,
+      "stages": {
+        "grounding": 0.035205,
+        "guardrail": 0.018091,
+        "language": 0.000024,
+        "llm": 0.00031600000000000004,
+        "query_analysis": 0.0010049999999999998,
+        "retrieval": 0.001563
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009799,
+      "stages": {
+        "grounding": 0.0065119999999999996,
+        "guardrail": 0.000805,
+        "language": 0.000019,
+        "query_analysis": 0.000268,
+        "retrieval": 0.0009379999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001402,
+      "stages": {
+        "guardrail": 0.0010780000000000002,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018876,
+      "stages": {
+        "grounding": 0.007929,
+        "guardrail": 0.004091,
+        "language": 0.000018,
+        "llm": 0.000281,
+        "query_analysis": 0.000367,
+        "retrieval": 0.001083
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053488,
+      "stages": {
+        "grounding": 0.026092,
+        "guardrail": 0.013031000000000001,
+        "language": 0.000017,
+        "llm": 0.000305,
+        "query_analysis": 0.000483,
+        "retrieval": 0.001341
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071568,
+      "stages": {
+        "grounding": 0.03524,
+        "guardrail": 0.018269,
+        "language": 0.000024,
+        "llm": 0.00029299999999999997,
+        "query_analysis": 0.001022,
+        "retrieval": 0.00167
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.00962,
+      "stages": {
+        "grounding": 0.006575,
+        "guardrail": 0.000692,
+        "language": 0.000017,
+        "query_analysis": 0.00025400000000000005,
+        "retrieval": 0.000833
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012950000000000001,
+      "stages": {
+        "guardrail": 0.000972,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019063,
+      "stages": {
+        "grounding": 0.008005,
+        "guardrail": 0.004597,
+        "language": 0.000018,
+        "llm": 0.000253,
+        "query_analysis": 0.000379,
+        "retrieval": 0.001018
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052274999999999995,
+      "stages": {
+        "grounding": 0.024371,
+        "guardrail": 0.013265,
+        "language": 0.000018,
+        "llm": 0.00025600000000000004,
+        "query_analysis": 0.000479,
+        "retrieval": 0.001287
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072377,
+      "stages": {
+        "grounding": 0.036195000000000005,
+        "guardrail": 0.018116,
+        "language": 0.000027,
+        "llm": 0.00031600000000000004,
+        "query_analysis": 0.000986,
+        "retrieval": 0.00178
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010169000000000001,
+      "stages": {
+        "grounding": 0.007195,
+        "guardrail": 0.000642,
+        "language": 0.000016000000000000003,
+        "query_analysis": 0.000255,
+        "retrieval": 0.000932
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0011799999999999998,
+      "stages": {
+        "guardrail": 0.000825,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.0191,
+      "stages": {
+        "grounding": 0.007880999999999999,
+        "guardrail": 0.004674,
+        "language": 0.000018,
+        "llm": 0.00023099999999999998,
+        "query_analysis": 0.00036199999999999996,
+        "retrieval": 0.001049
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052953,
+      "stages": {
+        "grounding": 0.024559,
+        "guardrail": 0.013283999999999999,
+        "language": 0.000027,
+        "llm": 0.000294,
+        "query_analysis": 0.00048800000000000004,
+        "retrieval": 0.0013599999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07169,
+      "stages": {
+        "grounding": 0.035246,
+        "guardrail": 0.018291,
+        "language": 0.000023,
+        "llm": 0.00025699999999999996,
+        "query_analysis": 0.0010479999999999999,
+        "retrieval": 0.001604
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009619,
+      "stages": {
+        "grounding": 0.006373,
+        "guardrail": 0.000727,
+        "language": 0.000018,
+        "query_analysis": 0.000329,
+        "retrieval": 0.000927
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001199,
+      "stages": {
+        "guardrail": 0.000871,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.026787,
+      "stages": {
+        "grounding": 0.010501,
+        "guardrail": 0.004312,
+        "language": 0.000019,
+        "llm": 0.000275,
+        "query_analysis": 0.000396,
+        "retrieval": 0.001174
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052732999999999995,
+      "stages": {
+        "grounding": 0.024416,
+        "guardrail": 0.013575,
+        "language": 0.000018,
+        "llm": 0.000277,
+        "query_analysis": 0.000499,
+        "retrieval": 0.001297
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07185399999999999,
+      "stages": {
+        "grounding": 0.035316,
+        "guardrail": 0.018109,
+        "language": 0.000024999999999999998,
+        "llm": 0.000435,
+        "query_analysis": 0.001037,
+        "retrieval": 0.001713
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009961,
+      "stages": {
+        "grounding": 0.006688,
+        "guardrail": 0.000709,
+        "language": 0.000018,
+        "query_analysis": 0.00026399999999999997,
+        "retrieval": 0.001063
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001872,
+      "stages": {
+        "guardrail": 0.0013599999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019742,
+      "stages": {
+        "grounding": 0.008681000000000001,
+        "guardrail": 0.004202,
+        "language": 0.000017,
+        "llm": 0.000265,
+        "query_analysis": 0.00048400000000000006,
+        "retrieval": 0.001254
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.056597,
+      "stages": {
+        "grounding": 0.025797,
+        "guardrail": 0.013394,
+        "language": 0.000017,
+        "llm": 0.000359,
+        "query_analysis": 0.000501,
+        "retrieval": 0.001381
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072005,
+      "stages": {
+        "grounding": 0.035407,
+        "guardrail": 0.01829,
+        "language": 0.000023,
+        "llm": 0.000372,
+        "query_analysis": 0.000989,
+        "retrieval": 0.001562
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009559,
+      "stages": {
+        "grounding": 0.00645,
+        "guardrail": 0.0006910000000000001,
+        "language": 0.000018,
+        "query_analysis": 0.00025,
+        "retrieval": 0.0009069999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001129,
+      "stages": {
+        "guardrail": 0.000791,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019109,
+      "stages": {
+        "grounding": 0.0081,
+        "guardrail": 0.0043820000000000005,
+        "language": 0.000017,
+        "llm": 0.000292,
+        "query_analysis": 0.000361,
+        "retrieval": 0.001068
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052479,
+      "stages": {
+        "grounding": 0.024706,
+        "guardrail": 0.013242,
+        "language": 0.000018,
+        "llm": 0.00031800000000000003,
+        "query_analysis": 0.00052,
+        "retrieval": 0.001368
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.076419,
+      "stages": {
+        "grounding": 0.039931,
+        "guardrail": 0.018387,
+        "language": 0.000024,
+        "llm": 0.00028500000000000004,
+        "query_analysis": 0.001017,
+        "retrieval": 0.001598
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009928000000000001,
+      "stages": {
+        "grounding": 0.006588,
+        "guardrail": 0.000869,
+        "language": 0.000018,
+        "query_analysis": 0.000265,
+        "retrieval": 0.000912
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001121,
+      "stages": {
+        "guardrail": 0.000799,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.017692,
+      "stages": {
+        "grounding": 0.007516,
+        "guardrail": 0.003972,
+        "language": 0.000017,
+        "llm": 0.000263,
+        "query_analysis": 0.00039000000000000005,
+        "retrieval": 0.001063
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05351,
+      "stages": {
+        "grounding": 0.025627,
+        "guardrail": 0.013162,
+        "language": 0.000019,
+        "llm": 0.00028700000000000004,
+        "query_analysis": 0.000496,
+        "retrieval": 0.001344
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071659,
+      "stages": {
+        "grounding": 0.035435,
+        "guardrail": 0.018182,
+        "language": 0.000029,
+        "llm": 0.000294,
+        "query_analysis": 0.00102,
+        "retrieval": 0.001892
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009803000000000001,
+      "stages": {
+        "grounding": 0.006541,
+        "guardrail": 0.0007449999999999999,
+        "language": 0.000018,
+        "query_analysis": 0.000282,
+        "retrieval": 0.000959
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001274,
+      "stages": {
+        "guardrail": 0.000948,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018468,
+      "stages": {
+        "grounding": 0.007954999999999999,
+        "guardrail": 0.004275,
+        "language": 0.000018,
+        "llm": 0.000274,
+        "query_analysis": 0.000363,
+        "retrieval": 0.001193
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053618,
+      "stages": {
+        "grounding": 0.025892,
+        "guardrail": 0.013122,
+        "language": 0.000027,
+        "llm": 0.00029099999999999997,
+        "query_analysis": 0.000519,
+        "retrieval": 0.0013260000000000001
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07069700000000001,
+      "stages": {
+        "grounding": 0.034766,
+        "guardrail": 0.018018,
+        "language": 0.000026000000000000002,
+        "llm": 0.00025,
+        "query_analysis": 0.001026,
+        "retrieval": 0.001655
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.00971,
+      "stages": {
+        "grounding": 0.006520000000000001,
+        "guardrail": 0.000708,
+        "language": 0.000019,
+        "query_analysis": 0.00029499999999999996,
+        "retrieval": 0.0009239999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012729999999999998,
+      "stages": {
+        "guardrail": 0.000937,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018546,
+      "stages": {
+        "grounding": 0.008184,
+        "guardrail": 0.004079,
+        "language": 0.000018,
+        "llm": 0.000247,
+        "query_analysis": 0.000344,
+        "retrieval": 0.0010350000000000001
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.057147,
+      "stages": {
+        "grounding": 0.024699,
+        "guardrail": 0.017960999999999998,
+        "language": 0.000018,
+        "llm": 0.00025400000000000005,
+        "query_analysis": 0.000513,
+        "retrieval": 0.0013009999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072118,
+      "stages": {
+        "grounding": 0.036162,
+        "guardrail": 0.01811,
+        "language": 0.000029,
+        "llm": 0.00031,
+        "query_analysis": 0.001008,
+        "retrieval": 0.001711
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010005,
+      "stages": {
+        "grounding": 0.006878,
+        "guardrail": 0.0006789999999999999,
+        "language": 0.000018,
+        "query_analysis": 0.000275,
+        "retrieval": 0.000856
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001104,
+      "stages": {
+        "guardrail": 0.0007689999999999999,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018479,
+      "stages": {
+        "grounding": 0.00805,
+        "guardrail": 0.004324,
+        "language": 0.000018,
+        "llm": 0.000268,
+        "query_analysis": 0.000352,
+        "retrieval": 0.000964
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.051919,
+      "stages": {
+        "grounding": 0.024206000000000002,
+        "guardrail": 0.013121,
+        "language": 0.000017,
+        "llm": 0.000255,
+        "query_analysis": 0.000527,
+        "retrieval": 0.0013230000000000002
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070969,
+      "stages": {
+        "grounding": 0.035017,
+        "guardrail": 0.017938,
+        "language": 0.000024,
+        "llm": 0.00025699999999999996,
+        "query_analysis": 0.000987,
+        "retrieval": 0.00168
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009519,
+      "stages": {
+        "grounding": 0.006335,
+        "guardrail": 0.0006569999999999999,
+        "language": 0.000017,
+        "query_analysis": 0.000283,
+        "retrieval": 0.0009969999999999998
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001074,
+      "stages": {
+        "guardrail": 0.000741,
+        "language": 0.000019
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018410000000000003,
+      "stages": {
+        "grounding": 0.008012,
+        "guardrail": 0.0041789999999999996,
+        "language": 0.000018,
+        "llm": 0.000275,
+        "query_analysis": 0.000373,
+        "retrieval": 0.001014
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.054222,
+      "stages": {
+        "grounding": 0.026033,
+        "guardrail": 0.013315,
+        "language": 0.000017,
+        "llm": 0.000305,
+        "query_analysis": 0.000544,
+        "retrieval": 0.001418
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.075053,
+      "stages": {
+        "grounding": 0.038761,
+        "guardrail": 0.018145,
+        "language": 0.000024,
+        "llm": 0.000255,
+        "query_analysis": 0.001065,
+        "retrieval": 0.001885
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009941,
+      "stages": {
+        "grounding": 0.006748,
+        "guardrail": 0.000687,
+        "language": 0.000017,
+        "query_analysis": 0.000353,
+        "retrieval": 0.0010049999999999998
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001111,
+      "stages": {
+        "guardrail": 0.000734,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.023348999999999998,
+      "stages": {
+        "grounding": 0.013022,
+        "guardrail": 0.004358,
+        "language": 0.000018,
+        "llm": 0.00025899999999999995,
+        "query_analysis": 0.00036899999999999997,
+        "retrieval": 0.000975
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052473,
+      "stages": {
+        "grounding": 0.024757,
+        "guardrail": 0.013181,
+        "language": 0.000027,
+        "llm": 0.000321,
+        "query_analysis": 0.000517,
+        "retrieval": 0.001369
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07268000000000001,
+      "stages": {
+        "grounding": 0.036662,
+        "guardrail": 0.018121,
+        "language": 0.000024999999999999998,
+        "llm": 0.00028700000000000004,
+        "query_analysis": 0.001002,
+        "retrieval": 0.0015710000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009873,
+      "stages": {
+        "grounding": 0.006491,
+        "guardrail": 0.0007900000000000001,
+        "language": 0.000018,
+        "query_analysis": 0.00031600000000000004,
+        "retrieval": 0.001006
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00128,
+      "stages": {
+        "guardrail": 0.000931,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019001,
+      "stages": {
+        "grounding": 0.00829,
+        "guardrail": 0.004364000000000001,
+        "language": 0.000018,
+        "llm": 0.000282,
+        "query_analysis": 0.000351,
+        "retrieval": 0.001043
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052425,
+      "stages": {
+        "grounding": 0.024239999999999998,
+        "guardrail": 0.013401,
+        "language": 0.000018,
+        "llm": 0.00029299999999999997,
+        "query_analysis": 0.000537,
+        "retrieval": 0.00132
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072889,
+      "stages": {
+        "grounding": 0.036433999999999994,
+        "guardrail": 0.018275,
+        "language": 0.000024,
+        "llm": 0.000272,
+        "query_analysis": 0.00099,
+        "retrieval": 0.001821
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010570000000000001,
+      "stages": {
+        "grounding": 0.007221999999999999,
+        "guardrail": 0.000868,
+        "language": 0.000017,
+        "query_analysis": 0.000284,
+        "retrieval": 0.001041
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001415,
+      "stages": {
+        "guardrail": 0.0010869999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019645,
+      "stages": {
+        "grounding": 0.009055,
+        "guardrail": 0.004439,
+        "language": 0.000018,
+        "llm": 0.00025,
+        "query_analysis": 0.000373,
+        "retrieval": 0.0009739999999999999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052061,
+      "stages": {
+        "grounding": 0.024432,
+        "guardrail": 0.013321,
+        "language": 0.000026000000000000002,
+        "llm": 0.00029,
+        "query_analysis": 0.00051,
+        "retrieval": 0.00124
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07109,
+      "stages": {
+        "grounding": 0.035057,
+        "guardrail": 0.018262,
+        "language": 0.000024999999999999998,
+        "llm": 0.000306,
+        "query_analysis": 0.000975,
+        "retrieval": 0.001593
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009584,
+      "stages": {
+        "grounding": 0.006457,
+        "guardrail": 0.000697,
+        "language": 0.000017,
+        "query_analysis": 0.000275,
+        "retrieval": 0.000909
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00125,
+      "stages": {
+        "guardrail": 0.000883,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018638000000000002,
+      "stages": {
+        "grounding": 0.00798,
+        "guardrail": 0.004392999999999999,
+        "language": 0.000017,
+        "llm": 0.000275,
+        "query_analysis": 0.000348,
+        "retrieval": 0.001052
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052249000000000004,
+      "stages": {
+        "grounding": 0.024423,
+        "guardrail": 0.013219999999999999,
+        "language": 0.000017,
+        "llm": 0.000265,
+        "query_analysis": 0.000533,
+        "retrieval": 0.001259
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07614499999999999,
+      "stages": {
+        "grounding": 0.035333,
+        "guardrail": 0.02237,
+        "language": 0.000024,
+        "llm": 0.000384,
+        "query_analysis": 0.000987,
+        "retrieval": 0.001768
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010312,
+      "stages": {
+        "grounding": 0.006728,
+        "guardrail": 0.000886,
+        "language": 0.00002,
+        "query_analysis": 0.000386,
+        "retrieval": 0.001022
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0013650000000000001,
+      "stages": {
+        "guardrail": 0.000986,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021442,
+      "stages": {
+        "grounding": 0.009493,
+        "guardrail": 0.004902,
+        "language": 0.000017,
+        "llm": 0.0003,
+        "query_analysis": 0.000412,
+        "retrieval": 0.0011790000000000001
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05367,
+      "stages": {
+        "grounding": 0.025435,
+        "guardrail": 0.013326,
+        "language": 0.000018,
+        "llm": 0.000317,
+        "query_analysis": 0.000521,
+        "retrieval": 0.001566
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.073785,
+      "stages": {
+        "grounding": 0.037101999999999996,
+        "guardrail": 0.018341,
+        "language": 0.000022,
+        "llm": 0.000335,
+        "query_analysis": 0.001082,
+        "retrieval": 0.0018390000000000001
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010322999999999999,
+      "stages": {
+        "grounding": 0.00696,
+        "guardrail": 0.000835,
+        "language": 0.000019,
+        "query_analysis": 0.000324,
+        "retrieval": 0.000991
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001502,
+      "stages": {
+        "guardrail": 0.0011200000000000001,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018723,
+      "stages": {
+        "grounding": 0.008144,
+        "guardrail": 0.004398000000000001,
+        "language": 0.000018,
+        "llm": 0.000305,
+        "query_analysis": 0.000397,
+        "retrieval": 0.000999
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05333,
+      "stages": {
+        "grounding": 0.024854,
+        "guardrail": 0.013553000000000003,
+        "language": 0.000029999999999999997,
+        "llm": 0.000341,
+        "query_analysis": 0.000509,
+        "retrieval": 0.001359
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.077216,
+      "stages": {
+        "grounding": 0.035688000000000004,
+        "guardrail": 0.023073999999999997,
+        "language": 0.000024,
+        "llm": 0.00034700000000000003,
+        "query_analysis": 0.001114,
+        "retrieval": 0.001768
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010186,
+      "stages": {
+        "grounding": 0.0066619999999999995,
+        "guardrail": 0.0007430000000000001,
+        "language": 0.000019,
+        "query_analysis": 0.00031,
+        "retrieval": 0.001188
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001181,
+      "stages": {
+        "guardrail": 0.000865,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019296,
+      "stages": {
+        "grounding": 0.008291999999999999,
+        "guardrail": 0.004336,
+        "language": 0.000018,
+        "llm": 0.00033,
+        "query_analysis": 0.00039000000000000005,
+        "retrieval": 0.001063
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.05317,
+      "stages": {
+        "grounding": 0.024957,
+        "guardrail": 0.013359,
+        "language": 0.000019,
+        "llm": 0.00032599999999999996,
+        "query_analysis": 0.000546,
+        "retrieval": 0.001377
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072254,
+      "stages": {
+        "grounding": 0.035375,
+        "guardrail": 0.018466999999999997,
+        "language": 0.000024999999999999998,
+        "llm": 0.000353,
+        "query_analysis": 0.001042,
+        "retrieval": 0.001787
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010399,
+      "stages": {
+        "grounding": 0.007062000000000001,
+        "guardrail": 0.000727,
+        "language": 0.000018,
+        "query_analysis": 0.00028500000000000004,
+        "retrieval": 0.001105
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001259,
+      "stages": {
+        "guardrail": 0.000929,
+        "language": 0.000017
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.020071000000000002,
+      "stages": {
+        "grounding": 0.009118,
+        "guardrail": 0.004489,
+        "language": 0.000018,
+        "llm": 0.000308,
+        "query_analysis": 0.00038500000000000003,
+        "retrieval": 0.001032
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053738,
+      "stages": {
+        "grounding": 0.025289000000000002,
+        "guardrail": 0.013601,
+        "language": 0.000026000000000000002,
+        "llm": 0.000374,
+        "query_analysis": 0.000537,
+        "retrieval": 0.001237
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07227900000000001,
+      "stages": {
+        "grounding": 0.035621,
+        "guardrail": 0.018477999999999998,
+        "language": 0.000024999999999999998,
+        "llm": 0.000332,
+        "query_analysis": 0.0010160000000000002,
+        "retrieval": 0.00159
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009932000000000002,
+      "stages": {
+        "grounding": 0.006716,
+        "guardrail": 0.0007449999999999999,
+        "language": 0.000017,
+        "query_analysis": 0.00024400000000000002,
+        "retrieval": 0.0009710000000000001
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001207,
+      "stages": {
+        "guardrail": 0.00086,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019087,
+      "stages": {
+        "grounding": 0.008117000000000001,
+        "guardrail": 0.004129000000000001,
+        "language": 0.000018,
+        "llm": 0.000276,
+        "query_analysis": 0.000402,
+        "retrieval": 0.001123
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.054454999999999996,
+      "stages": {
+        "grounding": 0.026496,
+        "guardrail": 0.013197,
+        "language": 0.000017,
+        "llm": 0.00041,
+        "query_analysis": 0.000492,
+        "retrieval": 0.0013239999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071771,
+      "stages": {
+        "grounding": 0.035166,
+        "guardrail": 0.018297,
+        "language": 0.000024,
+        "llm": 0.00031600000000000004,
+        "query_analysis": 0.001011,
+        "retrieval": 0.001668
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009701000000000001,
+      "stages": {
+        "grounding": 0.006526,
+        "guardrail": 0.0006969999999999999,
+        "language": 0.000017,
+        "query_analysis": 0.000309,
+        "retrieval": 0.000913
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001122,
+      "stages": {
+        "guardrail": 0.0007490000000000001,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.019154,
+      "stages": {
+        "grounding": 0.008406,
+        "guardrail": 0.004117,
+        "language": 0.000017,
+        "llm": 0.000308,
+        "query_analysis": 0.00038500000000000003,
+        "retrieval": 0.001123
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052166000000000004,
+      "stages": {
+        "grounding": 0.024513,
+        "guardrail": 0.013090999999999998,
+        "language": 0.000017,
+        "llm": 0.000348,
+        "query_analysis": 0.000491,
+        "retrieval": 0.001317
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.070894,
+      "stages": {
+        "grounding": 0.035157,
+        "guardrail": 0.017905,
+        "language": 0.000023,
+        "llm": 0.000324,
+        "query_analysis": 0.00102,
+        "retrieval": 0.001547
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009499,
+      "stages": {
+        "grounding": 0.006431,
+        "guardrail": 0.000692,
+        "language": 0.000018,
+        "query_analysis": 0.000237,
+        "retrieval": 0.00087
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001333,
+      "stages": {
+        "guardrail": 0.001011,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.02094,
+      "stages": {
+        "grounding": 0.009829000000000001,
+        "guardrail": 0.004251,
+        "language": 0.000017,
+        "llm": 0.000288,
+        "query_analysis": 0.000366,
+        "retrieval": 0.001076
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052828,
+      "stages": {
+        "grounding": 0.024704,
+        "guardrail": 0.013291,
+        "language": 0.000018,
+        "llm": 0.000367,
+        "query_analysis": 0.000572,
+        "retrieval": 0.00141
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07183099999999999,
+      "stages": {
+        "grounding": 0.035544,
+        "guardrail": 0.018144,
+        "language": 0.000024,
+        "llm": 0.00047999999999999996,
+        "query_analysis": 0.00099,
+        "retrieval": 0.001545
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.010049,
+      "stages": {
+        "grounding": 0.006573,
+        "guardrail": 0.000936,
+        "language": 0.000018,
+        "query_analysis": 0.000279,
+        "retrieval": 0.001011
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012180000000000001,
+      "stages": {
+        "guardrail": 0.000885,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018881000000000002,
+      "stages": {
+        "grounding": 0.008141,
+        "guardrail": 0.0041470000000000005,
+        "language": 0.000018,
+        "llm": 0.00029499999999999996,
+        "query_analysis": 0.000399,
+        "retrieval": 0.001132
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.054178000000000004,
+      "stages": {
+        "grounding": 0.026205,
+        "guardrail": 0.013297,
+        "language": 0.000019,
+        "llm": 0.000373,
+        "query_analysis": 0.00052,
+        "retrieval": 0.001372
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07160899999999999,
+      "stages": {
+        "grounding": 0.035215,
+        "guardrail": 0.018221,
+        "language": 0.000024999999999999998,
+        "llm": 0.00039000000000000005,
+        "query_analysis": 0.0010279999999999998,
+        "retrieval": 0.001618
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009888,
+      "stages": {
+        "grounding": 0.006639,
+        "guardrail": 0.000733,
+        "language": 0.000016000000000000003,
+        "query_analysis": 0.000258,
+        "retrieval": 0.00101
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001449,
+      "stages": {
+        "guardrail": 0.0011179999999999999,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.021926,
+      "stages": {
+        "grounding": 0.007941,
+        "guardrail": 0.007461000000000001,
+        "language": 0.000019,
+        "llm": 0.00029,
+        "query_analysis": 0.00035800000000000003,
+        "retrieval": 0.001225
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053239,
+      "stages": {
+        "grounding": 0.0245,
+        "guardrail": 0.013226,
+        "language": 0.000018,
+        "llm": 0.000329,
+        "query_analysis": 0.000544,
+        "retrieval": 0.001557
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.072922,
+      "stages": {
+        "grounding": 0.036844,
+        "guardrail": 0.017960999999999998,
+        "language": 0.000024,
+        "llm": 0.00039000000000000005,
+        "query_analysis": 0.000978,
+        "retrieval": 0.00183
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009918,
+      "stages": {
+        "grounding": 0.006647999999999999,
+        "guardrail": 0.0006580000000000001,
+        "language": 0.000018,
+        "query_analysis": 0.00028000000000000003,
+        "retrieval": 0.0009530000000000001
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00131,
+      "stages": {
+        "guardrail": 0.000957,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018694000000000002,
+      "stages": {
+        "grounding": 0.007833,
+        "guardrail": 0.004243,
+        "language": 0.000017,
+        "llm": 0.000258,
+        "query_analysis": 0.00046199999999999995,
+        "retrieval": 0.001217
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052251,
+      "stages": {
+        "grounding": 0.0245,
+        "guardrail": 0.013058,
+        "language": 0.000018,
+        "llm": 0.000315,
+        "query_analysis": 0.000542,
+        "retrieval": 0.0012929999999999999
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.07121000000000001,
+      "stages": {
+        "grounding": 0.035033999999999996,
+        "guardrail": 0.017968,
+        "language": 0.000023,
+        "llm": 0.000374,
+        "query_analysis": 0.001002,
+        "retrieval": 0.0016539999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009388,
+      "stages": {
+        "grounding": 0.006167000000000001,
+        "guardrail": 0.000681,
+        "language": 0.000018,
+        "query_analysis": 0.000258,
+        "retrieval": 0.0010249999999999999
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.0012640000000000001,
+      "stages": {
+        "guardrail": 0.000929,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018987999999999998,
+      "stages": {
+        "grounding": 0.007728,
+        "guardrail": 0.00426,
+        "language": 0.000018,
+        "llm": 0.00026399999999999997,
+        "query_analysis": 0.000414,
+        "retrieval": 0.001217
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.053813999999999994,
+      "stages": {
+        "grounding": 0.025796,
+        "guardrail": 0.013297,
+        "language": 0.00002,
+        "llm": 0.00033099999999999997,
+        "query_analysis": 0.000507,
+        "retrieval": 0.001473
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.071311,
+      "stages": {
+        "grounding": 0.035002,
+        "guardrail": 0.018194,
+        "language": 0.000024,
+        "llm": 0.000343,
+        "query_analysis": 0.001029,
+        "retrieval": 0.001625
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009849,
+      "stages": {
+        "grounding": 0.006606,
+        "guardrail": 0.000642,
+        "language": 0.000019,
+        "query_analysis": 0.000361,
+        "retrieval": 0.000916
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.001102,
+      "stages": {
+        "guardrail": 0.000781,
+        "language": 0.000018
+      }
+    },
+    {
+      "scenario": "supported_en",
+      "total_ms": 0.018563000000000003,
+      "stages": {
+        "grounding": 0.007895,
+        "guardrail": 0.00428,
+        "language": 0.000018,
+        "llm": 0.00024900000000000004,
+        "query_analysis": 0.00035,
+        "retrieval": 0.00107
+      }
+    },
+    {
+      "scenario": "supported_hi",
+      "total_ms": 0.052285,
+      "stages": {
+        "grounding": 0.024318,
+        "guardrail": 0.013236000000000001,
+        "language": 0.000017,
+        "llm": 0.000299,
+        "query_analysis": 0.00047999999999999996,
+        "retrieval": 0.00138
+      }
+    },
+    {
+      "scenario": "supported_ta",
+      "total_ms": 0.073307,
+      "stages": {
+        "grounding": 0.037183,
+        "guardrail": 0.018145,
+        "language": 0.000024999999999999998,
+        "llm": 0.000277,
+        "query_analysis": 0.00097,
+        "retrieval": 0.0017439999999999999
+      }
+    },
+    {
+      "scenario": "unsupported_itr",
+      "total_ms": 0.009618,
+      "stages": {
+        "grounding": 0.006353999999999999,
+        "guardrail": 0.0006990000000000001,
+        "language": 0.000017,
+        "query_analysis": 0.000275,
+        "retrieval": 0.000986
+      }
+    },
+    {
+      "scenario": "offtopic_cricket",
+      "total_ms": 0.00124,
+      "stages": {
+        "guardrail": 0.00089,
+        "language": 0.000018
+      }
+    }
+  ],
+  "total_summary": {
+    "count": 500,
+    "mean_ms": 0.03295616400000001,
+    "median_ms": 0.019296,
+    "p50_ms": 0.019296,
+    "p70_ms": 0.0534593,
+    "p100_ms": 0.11831
+  },
+  "stage_summaries": {
+    "grounding": {
+      "count": 400,
+      "mean_ms": 0.020120957499999998,
+      "median_ms": 0.023954,
+      "p50_ms": 0.023954,
+      "p70_ms": 0.0271607,
+      "p100_ms": 0.059552999999999995
+    },
+    "guardrail": {
+      "count": 500,
+      "mean_ms": 0.007896223999999999,
+      "median_ms": 0.004328,
+      "p50_ms": 0.004328,
+      "p70_ms": 0.013297,
+      "p100_ms": 0.038139000000000006
+    },
+    "language": {
+      "count": 500,
+      "mean_ms": 0.00002117999999999989,
+      "median_ms": 0.000019,
+      "p50_ms": 0.000019,
+      "p70_ms": 0.000023,
+      "p100_ms": 0.000063
+    },
+    "llm": {
+      "count": 300,
+      "mean_ms": 0.000344376666666667,
+      "median_ms": 0.00031150000000000004,
+      "p50_ms": 0.00031150000000000004,
+      "p70_ms": 0.00035999999999999997,
+      "p100_ms": 0.00115
+    },
+    "query_analysis": {
+      "count": 400,
+      "mean_ms": 0.0006024574999999998,
+      "median_ms": 0.000498,
+      "p50_ms": 0.000498,
+      "p70_ms": 0.000599,
+      "p100_ms": 0.002187
+    },
+    "retrieval": {
+      "count": 400,
+      "mean_ms": 0.001383452499999999,
+      "median_ms": 0.0013,
+      "p50_ms": 0.0013,
+      "p70_ms": 0.0015623,
+      "p100_ms": 0.004109
+    }
+  }
+}

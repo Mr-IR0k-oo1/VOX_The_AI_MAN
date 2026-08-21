@@ -7,7 +7,7 @@ with per-stage latency metrics. VOX refuses to answer — with a stable reason
 code and a localized grounded-refusal message — whenever the evidence does
 not support it.
 
-## Status: Phase 6 — OREO retrieval integration
+## Status: Phase 7 — Performance engineering
 
 The pipeline runs end-to-end and reaches the real retrieval service through
 configuration alone (`VOX_RETRIEVAL_MODE=http`); the mock backend remains the
@@ -64,6 +64,10 @@ voice/text → input guard → STT → language detection → query analysis
 - **Metrics**: `stt`, `language`, `query_analysis`, `retrieval`,
   `grounding`, `guardrail`, `llm`, `total` (ms); stages that did not run are
   omitted.
+- **Benchmarks**: the `vox-bench` harness measures L0 (retrieval boundary),
+  L1 (text-to-answer), and L2 (voice-to-answer) over a five-scenario
+  multilingual test set, emitting raw samples plus mean/median/P50/P70/P100
+  to `benchmarks/*.json`; see `benchmarks/performance_report.md`.
 
 Not yet implemented (deliberately): real retrieval service, UI, deployment.
 
@@ -80,7 +84,7 @@ Not yet implemented (deliberately): real retrieval service, UI, deployment.
 | `vox-grounding` | Evidence-sufficiency scoring → `Answerability`; answer verification against evidence |
 | `vox-llm` | `LlmProvider` trait, prompt construction, extractive baseline + OpenAI-compatible provider |
 | `vox-guard` | Input/evidence/output guardrails: `Allow`/`Refuse{reason}`/`Regenerate{reason}` decisions, refusal messages |
-| `vox-bench` | Latency percentile utilities; scenario harnesses land later |
+| `vox-bench` | Latency percentile utilities + benchmark harness (`L0` retrieval, `L1` text-to-answer, `L2` voice-to-answer) |
 
 Dependency direction: everything depends on `vox-types`; adapters
 (`vox-stt`, `vox-retrieval`, `vox-llm`) define their own traits;
