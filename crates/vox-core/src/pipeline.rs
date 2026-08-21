@@ -172,6 +172,7 @@ mod tests {
         async fn retrieve(&self, _request: Query) -> Result<RetrievalResponse, RetrievalError> {
             Ok(RetrievalResponse {
                 documents: Vec::new(),
+                timings_ms: None,
             })
         }
     }
