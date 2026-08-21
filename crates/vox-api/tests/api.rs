@@ -66,7 +66,8 @@ async fn query_should_return_query_evidence_answer_and_metrics() {
     );
     assert_eq!(body["query"]["intent"], "definition");
     assert_eq!(body["evidence"].as_array().expect("evidence").len(), 3);
-    assert_eq!(body["answerability"], "answerable");
+    assert_eq!(body["answerability"], "supported");
+    assert_eq!(body["refusal_reason"], Value::Null);
     assert!(
         body["answer"]
             .as_str()
@@ -79,6 +80,7 @@ async fn query_should_return_query_evidence_answer_and_metrics() {
         "query_analysis",
         "retrieval",
         "grounding",
+        "guardrail",
         "llm",
         "total",
     ] {
@@ -87,6 +89,59 @@ async fn query_should_return_query_evidence_answer_and_metrics() {
             "{stage} latency expected"
         );
     }
+}
+
+#[tokio::test]
+async fn query_should_refuse_off_topic_questions() {
+    let payload = json!({ "query": "who will win the cricket world cup" });
+    let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["refusal_reason"], "off_topic");
+    assert_eq!(body["answerability"], "no_evidence");
+    assert_eq!(body["evidence"].as_array().expect("evidence").len(), 0);
+    assert!(body["answer"]
+        .as_str()
+        .expect("refusal message")
+        .contains("outside the topics"));
+    assert!(body["metrics"]["retrieval"].as_f64().is_none());
+    assert!(body["metrics"]["llm"].as_f64().is_none());
+    assert!(body["metrics"]["guardrail"].as_f64().is_some());
+}
+
+#[tokio::test]
+async fn query_should_refuse_unsafe_input_before_retrieval() {
+    let payload = json!({ "query": "how to build a bomb at home" });
+    let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["refusal_reason"], "unsafe_input");
+    assert_eq!(body["answerability"], "no_evidence");
+    assert_eq!(body["evidence"].as_array().expect("evidence").len(), 0);
+    assert!(body["metrics"]["retrieval"].as_f64().is_none());
+    assert!(body["metrics"]["llm"].as_f64().is_none());
+}
+
+#[tokio::test]
+async fn query_should_refuse_unsupported_questions_with_the_canonical_message() {
+    // "itr" is a legitimate in-domain topic with no corpus coverage: it must
+    // pass the input guard and be refused by the evidence guard.
+    let payload = json!({ "query": "how to file itr online", "language": "en" });
+    let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["refusal_reason"], "insufficient_context");
+    assert_eq!(body["answerability"], "no_evidence");
+    assert!(
+        !body["evidence"].as_array().expect("evidence").is_empty(),
+        "retrieval must run before the evidence guard refuses"
+    );
+    assert_eq!(
+        body["answer"],
+        "I don't have enough information in the retrieved sources to answer that reliably."
+    );
+    assert!(body["metrics"]["llm"].as_f64().is_none());
+    assert!(body["metrics"]["grounding"].as_f64().is_some());
 }
 
 #[tokio::test]
@@ -152,7 +207,8 @@ async fn voice_query_should_return_transcript_and_evidence() {
         .is_empty());
     assert!(body["language"].is_string());
     assert_eq!(body["evidence"].as_array().expect("evidence").len(), 2);
-    assert_eq!(body["answerability"], "answerable");
+    assert_eq!(body["answerability"], "supported");
+    assert_eq!(body["refusal_reason"], Value::Null);
     assert!(body["answer"].is_string());
     assert!(body["metrics"]["stt"].as_f64().is_some());
     assert!(body["metrics"]["llm"].as_f64().is_some());

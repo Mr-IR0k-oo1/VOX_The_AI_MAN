@@ -3,6 +3,7 @@
 use std::time::Duration;
 
 use thiserror::Error;
+use vox_grounding::GroundingConfig;
 use vox_retrieval::RetryPolicy;
 
 /// How the retrieval backend is selected.
@@ -102,8 +103,8 @@ pub struct Config {
     pub stt: SttConfig,
     /// Answer-generation backend settings.
     pub llm: LlmConfig,
-    /// Minimum best-evidence score for the preliminary answerability check.
-    pub grounding_min_score: f32,
+    /// Grounding thresholds (evidence sufficiency + answer support).
+    pub grounding: GroundingConfig,
 }
 
 /// Environment parsing failures.
@@ -154,6 +155,15 @@ impl Config {
                     value: other.to_owned(),
                 })
             }
+        };
+
+        let grounding = GroundingConfig {
+            min_score: parse_env(&source, "VOX_GROUNDING_MIN_SCORE", 0.30)?,
+            relevance_min: parse_env(&source, "VOX_GROUNDING_RELEVANCE_MIN", 0.50)?,
+            coverage_min: parse_env(&source, "VOX_GROUNDING_COVERAGE_MIN", 0.50)?,
+            consistency_min: parse_env(&source, "VOX_GROUNDING_CONSISTENCY_MIN", 0.50)?,
+            agreement_min: parse_env(&source, "VOX_GROUNDING_AGREEMENT_MIN", 0.10)?,
+            answer_support_min: parse_env(&source, "VOX_GUARD_ANSWER_SUPPORT_MIN", 0.60)?,
         };
 
         let retrieval_mode = match source("VOX_RETRIEVAL_MODE").as_deref() {
@@ -258,7 +268,7 @@ impl Config {
                     .unwrap_or_else(|| "https://api.openai.com/v1".to_owned()),
                 timeout: Duration::from_millis(parse_env(&source, "VOX_LLM_TIMEOUT_MS", 8000)?),
             },
-            grounding_min_score: parse_env(&source, "VOX_GROUNDING_MIN_SCORE", 0.30)?,
+            grounding,
         })
     }
 }
@@ -303,7 +313,13 @@ mod tests {
         assert_eq!(config.llm.model, "gpt-4o-mini");
         assert_eq!(config.llm.base_url, "https://api.openai.com/v1");
         assert_eq!(config.llm.timeout, Duration::from_millis(8000));
-        assert!((config.grounding_min_score - 0.30).abs() < f32::EPSILON);
+        let grounding = config.grounding;
+        assert!((grounding.min_score - 0.30).abs() < f32::EPSILON);
+        assert!((grounding.relevance_min - 0.50).abs() < f32::EPSILON);
+        assert!((grounding.coverage_min - 0.50).abs() < f32::EPSILON);
+        assert!((grounding.consistency_min - 0.50).abs() < f32::EPSILON);
+        assert!((grounding.agreement_min - 0.10).abs() < f32::EPSILON);
+        assert!((grounding.answer_support_min - 0.60).abs() < f32::EPSILON);
     }
 
     #[test]
@@ -380,6 +396,11 @@ mod tests {
             ("VOX_LLM_BASE_URL", "http://localhost:11434/v1"),
             ("VOX_LLM_TIMEOUT_MS", "2500"),
             ("VOX_GROUNDING_MIN_SCORE", "0.5"),
+            ("VOX_GROUNDING_RELEVANCE_MIN", "0.7"),
+            ("VOX_GROUNDING_COVERAGE_MIN", "0.8"),
+            ("VOX_GROUNDING_CONSISTENCY_MIN", "0.9"),
+            ("VOX_GROUNDING_AGREEMENT_MIN", "0.2"),
+            ("VOX_GUARD_ANSWER_SUPPORT_MIN", "0.75"),
         ]);
         let config = Config::from_source(source).expect("parsed");
         assert_eq!(config.llm.mode, LlmMode::OpenAi);
@@ -387,7 +408,13 @@ mod tests {
         assert_eq!(config.llm.model, "llama3:8b");
         assert_eq!(config.llm.base_url, "http://localhost:11434/v1");
         assert_eq!(config.llm.timeout, Duration::from_millis(2500));
-        assert!((config.grounding_min_score - 0.5).abs() < f32::EPSILON);
+        let grounding = config.grounding;
+        assert!((grounding.min_score - 0.5).abs() < f32::EPSILON);
+        assert!((grounding.relevance_min - 0.7).abs() < f32::EPSILON);
+        assert!((grounding.coverage_min - 0.8).abs() < f32::EPSILON);
+        assert!((grounding.consistency_min - 0.9).abs() < f32::EPSILON);
+        assert!((grounding.agreement_min - 0.2).abs() < f32::EPSILON);
+        assert!((grounding.answer_support_min - 0.75).abs() < f32::EPSILON);
     }
 
     #[test]

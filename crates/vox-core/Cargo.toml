@@ -11,6 +11,7 @@ workspace = true
 thiserror = { workspace = true }
 tracing = { workspace = true }
 vox-grounding = { workspace = true }
+vox-guard = { workspace = true }
 vox-ingest = { workspace = true }
 vox-llm = { workspace = true }
 vox-retrieval = { workspace = true }

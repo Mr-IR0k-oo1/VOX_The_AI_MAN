@@ -6,9 +6,9 @@ use vox_types::{
 
 /// Everything the pipeline knows about the request it is processing.
 ///
-/// Built up stage by stage (STT → language → query analysis → retrieval →
-/// grounding preparation → generation) and converted into the endpoint
-/// response at the end.
+/// Built up stage by stage (input guard → STT → language → query analysis →
+/// retrieval → grounding → evidence guard → generation → output guard) and
+/// converted into the endpoint response at the end.
 #[derive(Debug, Clone)]
 pub struct PipelineContext {
     /// Server-generated identifier for this request.
@@ -19,12 +19,15 @@ pub struct PipelineContext {
     pub language: Language,
     /// The analyzed query (normalized text + intent).
     pub query: Query,
-    /// Evidence returned by the retrieval boundary.
+    /// Evidence returned by the retrieval boundary. Empty when an input
+    /// guard refused before retrieval ran.
     pub evidence: Vec<RetrievedDocument>,
-    /// Preliminary evidence-sufficiency verdict (grounding preparation).
+    /// Evidence-sufficiency verdict from the grounding stage.
     pub answerability: Answerability,
-    /// Generated answer, when the LLM produced usable output.
+    /// Generated answer, when the pipeline produced one.
     pub answer: Option<String>,
+    /// Machine-readable reason code when the pipeline refused to answer.
+    pub refusal_reason: Option<String>,
     /// Per-stage latency measurements (snapshot up to generation).
     pub metrics: LatencyMetrics,
 }
@@ -40,6 +43,7 @@ impl PipelineContext {
             evidence: self.evidence,
             answerability: self.answerability,
             answer: self.answer,
+            refusal_reason: self.refusal_reason,
             metrics: self.metrics,
         }
     }
@@ -59,6 +63,7 @@ impl PipelineContext {
             evidence: self.evidence,
             answerability: self.answerability,
             answer: self.answer,
+            refusal_reason: self.refusal_reason,
             metrics: self.metrics,
         }
     }

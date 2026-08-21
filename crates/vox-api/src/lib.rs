@@ -15,6 +15,7 @@ use std::sync::Arc;
 use axum::routing::{get, post};
 use axum::Router;
 use vox_core::VoxPipeline;
+use vox_guard::GuardService;
 use vox_llm::{ExtractiveProvider, LlmProvider, OpenAiCompatibleProvider};
 use vox_retrieval::{HttpRetrievalClient, MockRetrievalClient, RetrievalClient};
 use vox_stt::{MockRecognizer, SarvamRecognizer, SpeechRecognizer};
@@ -95,6 +96,14 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
         }
     };
 
+    // Input-guard topic vocabulary: the mock corpus knows its own domain;
+    // an HTTP backend's domain is unknown, so off-topic checking is disabled
+    // (empty vocabulary) until a real corpus manifest supplies it.
+    let guards = Arc::new(GuardService::new(match config.retrieval.mode {
+        RetrievalMode::Mock => MockRetrievalClient::topic_vocabulary(),
+        RetrievalMode::Http => Vec::new(),
+    }));
+
     tracing::info!(
         retrieval = retrieval.name(),
         stt = stt.name(),
@@ -102,7 +111,7 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
         retrieval_timeout_ms = config.retrieval.timeout.as_millis() as u64,
         stt_timeout_ms = config.stt.sarvam_timeout.as_millis() as u64,
         llm_timeout_ms = config.llm.timeout.as_millis() as u64,
-        grounding_min_score = config.grounding_min_score,
+        grounding_min_score = config.grounding.min_score,
         "backends selected"
     );
 
@@ -110,7 +119,8 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
         Arc::clone(&stt),
         Arc::clone(&retrieval),
         Arc::clone(&llm),
-        config.grounding_min_score,
+        config.grounding,
+        guards,
     );
 
     Ok(AppState {

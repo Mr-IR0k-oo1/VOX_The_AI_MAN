@@ -1511,6 +1511,8 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "vox-core",
+ "vox-grounding",
+ "vox-guard",
  "vox-ingest",
  "vox-llm",
  "vox-retrieval",
@@ -1532,6 +1534,7 @@ dependencies = [
  "tokio",
  "tracing",
  "vox-grounding",
+ "vox-guard",
  "vox-ingest",
  "vox-llm",
  "vox-retrieval",
@@ -1551,6 +1554,7 @@ dependencies = [
 name = "vox-guard"
 version = "0.1.0"
 dependencies = [
+ "vox-grounding",
  "vox-types",
 ]
 

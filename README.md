@@ -2,17 +2,19 @@
 
 Low-latency multilingual voice RAG for Indian languages: spoken or typed
 question → STT → language detection → query analysis → hybrid retrieval
-(dense + BM25 via `POST /v1/retrieve`) → grounding preparation → LLM answer,
-with per-stage latency metrics. Full grounding verification and guardrails
-land in later phases.
+(dense + BM25 via `POST /v1/retrieve`) → grounding → guardrails → LLM answer,
+with per-stage latency metrics. VOX refuses to answer — with a stable reason
+code and a localized grounded-refusal message — whenever the evidence does
+not support it.
 
-## Status: Phase 4 — LLM answer generation
+## Status: Phase 5 — Grounding and guardrails
 
 The pipeline runs end-to-end independently of OREO:
 
 ```
-voice/text → STT → language detection → query analysis → mock retrieval
-           → grounding preparation → LLM → response (+ latency metrics)
+voice/text → input guard → STT → language detection → query analysis
+           → mock retrieval → grounding (evidence sufficiency)
+           → evidence guard → LLM → output guard → response (+ latency metrics)
 ```
 
 - **STT**: `MockRecognizer` (deterministic) and `SarvamRecognizer`
@@ -24,10 +26,20 @@ voice/text → STT → language detection → query analysis → mock retrieval
   cleanup only — no translation) + deterministic intent heuristics
   (`factual`, `definition`, `comparison`, `procedural`, `unknown`) with
   English, Hindi, and Tamil markers.
+- **Input guardrails**: unsafe requests are refused before retrieval;
+  off-topic questions are refused against the configured topic vocabulary
+  (disabled automatically when running against an HTTP backend whose domain
+  is unknown).
 - **Retrieval**: deterministic `MockRetrievalClient` with a small canned
   corpus. Qdrant/Tantivy/OREO integration is deliberately deferred.
-- **Grounding preparation**: preliminary evidence-sufficiency check
-  (`answerability`: best score vs threshold). Full verification deferred.
+- **Grounding**: deterministic lexical scoring of evidence sufficiency —
+  *relevance* (best single-document coverage of the query terms), *coverage*
+  (union coverage), and *consistency* (do relevant documents agree?) — mapped
+  onto `answerability`: `supported`, `weak_evidence`, `no_evidence`,
+  `conflicting_evidence`. All thresholds are configurable.
+- **Evidence guardrails**: anything not `supported` is refused before a
+  generation call is spent (`insufficient_context`, `weak_evidence`,
+  `conflicting_evidence`).
 - **LLM**: shared deterministic prompt construction instructing the model to
   use only the supplied evidence, never invent claims, state insufficient
   information explicitly, and answer in the request language.
@@ -35,25 +47,33 @@ voice/text → STT → language detection → query analysis → mock retrieval
   `OpenAiCompatibleProvider` (`POST {base_url}/chat/completions`,
   env-provided API key, explicit timeout, one retry on safe transient
   failures only).
+- **Output guardrails**: generated answers are verified against the evidence
+  (content-token support ratio; invented numbers are flagged). Unsupported
+  answers trigger exactly one regeneration attempt and then refuse with
+  `unsupported_claim`; unsafe or empty output refuses immediately.
+- **Refusals** are HTTP 200 responses carrying `refusal_reason` plus a
+  localized grounded-refusal message (English canonical: *"I don't have
+  enough information in the retrieved sources to answer that reliably."*);
+  only infrastructure failures surface as errors.
 - **Metrics**: `stt`, `language`, `query_analysis`, `retrieval`,
-  `grounding`, `llm`, `total` (ms); stages that did not run are omitted.
+  `grounding`, `guardrail`, `llm`, `total` (ms); stages that did not run are
+  omitted.
 
-Not yet implemented (deliberately): full grounding verification,
-guardrails, real retrieval service, UI, deployment.
+Not yet implemented (deliberately): real retrieval service, UI, deployment.
 
 ## Workspace layout
 
 | Crate | Responsibility |
 |---|---|
 | `vox-types` | Shared domain types: `Query`, `QueryIntent`, `Transcript`, `RetrievedDocument`, `Language`, responses, `LatencyMetrics`, validation errors |
-| `vox-core` | Pipeline orchestration: STT → language → query analysis → retrieval, per-stage timings |
+| `vox-core` | Pipeline orchestration: guards → STT → language → analysis → retrieval → grounding → generation, per-stage timings |
 | `vox-api` | Axum server exposing the frozen v1 endpoints; config, logging, metrics |
 | `vox-stt` | `SpeechRecognizer` trait + mock + Sarvam HTTP backend |
 | `vox-retrieval` | `RetrievalClient` trait + mock backend + HTTP client for OREO (timeouts, bounded retries) |
 | `vox-ingest` | Voice ingestion boundary: base64 decode, size caps, container sniffing |
-| `vox-grounding` | Evidence-sufficiency assessment → `Answerability` (preliminary check active) |
+| `vox-grounding` | Evidence-sufficiency scoring → `Answerability`; answer verification against evidence |
 | `vox-llm` | `LlmProvider` trait, prompt construction, extractive baseline + OpenAI-compatible provider |
-| `vox-guard` | Guardrail decisions over evidence verdicts and generated answers (later phase) |
+| `vox-guard` | Input/evidence/output guardrails: `Allow`/`Refuse{reason}`/`Regenerate{reason}` decisions, refusal messages |
 | `vox-bench` | Latency percentile utilities; scenario harnesses land later |
 
 Dependency direction: everything depends on `vox-types`; adapters
@@ -104,11 +124,27 @@ Example response (`POST /v1/query`):
   "evidence": [
     { "id": "mock-0000", "text": "Artificial intelligence (AI) is the simulation …", "score": 0.95, "rank": 1, "metadata": {"source":"mock","language":"en"} }
   ],
-  "answerability": "answerable",
+  "answerability": "supported",
   "answer": "Artificial intelligence (AI) is the simulation of human intelligence processes by computer systems.",
-  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.15, "grounding": 0.001, "llm": 1.2, "total": 1.4 }
+  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.15, "grounding": 0.001, "guardrail": 0.001, "llm": 1.2, "total": 1.4 }
 }
 ```
+
+Refusal example (`POST /v1/query` with an off-corpus question):
+
+```json
+{
+  "request_id": "req-68a5f0c2e1a3-0008",
+  "answerability": "no_evidence",
+  "refusal_reason": "insufficient_context",
+  "answer": "I don't have enough information in the retrieved sources to answer that reliably.",
+  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.14, "grounding": 0.001, "guardrail": 0.001, "total": 0.16 }
+}
+```
+
+Refusal reasons: `unsafe_input`, `off_topic`, `insufficient_context`,
+`weak_evidence`, `conflicting_evidence`, `unsupported_claim`,
+`unsafe_output`, `malformed_output`.
 
 ## Frozen API (Phase 0)
 
@@ -117,8 +153,8 @@ Example response (`POST /v1/query`):
 | `GET /health` | Liveness + uptime |
 | `GET /metrics` | Prometheus exposition |
 | `POST /v1/retrieve` | `Query` → `RetrievalResponse` (`{documents: [...]}`) |
-| `POST /v1/query` | `Query` → `{request_id, language, query, evidence, answerability, answer, metrics}` |
-| `POST /v1/voice/query` | `VoiceRequest` → `{request_id, transcript, language, query, evidence, answerability, answer, metrics}` |
+| `POST /v1/query` | `Query` → `{request_id, language, query, evidence, answerability, answer?, refusal_reason?, metrics}` |
+| `POST /v1/voice/query` | `VoiceRequest` → `{request_id, transcript, language, query, evidence, answerability, answer?, refusal_reason?, metrics}` |
 
 Errors: `422` invalid input/audio, `502` upstream failure, `504` upstream
 timeout, `503` retrieval unavailable, `501` not yet implemented.
@@ -147,7 +183,12 @@ See [.env.example](.env.example).
 | `VOX_LLM_MODEL` | `gpt-4o-mini` | Model identifier for the completion request |
 | `VOX_LLM_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint |
 | `VOX_LLM_TIMEOUT_MS` | `8000` | Per-request timeout for generation |
-| `VOX_GROUNDING_MIN_SCORE` | `0.30` | Best-evidence score threshold for `answerability` |
+| `VOX_GROUNDING_MIN_SCORE` | `0.30` | Best hybrid-retrieval score required for `supported` |
+| `VOX_GROUNDING_RELEVANCE_MIN` | `0.50` | Best single-document query-term coverage for `supported` |
+| `VOX_GROUNDING_COVERAGE_MIN` | `0.50` | Union query-term coverage across evidence for `supported` |
+| `VOX_GROUNDING_CONSISTENCY_MIN` | `0.50` | Required agreement ratio among relevant documents |
+| `VOX_GROUNDING_AGREEMENT_MIN` | `0.10` | Pairwise overlap coefficient counting as agreement |
+| `VOX_GUARD_ANSWER_SUPPORT_MIN` | `0.60` | Share of answer content tokens that must appear in the evidence |
 
 ## Development
 

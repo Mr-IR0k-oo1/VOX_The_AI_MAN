@@ -6,7 +6,10 @@ use vox_types::{AudioFormat, Language, Transcript};
 use crate::{SpeechRecognizer, SttError};
 
 /// Default transcript produced by [`MockRecognizer::new`].
-pub const DEFAULT_TRANSCRIPT: &str = "This is a mock transcript for voice pipeline testing.";
+///
+/// Deliberately on-topic for the sample corpus so the default voice flow
+/// passes the input guard and produces a supported answer end-to-end.
+pub const DEFAULT_TRANSCRIPT: &str = "What is GST in India?";
 
 /// Deterministic in-process recognizer.
 ///

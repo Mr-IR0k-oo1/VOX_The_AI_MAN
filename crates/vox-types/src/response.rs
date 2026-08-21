@@ -19,11 +19,15 @@ pub struct QueryResponse {
     pub query: Query,
     /// Mock/sample evidence retrieved for the query.
     pub evidence: Vec<RetrievedDocument>,
-    /// Preliminary evidence-sufficiency verdict from grounding preparation.
+    /// Evidence-sufficiency verdict from the grounding stage.
     pub answerability: Answerability,
     /// Generated answer; absent when generation produced nothing usable.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub answer: Option<String>,
+    /// Machine-readable refusal reason; present exactly when the pipeline
+    /// refused to answer instead of generating.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub refusal_reason: Option<String>,
     /// Per-stage latencies in milliseconds plus total.
     pub metrics: LatencyMetrics,
 }
