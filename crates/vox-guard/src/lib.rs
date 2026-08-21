@@ -86,7 +86,10 @@ fn is_unsafe(tokens: &[String]) -> bool {
     tokens.iter().any(|token| {
         let token = token.as_str();
         UNSAFE_TERMS.iter().any(|term| {
-            token == *term || token == format!("{term}s") || token == format!("{term}es")
+            token == *term
+                || (token.len() > term.len()
+                    && token.starts_with(term)
+                    && matches!(&token[term.len()..], "s" | "es"))
         })
     })
 }

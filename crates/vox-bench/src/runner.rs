@@ -99,8 +99,8 @@ impl StageStats {
         let mean = samples.iter().sum::<f64>() / samples.len() as f64;
         Some(Self {
             mean,
-            p50: crate::percentile_sorted(samples, 0.50)?,
-            p70: crate::percentile_sorted(samples, 0.70)?,
+            p50: crate::percentile(samples, 0.50)?,
+            p70: crate::percentile(samples, 0.70)?,
             p100: *samples.last()?,
         })
     }

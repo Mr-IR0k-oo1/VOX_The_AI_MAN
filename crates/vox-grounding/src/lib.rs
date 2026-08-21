@@ -94,7 +94,7 @@ pub struct AnswerVerification {
 /// ignored.
 #[must_use]
 pub fn tokenize(text: &str) -> Vec<String> {
-    let mut tokens = Vec::new();
+    let mut tokens = Vec::with_capacity(text.len() / 3 + 1);
     let mut current = String::new();
     for ch in text.chars() {
         if is_word_char(ch) {
@@ -225,6 +225,58 @@ const STOPWORDS: &[&str] = &[
     "ஏன்",
 ];
 
+/// Pre-tokenized evidence shared by assessment and verification.
+///
+/// Tokenizing a corpus slice is the dominant cost of grounding, and the
+/// pipeline needs the same documents twice: once to judge sufficiency
+/// ([`assess_indexed`]) and once to verify the generated answer
+/// ([`verify_answer_indexed`]). Building this index once per request cuts
+/// the work to a single tokenization pass. Membership checks use sorted-free
+/// linear scans over small per-document token lists, which avoids the
+/// per-token hashing and duplicate string storage of a hash-set layout.
+#[derive(Debug, Clone)]
+pub struct EvidenceIndex {
+    /// Unique content tokens per document, in first-seen order.
+    docs: Vec<Vec<String>>,
+    best_score: f32,
+}
+
+impl EvidenceIndex {
+    /// Tokenizes every document exactly once.
+    #[must_use]
+    pub fn new(evidence: &[RetrievedDocument]) -> Self {
+        let mut docs = Vec::with_capacity(evidence.len());
+        let mut best_score = f32::NEG_INFINITY;
+        for doc in evidence {
+            let mut tokens: Vec<String> = Vec::with_capacity(32);
+            for token in tokenize(&doc.text) {
+                if !tokens.contains(&token) {
+                    tokens.push(token);
+                }
+            }
+            best_score = best_score.max(doc.score);
+            docs.push(tokens);
+        }
+        Self { docs, best_score }
+    }
+
+    /// Number of indexed documents.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.docs.len()
+    }
+
+    /// Whether the index holds no documents.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.docs.is_empty()
+    }
+
+    fn contains(&self, token: &str) -> bool {
+        self.docs.iter().any(|doc| doc.iter().any(|t| t == token))
+    }
+}
+
 /// Assesses whether the retrieved evidence suffices to ground an answer.
 ///
 /// Deterministic: identical inputs produce identical verdicts.
@@ -234,21 +286,28 @@ pub fn assess(
     evidence: &[RetrievedDocument],
     config: &GroundingConfig,
 ) -> Assessment {
+    assess_indexed(query_text, &EvidenceIndex::new(evidence), config)
+}
+
+/// Assesses sufficiency against a pre-built [`EvidenceIndex`].
+#[must_use]
+pub fn assess_indexed(
+    query_text: &str,
+    index: &EvidenceIndex,
+    config: &GroundingConfig,
+) -> Assessment {
     let query_tokens = tokenize(query_text);
-    if evidence.is_empty() || query_tokens.is_empty() {
+    if index.is_empty() || query_tokens.is_empty() {
         return no_evidence();
     }
 
     let query_set: HashSet<&String> = query_tokens.iter().collect();
-    let doc_sets: Vec<HashSet<String>> = evidence
-        .iter()
-        .map(|doc| tokenize(&doc.text).into_iter().collect::<HashSet<_>>())
-        .collect();
 
-    let containments: Vec<f32> = doc_sets
+    let containments: Vec<f32> = index
+        .docs
         .iter()
-        .map(|doc_set| {
-            let hits = doc_set.iter().filter(|t| query_set.contains(*t)).count();
+        .map(|doc| {
+            let hits = doc.iter().filter(|t| query_set.contains(*t)).count();
             hits as f32 / query_set.len() as f32
         })
         .collect();
@@ -257,20 +316,18 @@ pub fn assess(
 
     let mut covered = 0usize;
     for token in &query_set {
-        if doc_sets
-            .iter()
-            .any(|doc_set| doc_set.contains(token.as_str()))
-        {
+        if index.contains(token.as_str()) {
             covered += 1;
         }
     }
     let coverage = covered as f32 / query_set.len() as f32;
 
-    let relevant: Vec<&HashSet<String>> = doc_sets
+    let relevant: Vec<&Vec<String>> = index
+        .docs
         .iter()
         .zip(&containments)
         .filter(|(_, containment)| **containment >= RELEVANT_FLOOR)
-        .map(|(doc_set, _)| doc_set)
+        .map(|(doc, _)| doc)
         .collect();
     let consistency = pairwise_agreement(&relevant, config.agreement_min);
 
@@ -279,7 +336,7 @@ pub fn assess(
         coverage,
         consistency,
     };
-    let answerability = verdict(&scores, evidence, config);
+    let answerability = verdict_indexed(&scores, index, config);
     Assessment {
         answerability,
         scores,
@@ -297,20 +354,16 @@ fn no_evidence() -> Assessment {
     }
 }
 
-fn verdict(
+fn verdict_indexed(
     scores: &SufficiencyScores,
-    evidence: &[RetrievedDocument],
+    index: &EvidenceIndex,
     config: &GroundingConfig,
 ) -> Answerability {
     if scores.relevance <= 0.0 {
         return Answerability::NoEvidence;
     }
 
-    let best_score = evidence
-        .iter()
-        .map(|doc| doc.score)
-        .fold(f32::NEG_INFINITY, f32::max);
-    let score_ok = best_score.is_finite() && best_score >= config.min_score;
+    let score_ok = index.best_score.is_finite() && index.best_score >= config.min_score;
     let coverage_ok = scores.coverage >= config.coverage_min;
     let relevance_ok = scores.relevance >= config.relevance_min;
     let consistency_ok = scores.consistency >= config.consistency_min;
@@ -327,7 +380,7 @@ fn verdict(
 /// Fraction of relevant-document pairs whose overlap coefficient reaches
 /// `agreement_min`. One or zero relevant documents cannot conflict, so the
 /// result is `1.0`.
-fn pairwise_agreement(relevant: &[&HashSet<String>], agreement_min: f32) -> f32 {
+fn pairwise_agreement(relevant: &[&Vec<String>], agreement_min: f32) -> f32 {
     if relevant.len() < 2 {
         return 1.0;
     }
@@ -336,8 +389,9 @@ fn pairwise_agreement(relevant: &[&HashSet<String>], agreement_min: f32) -> f32 
     for i in 0..relevant.len() {
         for j in (i + 1)..relevant.len() {
             pairs += 1;
-            let shared = relevant[i].intersection(relevant[j]).count();
-            let smaller = relevant[i].len().min(relevant[j].len());
+            let (a, b) = (relevant[i], relevant[j]);
+            let shared = a.iter().filter(|t| b.contains(t)).count();
+            let smaller = a.len().min(b.len());
             let coefficient = if smaller == 0 {
                 0.0
             } else {
@@ -363,21 +417,26 @@ pub fn verify_answer(
     evidence: &[RetrievedDocument],
     config: &GroundingConfig,
 ) -> AnswerVerification {
+    verify_answer_indexed(answer, &EvidenceIndex::new(evidence), config)
+}
+
+/// Verifies a generated answer against a pre-built [`EvidenceIndex`].
+#[must_use]
+pub fn verify_answer_indexed(
+    answer: &str,
+    index: &EvidenceIndex,
+    config: &GroundingConfig,
+) -> AnswerVerification {
     let answer_tokens = tokenize(answer);
-    let mut evidence_union: HashSet<String> = HashSet::new();
-    for doc in evidence {
-        evidence_union.extend(tokenize(&doc.text));
-    }
 
     let mut found = 0usize;
     let mut checked = 0usize;
     let mut unsupported_numbers = Vec::new();
     for token in &answer_tokens {
         checked += 1;
-        if evidence_union.contains(token) {
+        if index.contains(token) {
             found += 1;
-        }
-        if token.chars().any(|ch| ch.is_ascii_digit()) && !evidence_union.contains(token) {
+        } else if token.chars().any(|ch| ch.is_ascii_digit()) {
             unsupported_numbers.push(token.clone());
         }
     }

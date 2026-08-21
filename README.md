@@ -7,7 +7,7 @@ with per-stage latency metrics. VOX refuses to answer — with a stable reason
 code and a localized grounded-refusal message — whenever the evidence does
 not support it.
 
-## Status: Phases 1–6 — pipeline, OREO retrieval, evaluation, integration
+## Status: Phases 1–7 — pipeline, OREO retrieval, evaluation, integration, performance
 
 Phase 0 froze the architecture (shared types, backend traits, five v1
 endpoints, env config, tracing). The full pipeline then came together on
@@ -83,6 +83,10 @@ voice/text → input guard → STT → language detection → query analysis
 - **Metrics**: `stt`, `language`, `query_analysis`, `retrieval`,
   `grounding`, `guardrail`, `llm`, `total` (ms); stages that did not run are
   omitted.
+- **Benchmarks**: the `vox-bench` harness measures L0 (retrieval boundary),
+  L1 (text-to-answer), and L2 (voice-to-answer) over a five-scenario
+  multilingual test set, emitting raw samples plus mean/median/P50/P70/P100
+  to `benchmarks/*.json`; see `benchmarks/performance_report.md`.
 
 Not yet implemented (deliberately): neural embeddings/rerankers, audio
 transcoding, UI, deployment.
@@ -101,7 +105,7 @@ transcoding, UI, deployment.
 | `vox-grounding` | Evidence-sufficiency scoring → `Answerability`; answer verification against evidence |
 | `vox-llm` | `LlmProvider` trait, prompt construction, extractive baseline + OpenAI-compatible provider |
 | `vox-guard` | Input/evidence/output guardrails: `Allow`/`Refuse{reason}`/`Regenerate{reason}` decisions, refusal messages |
-| `vox-bench` | Latency percentile utilities; scenario harnesses land later |
+| `vox-bench` | Latency percentile utilities + benchmark harness (`L0` retrieval, `L1` text-to-answer, `L2` voice-to-answer) |
 
 Dependency direction: everything depends on `vox-types`; adapters
 (`vox-stt`, `vox-retrieval`, `vox-llm`) define their own traits;

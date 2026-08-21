@@ -1,6 +1,6 @@
 [package]
 name = "vox-bench"
-description = "VOX benchmarking: retrieval evaluation runner producing Phase 3 quality/latency baselines"
+description = "VOX benchmarking: retrieval evaluation runner (Phase 3) and end-to-end latency harness (Phase 7)"
 version.workspace = true
 edition.workspace = true
 
@@ -12,7 +12,13 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 tempfile = { workspace = true }
 tokio = { workspace = true }
+vox-core = { workspace = true }
+vox-grounding = { workspace = true }
+vox-guard = { workspace = true }
+vox-llm = { workspace = true }
 vox-oreo = { workspace = true }
+vox-retrieval = { workspace = true }
+vox-stt = { workspace = true }
 vox-types = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
