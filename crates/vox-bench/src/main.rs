@@ -115,6 +115,7 @@ fn print_usage() {
     println!(
         "usage: vox-bench [--level all|L0|L1|L2] [--rounds N] [--warmup N] \
          [--out DIR] [--retrieval-url URL]\n       \
+         vox-bench ablation [output-dir]\n       \
          vox-bench eval [output-dir]\n       \
          vox-bench multilingual [output-dir] [--rounds N]"
     );
@@ -578,7 +579,8 @@ async fn eval_main() -> Result<(), Box<dyn std::error::Error>> {
     )?;
 
     let markdown = vox_bench::report::render_report(&environment, &baseline, &ablation, &chunkings);
-    std::fs::write(out_dir.join("retrieval_report.md"), markdown)?;
+    std::fs::write(out_dir.join("retrieval_report.md"), &markdown)?;
+    std::fs::write(out_dir.join("ablation_report.md"), &markdown)?;
 
     println!("reports written to {}", out_dir.display());
     Ok(())
@@ -629,9 +631,9 @@ fn write_json<T: Serialize>(
 #[tokio::main]
 async fn main() {
     match std::env::args().nth(1).as_deref() {
-        Some("eval") => {
+        Some("eval") | Some("ablation") => {
             eval_main().await.unwrap_or_else(|err| {
-                eprintln!("eval failed: {err}");
+                eprintln!("ablation eval failed: {err}");
                 std::process::exit(1);
             });
         }

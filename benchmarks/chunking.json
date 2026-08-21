@@ -5,47 +5,47 @@
     "cpu_model": "13th Gen Intel(R) Core(TM) i5-13420H",
     "parallelism": 12,
     "profile": "debug",
-    "measured_at_unix_secs": 1787309557,
+    "measured_at_unix_secs": 1787311058,
     "measured_at_date": "2026-08-21"
   },
   "strategies": [
     {
       "strategy": "fixed:400:80",
-      "chunks_indexed": 20,
-      "queries": 36,
+      "chunks_indexed": 30,
+      "queries": 60,
       "recall_at_5": 1.0,
       "mrr": 1.0,
       "total": {
-        "mean": 9.17536944444444,
-        "p50": 8.87715,
-        "p70": 10.47609,
-        "p100": 17.7203
+        "mean": 29.884734999999996,
+        "p50": 27.42,
+        "p70": 31.42449,
+        "p100": 80.4371
       }
     },
     {
       "strategy": "sentence:700:80",
-      "chunks_indexed": 20,
-      "queries": 36,
+      "chunks_indexed": 30,
+      "queries": 60,
       "recall_at_5": 1.0,
       "mrr": 1.0,
       "total": {
-        "mean": 8.115007407407406,
-        "p50": 7.861800000000001,
-        "p70": 8.70074,
-        "p100": 13.043199999999999
+        "mean": 34.27998055555556,
+        "p50": 31.463950000000004,
+        "p70": 35.858219999999996,
+        "p100": 129.296
       }
     },
     {
       "strategy": "sliding:600:300",
-      "chunks_indexed": 20,
-      "queries": 36,
+      "chunks_indexed": 30,
+      "queries": 60,
       "recall_at_5": 1.0,
       "mrr": 1.0,
       "total": {
-        "mean": 10.500264814814814,
-        "p50": 10.35935,
-        "p70": 11.53637,
-        "p100": 21.601200000000002
+        "mean": 41.203795000000014,
+        "p50": 32.8514,
+        "p70": 41.0178,
+        "p100": 186.4809
       }
     }
   ]

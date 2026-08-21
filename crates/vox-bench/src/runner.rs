@@ -570,7 +570,13 @@ fn dataset_info(report: &IndexReport, queries: &[EvalQuery]) -> DatasetInfo {
         corpus_documents: report.raw_documents,
         chunks_indexed: report.chunks,
         queries: queries.len(),
-        languages: vec!["en".to_owned(), "hi".to_owned(), "ta".to_owned()],
+        languages: vec![
+            "en".to_owned(),
+            "hi".to_owned(),
+            "ta".to_owned(),
+            "te".to_owned(),
+            "kn".to_owned(),
+        ],
         judgment_method: "hand-authored binary relevance judgments against the \
             bundled sample corpus (crates/vox-bench/data/eval-queries.jsonl)"
             .to_owned(),
