@@ -19,7 +19,7 @@ pub mod voice;
 pub use answer::AnswerResponse;
 pub use audio::AudioFormat;
 pub use decision::{Answerability, GuardrailDecision};
-pub use document::{RetrievalResponse, RetrievedDocument};
+pub use document::{RetrievalResponse, RetrievalTimings, RetrievedDocument};
 pub use error::{ValidationError, MAX_TOP_K};
 pub use language::Language;
 pub use latency::{ms, LatencyMetrics};
