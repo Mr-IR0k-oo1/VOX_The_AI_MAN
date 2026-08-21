@@ -25,6 +25,6 @@ vox-stt = { workspace = true }
 vox-types = { workspace = true }
 
 [dev-dependencies]
-http-body-util = "0.1"
+http-body-util = { workspace = true }
 tempfile = { workspace = true }
 tower = { workspace = true }

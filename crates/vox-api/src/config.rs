@@ -3,7 +3,6 @@
 use std::time::Duration;
 
 use thiserror::Error;
-use vox_core::PipelineConfig;
 use vox_retrieval::RetryPolicy;
 
 /// How the retrieval backend is selected.
@@ -15,6 +14,15 @@ pub enum RetrievalMode {
     Http,
     /// The OREO retrieval engine, embedded in this process.
     Oreo,
+}
+
+/// How the speech-to-text backend is selected.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SttMode {
+    /// Deterministic in-process mock (default; Phase 1 testing only).
+    Mock,
+    /// Sarvam AI speech-to-text over HTTP.
+    Sarvam,
 }
 
 /// Log output format.
@@ -43,6 +51,21 @@ pub struct RetrievalConfig {
     pub oreo: Option<vox_oreo::OreoConfig>,
 }
 
+/// Speech-to-text backend settings.
+#[derive(Debug, Clone)]
+pub struct SttConfig {
+    /// Which backend implementation to build.
+    pub mode: SttMode,
+    /// Sarvam subscription key (required in `sarvam` mode).
+    pub sarvam_api_key: String,
+    /// Sarvam model identifier (e.g. `saarika:v2.5`).
+    pub sarvam_model: String,
+    /// Sarvam API base URL.
+    pub sarvam_base_url: String,
+    /// Per-request timeout for the Sarvam call.
+    pub sarvam_timeout: Duration,
+}
+
 /// Full runtime configuration.
 #[derive(Debug, Clone)]
 pub struct Config {
@@ -54,8 +77,8 @@ pub struct Config {
     pub log_format: LogFormat,
     /// Retrieval backend settings.
     pub retrieval: RetrievalConfig,
-    /// Pipeline tunables.
-    pub pipeline: PipelineConfig,
+    /// Speech-to-text backend settings.
+    pub stt: SttConfig,
 }
 
 /// Environment parsing failures.
@@ -72,8 +95,8 @@ pub enum ConfigError {
         /// Offending raw value.
         value: String,
     },
-    /// The HTTP client for the retrieval backend could not be built.
-    #[error("failed to build retrieval http client: {0}")]
+    /// An HTTP client for a backend could not be built.
+    #[error("failed to build http client: {0}")]
     HttpClient(String),
     /// The embedded OREO engine could not be built.
     #[error("failed to build oreo engine: {0}")]
@@ -114,7 +137,7 @@ impl Config {
             }
         };
 
-        let mode = match source("VOX_RETRIEVAL_MODE").as_deref() {
+        let retrieval_mode = match source("VOX_RETRIEVAL_MODE").as_deref() {
             Some("http") => RetrievalMode::Http,
             Some("mock") | None => RetrievalMode::Mock,
             Some("oreo") => RetrievalMode::Oreo,
@@ -125,7 +148,7 @@ impl Config {
                 })
             }
         };
-        let base_url = if mode == RetrievalMode::Http {
+        let retrieval_base_url = if retrieval_mode == RetrievalMode::Http {
             Some(
                 source("VOX_RETRIEVAL_BASE_URL")
                     .ok_or(ConfigError::MissingEnv("VOX_RETRIEVAL_BASE_URL"))?,
@@ -142,13 +165,33 @@ impl Config {
             None
         };
 
+        let stt_mode = match source("VOX_STT_MODE").as_deref() {
+            Some("sarvam") => SttMode::Sarvam,
+            Some("mock") | None => SttMode::Mock,
+            Some(other) => {
+                return Err(ConfigError::InvalidEnv {
+                    name: "VOX_STT_MODE",
+                    value: other.to_owned(),
+                })
+            }
+        };
+        let sarvam_api_key = if stt_mode == SttMode::Sarvam {
+            Some(
+                source("VOX_SARVAM_API_KEY")
+                    .filter(|v| !v.trim().is_empty())
+                    .ok_or(ConfigError::MissingEnv("VOX_SARVAM_API_KEY"))?,
+            )
+        } else {
+            None
+        };
+
         Ok(Self {
             host,
             port,
             log_format,
             retrieval: RetrievalConfig {
-                mode,
-                base_url: base_url.unwrap_or_default(),
+                mode: retrieval_mode,
+                base_url: retrieval_base_url.unwrap_or_default(),
                 timeout: Duration::from_millis(parse_env(
                     &source,
                     "VOX_RETRIEVAL_TIMEOUT_MS",
@@ -165,8 +208,18 @@ impl Config {
                 mock_delay: Duration::from_millis(parse_env(&source, "VOX_MOCK_DELAY_MS", 0)?),
                 oreo,
             },
-            pipeline: PipelineConfig {
-                grounding_min_score: parse_env(&source, "VOX_GROUNDING_MIN_SCORE", 0.30)?,
+            stt: SttConfig {
+                mode: stt_mode,
+                sarvam_api_key: sarvam_api_key.unwrap_or_default(),
+                sarvam_model: source("VOX_SARVAM_MODEL")
+                    .unwrap_or_else(|| "saarika:v2.5".to_owned()),
+                sarvam_base_url: source("VOX_SARVAM_BASE_URL")
+                    .unwrap_or_else(|| "https://api.sarvam.ai".to_owned()),
+                sarvam_timeout: Duration::from_millis(parse_env(
+                    &source,
+                    "VOX_SARVAM_TIMEOUT_MS",
+                    3000,
+                )?),
             },
         })
     }
@@ -204,7 +257,10 @@ mod tests {
         assert_eq!(config.log_format, LogFormat::Text);
         assert_eq!(config.retrieval.mode, RetrievalMode::Mock);
         assert_eq!(config.retrieval.timeout, Duration::from_millis(800));
-        assert!((config.pipeline.grounding_min_score - 0.30).abs() < f32::EPSILON);
+        assert_eq!(config.stt.mode, SttMode::Mock);
+        assert_eq!(config.stt.sarvam_model, "saarika:v2.5");
+        assert_eq!(config.stt.sarvam_base_url, "https://api.sarvam.ai");
+        assert_eq!(config.stt.sarvam_timeout, Duration::from_millis(3000));
     }
 
     #[test]
@@ -212,16 +268,18 @@ mod tests {
         let source = source_from(&[
             ("VOX_PORT", "9000"),
             ("VOX_LOG_FORMAT", "json"),
-            ("VOX_GROUNDING_MIN_SCORE", "0.5"),
+            ("VOX_SARVAM_MODEL", "saarika:v1"),
+            ("VOX_SARVAM_TIMEOUT_MS", "1500"),
         ]);
         let config = Config::from_source(source).expect("parsed");
         assert_eq!(config.port, 9000);
         assert_eq!(config.log_format, LogFormat::Json);
-        assert!((config.pipeline.grounding_min_score - 0.5).abs() < f32::EPSILON);
+        assert_eq!(config.stt.sarvam_model, "saarika:v1");
+        assert_eq!(config.stt.sarvam_timeout, Duration::from_millis(1500));
     }
 
     #[test]
-    fn from_source_should_require_base_url_in_http_mode() {
+    fn from_source_should_require_base_url_in_http_retrieval_mode() {
         let source = source_from(&[("VOX_RETRIEVAL_MODE", "http")]);
         assert!(matches!(
             Config::from_source(source),
@@ -230,12 +288,38 @@ mod tests {
     }
 
     #[test]
-    fn from_source_should_reject_unknown_modes_and_formats() {
-        let bad_mode = source_from(&[("VOX_RETRIEVAL_MODE", "quantum")]);
+    fn from_source_should_require_api_key_in_sarvam_mode() {
+        let source = source_from(&[("VOX_STT_MODE", "sarvam")]);
         assert!(matches!(
-            Config::from_source(bad_mode),
+            Config::from_source(source),
+            Err(ConfigError::MissingEnv("VOX_SARVAM_API_KEY"))
+        ));
+
+        let blank = source_from(&[("VOX_STT_MODE", "sarvam"), ("VOX_SARVAM_API_KEY", "   ")]);
+        assert!(matches!(
+            Config::from_source(blank),
+            Err(ConfigError::MissingEnv("VOX_SARVAM_API_KEY"))
+        ));
+    }
+
+    #[test]
+    fn from_source_should_accept_sarvam_mode_with_key() {
+        let source = source_from(&[
+            ("VOX_STT_MODE", "sarvam"),
+            ("VOX_SARVAM_API_KEY", "test-key"),
+        ]);
+        let config = Config::from_source(source).expect("parsed");
+        assert_eq!(config.stt.mode, SttMode::Sarvam);
+        assert_eq!(config.stt.sarvam_api_key, "test-key");
+    }
+
+    #[test]
+    fn from_source_should_reject_unknown_modes_and_formats() {
+        let bad_stt = source_from(&[("VOX_STT_MODE", "whisper")]);
+        assert!(matches!(
+            Config::from_source(bad_stt),
             Err(ConfigError::InvalidEnv {
-                name: "VOX_RETRIEVAL_MODE",
+                name: "VOX_STT_MODE",
                 ..
             })
         ));

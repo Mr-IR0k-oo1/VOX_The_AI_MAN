@@ -1,6 +1,6 @@
 [package]
 name = "vox-core"
-description = "VOX pipeline orchestration: language, retrieval, grounding, generation, guardrails"
+description = "VOX pipeline orchestration: STT, language detection, query analysis, retrieval"
 version.workspace = true
 edition.workspace = true
 
@@ -10,10 +10,9 @@ workspace = true
 [dependencies]
 thiserror = { workspace = true }
 tracing = { workspace = true }
-vox-guard = { workspace = true }
-vox-grounding = { workspace = true }
-vox-llm = { workspace = true }
+vox-ingest = { workspace = true }
 vox-retrieval = { workspace = true }
+vox-stt = { workspace = true }
 vox-types = { workspace = true }
 
 [dev-dependencies]

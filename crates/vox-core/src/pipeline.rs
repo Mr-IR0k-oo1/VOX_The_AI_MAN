@@ -1,299 +1,337 @@
-//! The user-facing RAG pipeline: language → query analysis → retrieval →
-//! grounding → generation → guardrail, with per-stage timing.
+//! The IR0K voice/text pipeline: STT → language → query analysis →
+//! retrieval, with per-stage latency measurement.
+//!
+//! Phase 1 scope: the pipeline ends at evidence. Answer generation (LLM),
+//! grounding, and guardrails are later phases.
 
 use std::sync::Arc;
 use std::time::Instant;
 
 use tracing::instrument;
-use vox_grounding::assess;
-use vox_guard::{decide, evaluate_answer};
-use vox_llm::LlmProvider;
+use vox_ingest::decode_audio;
 use vox_retrieval::RetrievalClient;
-use vox_types::{ms, AnswerResponse, GuardrailDecision, Language, LatencyMetrics, Query};
+use vox_stt::SpeechRecognizer;
+use vox_types::{ms, LatencyMetrics, Query, QueryResponse, VoiceRequest, VoiceResponse};
 
+use crate::analysis::analyze;
+use crate::context::PipelineContext;
 use crate::error::PipelineError;
+use crate::language::detect_language;
 
-/// Tunables for [`VoiceRagPipeline`].
-#[derive(Debug, Clone, Copy)]
-pub struct PipelineConfig {
-    /// Best evidence score below which the pipeline refuses to answer.
-    pub grounding_min_score: f32,
-}
-
-impl Default for PipelineConfig {
-    fn default() -> Self {
-        Self {
-            grounding_min_score: 0.30,
-        }
-    }
-}
-
-/// Orchestrates one text query from validation to a grounded answer or an
-/// explicit refusal.
-pub struct VoiceRagPipeline {
+/// Orchestrates one request from input to retrieved evidence.
+pub struct VoxPipeline {
+    stt: Arc<dyn SpeechRecognizer>,
     retrieval: Arc<dyn RetrievalClient>,
-    llm: Arc<dyn LlmProvider>,
-    config: PipelineConfig,
 }
 
-impl VoiceRagPipeline {
-    /// Creates a pipeline over the given retrieval and generation backends.
+impl VoxPipeline {
+    /// Creates a pipeline over the given STT and retrieval backends.
     #[must_use]
-    pub fn new(
-        retrieval: Arc<dyn RetrievalClient>,
-        llm: Arc<dyn LlmProvider>,
-        config: PipelineConfig,
-    ) -> Self {
-        Self {
-            retrieval,
-            llm,
-            config,
-        }
+    pub fn new(stt: Arc<dyn SpeechRecognizer>, retrieval: Arc<dyn RetrievalClient>) -> Self {
+        Self { stt, retrieval }
     }
 
-    /// Runs the full pipeline for `request`.
+    /// Runs the text flow: language detection → query analysis → retrieval.
     ///
     /// # Errors
-    /// Returns [`PipelineError`] on invalid input, retrieval failure after
-    /// retries, or generation failure. Refusals are returned as successful
-    /// responses with `grounded = false`.
+    /// Returns [`PipelineError`] on invalid input or retrieval failure.
     #[instrument(
-        name = "pipeline.run",
+        name = "pipeline.run_text",
         skip_all,
-        fields(query_len = request.query.len(), language = %request.language)
+        fields(request_id = %request_id, query_len = query.text.len())
     )]
-    pub async fn run(&self, request: Query) -> Result<AnswerResponse, PipelineError> {
+    pub async fn run_text(
+        &self,
+        request_id: String,
+        mut query: Query,
+    ) -> Result<QueryResponse, PipelineError> {
         let started = Instant::now();
-        let mut timings = LatencyMetrics::default();
+        let mut metrics = LatencyMetrics::default();
 
-        request.validate()?;
-        let echoed_query = request.query.clone();
+        query.validate()?;
 
+        // Language stage: hint → script fallback (no STT on the text flow).
         let stage = Instant::now();
-        let language: Language = request.language;
-        timings.language = Some(ms(stage.elapsed()));
+        let language = detect_language(query.language, None, &query.text);
+        metrics.language = Some(ms(stage.elapsed()));
+        query.language = Some(language);
 
-        let (normalized_query, analysis) = analyze_query(&request.query);
-        timings.query_analysis = Some(analysis);
+        let context = self
+            .analyze_and_retrieve(&request_id, None, &mut query, &mut metrics)
+            .await?;
+        metrics.total = Some(ms(started.elapsed()));
 
-        let stage = Instant::now();
-        let retrieve_query = Query {
-            query: normalized_query.clone(),
-            ..request
-        };
-        let evidence = self.retrieval.retrieve(retrieve_query).await?.documents;
-        timings.retrieval = Some(ms(stage.elapsed()));
-
-        let stage = Instant::now();
-        let answerability = assess(&evidence, self.config.grounding_min_score);
-        timings.grounding = Some(ms(stage.elapsed()));
-
-        let (answer, grounded, refusal_reason) = match decide(answerability) {
-            GuardrailDecision::Refuse { reason } => (String::new(), false, Some(reason)),
-            GuardrailDecision::Allow => {
-                let stage = Instant::now();
-                let output = self
-                    .llm
-                    .generate(&normalized_query, language, &evidence)
-                    .await?;
-                timings.llm = Some(ms(stage.elapsed()));
-
-                let stage = Instant::now();
-                let answer = output.answer.trim().to_owned();
-                let verdict = evaluate_answer(&answer);
-                timings.guardrail = Some(ms(stage.elapsed()));
-
-                match verdict {
-                    GuardrailDecision::Allow => (answer, true, None),
-                    GuardrailDecision::Refuse { reason } => (String::new(), false, Some(reason)),
-                }
-            }
-        };
-
-        timings.total = Some(ms(started.elapsed()));
         tracing::info!(
-            grounded,
-            evidence_documents = evidence.len(),
+            request_id = %request_id,
+            language = %language,
+            intent = ?query.intent,
+            evidence = context.evidence.len(),
             backend = self.retrieval.name(),
-            generator = self.llm.name(),
-            total_ms = timings.total.unwrap_or_default(),
-            "pipeline complete"
+            total_ms = metrics.total.unwrap_or_default(),
+            "text pipeline complete"
         );
 
-        Ok(AnswerResponse {
-            query: echoed_query,
-            language,
-            answer,
-            grounded,
-            refusal_reason,
-            timings_ms: timings,
+        let mut response = context.into_query_response();
+        response.metrics = metrics;
+        Ok(response)
+    }
+
+    /// Runs the voice flow: STT → language detection → query analysis →
+    /// retrieval.
+    ///
+    /// # Errors
+    /// Returns [`PipelineError`] on invalid input, ingestion failure, STT
+    /// failure, or retrieval failure.
+    #[instrument(name = "pipeline.run_voice", skip_all, fields(request_id = %request_id))]
+    pub async fn run_voice(
+        &self,
+        request_id: String,
+        request: VoiceRequest,
+    ) -> Result<VoiceResponse, PipelineError> {
+        let started = Instant::now();
+        let mut metrics = LatencyMetrics::default();
+
+        // Ingestion + STT stage.
+        request.validate()?;
+        let audio = decode_audio(&request.audio_base64, request.format)?;
+        let stage = Instant::now();
+        let transcript = self
+            .stt
+            .transcribe(&audio.bytes, audio.format, request.language)
+            .await?;
+        metrics.stt = Some(ms(stage.elapsed()));
+
+        // Language stage: hint → STT-provided → script fallback.
+        let stage = Instant::now();
+        let language = detect_language(
+            request.language,
+            transcript.detected_language,
+            &transcript.text,
+        );
+        metrics.language = Some(ms(stage.elapsed()));
+
+        let mut query = Query::new(transcript.text.clone(), Some(language), request.top_k);
+        let context = self
+            .analyze_and_retrieve(
+                &request_id,
+                Some(transcript.clone()),
+                &mut query,
+                &mut metrics,
+            )
+            .await?;
+        metrics.total = Some(ms(started.elapsed()));
+
+        tracing::info!(
+            request_id = %request_id,
+            language = %language,
+            intent = ?query.intent,
+            evidence = context.evidence.len(),
+            stt_backend = self.stt.name(),
+            total_ms = metrics.total.unwrap_or_default(),
+            "voice pipeline complete"
+        );
+
+        let mut response = context.into_voice_response(transcript);
+        response.metrics = metrics;
+        Ok(response)
+    }
+
+    /// Shared tail of both flows: query analysis → retrieval.
+    ///
+    /// Mutates `query` in place (normalized text, resolved language, refined
+    /// intent) and records the stage timings into `metrics`.
+    async fn analyze_and_retrieve(
+        &self,
+        request_id: &str,
+        transcript: Option<vox_types::Transcript>,
+        query: &mut Query,
+        metrics: &mut LatencyMetrics,
+    ) -> Result<PipelineContext, PipelineError> {
+        // Query-analysis stage.
+        let stage = Instant::now();
+        let (normalized_text, intent) = analyze(&query.text);
+        if query.intent == vox_types::QueryIntent::Unknown {
+            query.intent = intent;
+        }
+        query.normalized_text = normalized_text;
+        metrics.query_analysis = Some(ms(stage.elapsed()));
+
+        // Retrieval stage.
+        let stage = Instant::now();
+        let response = self.retrieval.retrieve(query.clone()).await?;
+        metrics.retrieval = Some(ms(stage.elapsed()));
+        let evidence = response.documents;
+
+        Ok(PipelineContext {
+            request_id: request_id.to_owned(),
+            transcript,
+            language: query.language.unwrap_or(vox_types::Language::En),
+            query: query.clone(),
+            evidence,
+            metrics: metrics.clone(),
         })
     }
 }
 
-/// Normalizes whitespace in the query and reports the stage duration.
-///
-/// Phase 0 scope: collapse whitespace. Script transliteration, intent
-/// detection (populating [`QueryIntent`]), and entity extraction land with
-/// query analysis proper.
-fn analyze_query(query: &str) -> (String, f64) {
-    let stage = Instant::now();
-    let mut normalized = String::with_capacity(query.len());
-    let mut first = true;
-    for word in query.split_whitespace() {
-        if !first {
-            normalized.push(' ');
-        }
-        normalized.push_str(word);
-        first = false;
-    }
-    (normalized, ms(stage.elapsed()))
-}
-
 #[cfg(test)]
 mod tests {
-    use std::time::Duration;
-
     use async_trait::async_trait;
-    use vox_llm::{LlmError, LlmOutput};
     use vox_retrieval::{MockRetrievalClient, RetrievalError};
-    use vox_types::{QueryIntent, RetrievalResponse, RetrievedDocument, ValidationError};
+    use vox_stt::{MockRecognizer, SpeechRecognizer, SttError};
+    use vox_types::{AudioFormat, Language, QueryIntent, RetrievalResponse, ValidationError};
 
     use super::*;
 
-    struct EmptyRetrievalClient;
+    struct FailingRetrieval;
 
     #[async_trait]
-    impl RetrievalClient for EmptyRetrievalClient {
-        fn name(&self) -> &'static str {
-            "empty"
-        }
-
-        async fn retrieve(&self, _request: Query) -> Result<RetrievalResponse, RetrievalError> {
-            Ok(RetrievalResponse {
-                documents: Vec::new(),
-                timings_ms: None,
-            })
-        }
-    }
-
-    struct FailingRetrievalClient;
-
-    #[async_trait]
-    impl RetrievalClient for FailingRetrievalClient {
+    impl RetrievalClient for FailingRetrieval {
         fn name(&self) -> &'static str {
             "failing"
         }
 
         async fn retrieve(&self, _request: Query) -> Result<RetrievalResponse, RetrievalError> {
-            Err(RetrievalError::Validation(ValidationError::EmptyQuery))
+            Err(RetrievalError::InvalidResponse("boom"))
         }
     }
 
-    struct EmptyLlmProvider;
+    struct FailingStt;
 
     #[async_trait]
-    impl LlmProvider for EmptyLlmProvider {
+    impl SpeechRecognizer for FailingStt {
         fn name(&self) -> &'static str {
-            "empty"
+            "failing"
         }
 
-        async fn generate(
+        async fn transcribe(
             &self,
-            _query: &str,
-            _language: Language,
-            _evidence: &[RetrievedDocument],
-        ) -> Result<LlmOutput, LlmError> {
-            Ok(LlmOutput {
-                answer: String::new(),
-            })
+            _audio: &[u8],
+            _format: AudioFormat,
+            _language: Option<Language>,
+        ) -> Result<vox_types::Transcript, SttError> {
+            Err(SttError::Backend("no engine".to_owned()))
         }
     }
 
-    fn mock_pipeline() -> VoiceRagPipeline {
-        VoiceRagPipeline::new(
-            Arc::new(MockRetrievalClient::new(Duration::ZERO)),
-            Arc::new(vox_llm::ExtractiveProvider),
-            PipelineConfig::default(),
+    fn mock_pipeline() -> VoxPipeline {
+        VoxPipeline::new(
+            Arc::new(MockRecognizer::new()),
+            Arc::new(MockRetrievalClient::default()),
         )
     }
 
-    fn request(query: &str) -> Query {
-        Query {
-            query: query.to_owned(),
-            language: Language::Ta,
+    fn voice_request(audio_base64: &str, language: Option<Language>) -> VoiceRequest {
+        VoiceRequest {
+            audio_base64: audio_base64.to_owned(),
+            format: AudioFormat::Wav,
+            language,
             top_k: 3,
-            intent: QueryIntent::Unknown,
         }
     }
 
     #[tokio::test]
-    async fn run_should_return_grounded_answer_with_all_stage_timings() {
+    async fn text_flow_should_return_analysis_evidence_and_metrics() {
+        let query = Query::new(
+            "  What   is artificial intelligence?? ",
+            Some(Language::En),
+            3,
+        );
         let response = mock_pipeline()
-            .run(request("  what   is  gst "))
+            .run_text("req-1".to_owned(), query)
             .await
-            .expect("pipeline run");
+            .expect("run");
 
-        assert!(response.grounded);
-        assert_eq!(response.refusal_reason, None);
-        assert!(!response.answer.is_empty());
-        // The extractive stub answers from the best chunk of the *normalized*
-        // query.
-        assert!(response.answer.contains("what is gst"));
-        let t = &response.timings_ms;
+        assert_eq!(response.request_id, "req-1");
+        assert_eq!(response.language, Language::En);
+        assert_eq!(
+            response.query.normalized_text,
+            "What is artificial intelligence?"
+        );
+        assert_eq!(response.query.intent, QueryIntent::Definition);
+        assert_eq!(response.evidence.len(), 3);
         for stage in [
-            t.language,
-            t.query_analysis,
-            t.retrieval,
-            t.grounding,
-            t.llm,
-            t.guardrail,
-            t.total,
+            response.metrics.language,
+            response.metrics.query_analysis,
+            response.metrics.retrieval,
+            response.metrics.total,
         ] {
             assert!(stage.is_some(), "missing stage timing");
         }
-        assert!(t.stt.is_none(), "text flow must not report stt");
+        assert!(
+            response.metrics.stt.is_none(),
+            "text flow must not report stt"
+        );
     }
 
     #[tokio::test]
-    async fn run_should_refuse_when_evidence_is_empty() {
-        let pipeline = VoiceRagPipeline::new(
-            Arc::new(EmptyRetrievalClient),
-            Arc::new(vox_llm::ExtractiveProvider),
-            PipelineConfig::default(),
+    async fn voice_flow_should_expose_transcript_language_query_evidence() {
+        let pipeline = VoxPipeline::new(
+            Arc::new(MockRecognizer::with_transcript(
+                "what is gst",
+                Some(Language::Hi),
+            )),
+            Arc::new(MockRetrievalClient::default()),
         );
 
-        let response = pipeline.run(request("anything")).await.expect("run");
-
-        assert!(!response.grounded);
-        assert_eq!(
-            response.refusal_reason.as_deref(),
-            Some("insufficient_evidence")
-        );
-        assert!(response.answer.is_empty());
-        assert!(response.timings_ms.llm.is_none(), "llm must be skipped");
-    }
-
-    #[tokio::test]
-    async fn run_should_refuse_empty_generations_via_guardrail() {
-        let pipeline = VoiceRagPipeline::new(
-            Arc::new(MockRetrievalClient::new(Duration::ZERO)),
-            Arc::new(EmptyLlmProvider),
-            PipelineConfig::default(),
-        );
-
-        let response = pipeline.run(request("anything")).await.expect("run");
-
-        assert!(!response.grounded);
-        assert_eq!(response.refusal_reason.as_deref(), Some("empty_generation"));
-    }
-
-    #[tokio::test]
-    async fn run_should_propagate_validation_errors() {
-        let err = mock_pipeline()
-            .run(request("   "))
+        // No hint: the STT-provided language must win over script detection
+        // (the text is Latin script).
+        let response = pipeline
+            .run_voice("req-2".to_owned(), voice_request("aGVsbG8=", None))
             .await
-            .expect_err("should fail validation");
+            .expect("run");
+
+        assert_eq!(response.request_id, "req-2");
+        assert_eq!(response.transcript.text, "what is gst");
+        assert_eq!(response.language, Language::Hi);
+        assert_eq!(response.query.intent, QueryIntent::Definition);
+        assert!(!response.evidence.is_empty());
+        assert!(response.metrics.stt.is_some());
+        assert!(response.metrics.total.is_some());
+    }
+
+    #[tokio::test]
+    async fn voice_flow_should_fall_back_to_script_detection() {
+        let pipeline = VoxPipeline::new(
+            // Recognizer reports no language; script detection must kick in.
+            Arc::new(MockRecognizer::with_transcript("வணக்கம் தமிழ்", None)),
+            Arc::new(MockRetrievalClient::default()),
+        );
+
+        let response = pipeline
+            .run_voice("req-3".to_owned(), voice_request("aGVsbG8=", None))
+            .await
+            .expect("run");
+
+        assert_eq!(response.language, Language::Ta);
+    }
+
+    #[tokio::test]
+    async fn hint_should_take_priority_over_stt_language() {
+        let pipeline = VoxPipeline::new(
+            Arc::new(MockRecognizer::with_transcript(
+                "what is gst",
+                Some(Language::Hi),
+            )),
+            Arc::new(MockRetrievalClient::default()),
+        );
+
+        let response = pipeline
+            .run_voice(
+                "req-4".to_owned(),
+                voice_request("aGVsbG8=", Some(Language::En)),
+            )
+            .await
+            .expect("run");
+
+        assert_eq!(response.language, Language::En);
+    }
+
+    #[tokio::test]
+    async fn text_flow_should_propagate_validation_errors() {
+        let err = mock_pipeline()
+            .run_text("req-5".to_owned(), Query::new("   ", None, 5))
+            .await
+            .expect_err("blank query must fail");
         assert!(matches!(
             err,
             PipelineError::Validation(ValidationError::EmptyQuery)
@@ -301,14 +339,33 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn run_should_propagate_retrieval_errors() {
-        let pipeline = VoiceRagPipeline::new(
-            Arc::new(FailingRetrievalClient),
-            Arc::new(vox_llm::ExtractiveProvider),
-            PipelineConfig::default(),
+    async fn voice_flow_should_propagate_stt_failures() {
+        let pipeline = VoxPipeline::new(
+            Arc::new(FailingStt),
+            Arc::new(MockRetrievalClient::default()),
         );
+        let err = pipeline
+            .run_voice("req-6".to_owned(), voice_request("aGVsbG8=", None))
+            .await
+            .expect_err("stt failure must propagate");
+        assert!(matches!(err, PipelineError::Stt(_)));
+    }
 
-        let err = pipeline.run(request("q")).await.expect_err("should fail");
-        assert!(matches!(err, PipelineError::Retrieval(_)));
+    #[tokio::test]
+    async fn both_flows_should_propagate_retrieval_failures() {
+        let pipeline =
+            VoxPipeline::new(Arc::new(MockRecognizer::new()), Arc::new(FailingRetrieval));
+
+        let text_err = pipeline
+            .run_text("req-7".to_owned(), Query::new("q", Some(Language::En), 3))
+            .await
+            .expect_err("retrieval failure must propagate");
+        assert!(matches!(text_err, PipelineError::Retrieval(_)));
+
+        let voice_err = pipeline
+            .run_voice("req-8".to_owned(), voice_request("aGVsbG8=", None))
+            .await
+            .expect_err("retrieval failure must propagate");
+        assert!(matches!(voice_err, PipelineError::Retrieval(_)));
     }
 }

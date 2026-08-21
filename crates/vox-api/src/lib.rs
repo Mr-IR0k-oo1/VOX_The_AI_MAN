@@ -4,6 +4,7 @@
 //! tests exercise the exact router that production serves.
 
 pub mod config;
+pub mod ids;
 pub mod logging;
 pub mod metrics;
 pub mod routes;
@@ -13,14 +14,13 @@ use std::sync::Arc;
 
 use axum::routing::{get, post};
 use axum::Router;
-use vox_core::{PipelineConfig, VoiceRagPipeline};
-use vox_llm::{ExtractiveProvider, LlmProvider};
+use vox_core::VoxPipeline;
 use vox_retrieval::{
     EmbeddedOreoClient, HttpRetrievalClient, MockRetrievalClient, RetrievalClient,
 };
-use vox_stt::{SpeechRecognizer, StubSpeechRecognizer};
+use vox_stt::{MockRecognizer, SarvamRecognizer, SpeechRecognizer};
 
-pub use crate::config::{Config, ConfigError, LogFormat, RetrievalMode};
+pub use crate::config::{Config, ConfigError, LogFormat, RetrievalMode, SttMode};
 pub use crate::state::AppState;
 
 /// The endpoints frozen in Phase 0, as `(method, path)` pairs.
@@ -32,6 +32,12 @@ pub const FROZEN_ENDPOINTS: [(&str, &str); 5] = [
     ("GET", "/metrics"),
 ];
 
+/// Maximum accepted JSON body size.
+///
+/// Driven by the voice endpoint: base64 inflates audio by ~4/3, so a
+/// 10 MB recording (the ingest limit) arrives as a ~14 MB JSON body.
+pub const MAX_BODY_BYTES: usize = 16 * 1024 * 1024;
+
 /// Builds the application router over `state`.
 pub fn build_router(state: Arc<AppState>) -> Router {
     Router::new()
@@ -40,13 +46,14 @@ pub fn build_router(state: Arc<AppState>) -> Router {
         .route("/v1/retrieve", post(routes::retrieve))
         .route("/v1/query", post(routes::query))
         .route("/v1/voice/query", post(routes::voice_query))
+        .layer(axum::extract::DefaultBodyLimit::max(MAX_BODY_BYTES))
         .with_state(state)
 }
 
 /// Builds [`AppState`] from `config`, selecting the backend implementations.
 ///
 /// # Errors
-/// Returns [`ConfigError`] when the HTTP retrieval backend or the embedded
+/// Returns [`ConfigError`] when an HTTP backend client or the embedded
 /// OREO engine cannot be built.
 pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
     let retrieval: Arc<dyn RetrievalClient> = match config.retrieval.mode {
@@ -72,29 +79,33 @@ pub fn build_state(config: &Config) -> Result<AppState, ConfigError> {
         }
     };
 
-    let stt: Arc<dyn SpeechRecognizer> = Arc::new(StubSpeechRecognizer);
-    let llm: Arc<dyn LlmProvider> = Arc::new(ExtractiveProvider);
+    let stt: Arc<dyn SpeechRecognizer> = match config.stt.mode {
+        SttMode::Mock => Arc::new(MockRecognizer::new()),
+        SttMode::Sarvam => {
+            let client = SarvamRecognizer::new(
+                config.stt.sarvam_api_key.clone(),
+                config.stt.sarvam_model.clone(),
+                config.stt.sarvam_base_url.clone(),
+                config.stt.sarvam_timeout,
+            )
+            .map_err(|err| ConfigError::HttpClient(err.to_string()))?;
+            Arc::new(client)
+        }
+    };
 
     tracing::info!(
         retrieval = retrieval.name(),
         stt = stt.name(),
-        llm = llm.name(),
-        timeout_ms = config.retrieval.timeout.as_millis() as u64,
+        retrieval_timeout_ms = config.retrieval.timeout.as_millis() as u64,
+        stt_timeout_ms = config.stt.sarvam_timeout.as_millis() as u64,
         "backends selected"
     );
 
-    let pipeline = VoiceRagPipeline::new(
-        Arc::clone(&retrieval),
-        Arc::clone(&llm),
-        PipelineConfig {
-            grounding_min_score: config.pipeline.grounding_min_score,
-        },
-    );
+    let pipeline = VoxPipeline::new(Arc::clone(&stt), Arc::clone(&retrieval));
 
     Ok(AppState {
         pipeline: Arc::new(pipeline),
         retrieval,
-        stt,
         started_at: std::time::Instant::now(),
     })
 }

@@ -1,43 +1,65 @@
 # VOX — Evidence-Aware Multilingual Voice RAG (Rust)
 
-Low-latency multilingual voice RAG for Indian languages: spoken question → STT →
-hybrid retrieval (dense + BM25 via `POST /v1/retrieve`) → grounding check →
-grounded answer, with explicit refusal when evidence is insufficient.
+Low-latency multilingual voice RAG for Indian languages: spoken or typed
+question → STT → language detection → query analysis → hybrid retrieval
+(dense + BM25 via `POST /v1/retrieve`) → evidence, with per-stage latency
+metrics. Grounded answer generation and refusal land in later phases.
 
-## Status: Phase 2 — OREO retrieval foundation
+## Status: Phases 1–3 — pipeline foundation, OREO retrieval, evaluation
 
 Phase 0 froze the architecture (shared types, backend traits, five v1
-endpoints, env config, tracing). Phase 2 adds **OREO** (`vox-oreo`), an
-independent multilingual retrieval engine: dataset ingestion → preprocessing
-(clean → NFC normalize → script-based language detection) → chunking →
-embeddings → Qdrant/Tantivy indexes → hybrid RRF fusion → rerank. The API can
-now serve `POST /v1/retrieve` from a real index via the embedded backend
-(`VOX_RETRIEVAL_MODE=oreo`), or from the standalone `vox-oreo` service.
+endpoints, env config, tracing). The full pipeline then came together on
+both sides of the integration boundary and now runs end-to-end:
 
-Retrieval defaults: en/hi/ta languages, sentence chunking, deterministic
-hashed embedder (offline placeholder for a future neural encoder), in-memory
-cosine store or Qdrant over REST for dense, Tantivy BM25 for sparse, RRF
-(k=60) fusing a top-20 candidate pool down to top-5 after lexical-overlap
-reranking. Every response carries per-stage timings (`timings_ms`).
+```
+voice/text → STT → language detection → query analysis → hybrid retrieval
+           → evidence → latency metrics
+```
 
-Not yet implemented (deliberately): real STT (`/v1/voice/query` returns 501
-via the stub recognizer), real LLM provider, off-topic guard, neural
-embeddings/rerankers, audio transcoding, benchmark scenarios.
+- **STT**: `MockRecognizer` (deterministic) and `SarvamRecognizer`
+  (Sarvam AI `/speech-to-text` via multipart, env-provided API key,
+  explicit timeout, one retry on transient failures only).
+- **Language detection**: hint → STT-reported → local script fallback
+  (Devanagari → Hindi, Tamil script → Tamil, Latin → English; no ML).
+- **Query analysis**: conservative normalization (whitespace/punctuation
+  cleanup only — no translation) + deterministic intent heuristics
+  (`factual`, `definition`, `comparison`, `procedural`, `unknown`) with
+  English, Hindi, and Tamil markers.
+- **OREO** (`vox-oreo`): independent multilingual retrieval engine:
+  dataset ingestion → preprocessing (clean → NFC normalize → script-based
+  language detection) → chunking → embeddings → Qdrant/Tantivy indexes →
+  hybrid RRF fusion → rerank. The API serves `POST /v1/retrieve` from a
+  real index via the embedded backend (`VOX_RETRIEVAL_MODE=oreo`) or from
+  the standalone `vox-oreo` service. Defaults: en/hi/ta languages,
+  sentence chunking, deterministic hashed embedder (offline placeholder
+  for a future neural encoder), in-memory cosine store or Qdrant for
+  dense, Tantivy BM25 for sparse, RRF (k=60) fusing a top-20 candidate
+  pool down to top-5 after lexical-overlap reranking. Every response
+  carries per-stage timings (`timings_ms`).
+- **Evaluation** (`vox-bench`): 36-query en/hi/ta eval set over the bundled
+  sample corpus; chunking-strategy comparison, retrieval-component ablation
+  (dense / BM25 / score-sum / RRF / +rerank), Recall@5 + MRR quality,
+  P50/P70/P100 latency per stage. Results and methodology live in
+  [benchmarks/](benchmarks/).
+
+Not yet implemented (deliberately): LLM answer generation wired into the
+API, grounding check, guardrails, neural embeddings/rerankers, audio
+transcoding, UI, deployment.
 
 ## Workspace layout
 
 | Crate | Responsibility |
 |---|---|
-| `vox-types` | Shared domain types: `Query`, `RetrievedDocument`, `Transcript`, `Language`, verdicts, `LatencyMetrics`, validation errors |
-| `vox-core` | Pipeline orchestration: language → query analysis → retrieval → grounding → generation → guardrail, per-stage timings |
+| `vox-types` | Shared domain types: `Query`, `QueryIntent`, `Transcript`, `RetrievedDocument`, `Language`, responses, `LatencyMetrics`, validation errors |
+| `vox-core` | Pipeline orchestration: STT → language → query analysis → retrieval, per-stage timings |
 | `vox-api` | Axum server exposing the frozen v1 endpoints; config, logging, metrics |
-| `vox-stt` | `SpeechRecognizer` trait + stub (real engine lands later) |
+| `vox-stt` | `SpeechRecognizer` trait + mock + Sarvam HTTP backend |
 | `vox-retrieval` | `RetrievalClient` trait + mock backend + embedded OREO backend + HTTP client (timeouts, bounded retries) |
 | `vox-oreo` | OREO retrieval engine: ingest, preprocess, chunk, embed, Qdrant/Tantivy, hybrid RRF, rerank; standalone `POST /v1/retrieve` service |
 | `vox-ingest` | Voice ingestion boundary: base64 decode, size caps, container sniffing |
-| `vox-grounding` | Evidence-sufficiency assessment → `Answerability` |
-| `vox-llm` | `LlmProvider` trait + extractive stub provider |
-| `vox-guard` | Guardrail decisions over evidence verdicts and generated answers |
+| `vox-grounding` | Evidence-sufficiency assessment → `Answerability` (later phase) |
+| `vox-llm` | `LlmProvider` trait + extractive stub provider (later phase) |
+| `vox-guard` | Guardrail decisions over evidence verdicts and generated answers (later phase) |
 | `vox-bench` | Latency percentile utilities; scenario harnesses land later |
 
 Dependency direction: everything depends on `vox-types`; adapters
@@ -50,16 +72,46 @@ Integration boundary with the retrieval service is exclusively
 ## Quickstart
 
 ```sh
-cargo run -p vox-api            # serves on 0.0.0.0:8080 with the mock backend
+cargo run -p vox-api            # serves on 0.0.0.0:8080 with mock backends
 
 curl -s localhost:8080/health
+
+# Text flow
 curl -s -X POST localhost:8080/v1/query \
   -H 'content-type: application/json' \
-  -d '{"query":"What is GST?","language":"hi","top_k":3}'
+  -d '{"query":"What is artificial intelligence?","language":"en"}'
+
+# Voice flow (base64 audio; mock STT returns a fixed transcript)
+curl -s -X POST localhost:8080/v1/voice/query \
+  -H 'content-type: application/json' \
+  -d "{\"audio_base64\":\"$(base64 -w0 sample.wav)\",\"format\":\"wav\"}"
+
+# Direct retrieval boundary
 curl -s -X POST localhost:8080/v1/retrieve \
   -H 'content-type: application/json' \
-  -d '{"query":"What is GST?","language":"hi","top_k":3}'
+  -d '{"query":"What is GST?","language":"en","top_k":3}'
+
 curl -s localhost:8080/metrics
+```
+
+Example response (`POST /v1/query`):
+
+```json
+{
+  "request_id": "req-68a5f0c2e1a3-0007",
+  "language": "en",
+  "query": {
+    "query": "What is artificial intelligence?",
+    "normalized_text": "What is artificial intelligence?",
+    "language": "en",
+    "intent": "definition",
+    "top_k": 5
+  },
+  "evidence": [
+    { "id": "mock-0000", "text": "Artificial intelligence (AI) …", "score": 0.95, "rank": 1, "metadata": {"source":"mock","language":"en"} }
+  ],
+  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.15, "total": 0.16 }
+}
 ```
 
 ### Real retrieval (OREO)
@@ -84,6 +136,10 @@ p50 ≈ 1.5 ms, p95 ≈ 3.6 ms per hybrid query, dominated by BM25 + rerank.
 Dense vectors default to the in-process store; set
 `VOX_OREO_VECTOR_STORE=qdrant` (+ `VOX_OREO_QDRANT_URL`) to use Qdrant.
 
+Retrieval-quality evaluation (chunking strategies, component ablation,
+Recall@5/MRR, P50/P70/P100): `cargo run -p vox-bench`; outputs and the
+full report are written to [benchmarks/](benchmarks/).
+
 ## Frozen API (Phase 0)
 
 | Endpoint | Contract |
@@ -91,8 +147,8 @@ Dense vectors default to the in-process store; set
 | `GET /health` | Liveness + uptime |
 | `GET /metrics` | Prometheus exposition |
 | `POST /v1/retrieve` | `Query` → `RetrievalResponse` (`{documents: [...]}`) |
-| `POST /v1/query` | `Query` → grounded `AnswerResponse` or refusal, always with `timings_ms` |
-| `POST /v1/voice/query` | `VoiceRequest` → `VoiceResponse`; currently `501` until a real STT engine lands |
+| `POST /v1/query` | `Query` → `{request_id, language, query, evidence, metrics}` |
+| `POST /v1/voice/query` | `VoiceRequest` → `{request_id, transcript, language, query, evidence, metrics}` |
 
 Errors: `422` invalid input/audio, `502` upstream failure, `504` upstream
 timeout, `503` retrieval unavailable, `501` not yet implemented.
@@ -123,6 +179,11 @@ See [.env.example](.env.example).
 | `VOX_OREO_FINAL_TOP` | `5` | Final results returned after rerank |
 | `VOX_OREO_RRF_K` | `60` | Reciprocal Rank Fusion constant |
 | `VOX_OREO_RERANKER` | `lexical` | `lexical` or `none` |
+| `VOX_STT_MODE` | `mock` | `mock` or `sarvam` |
+| `VOX_SARVAM_API_KEY` | — | Required when mode is `sarvam`; never hard-code |
+| `VOX_SARVAM_MODEL` | `saarika:v2.5` | Sarvam model identifier |
+| `VOX_SARVAM_BASE_URL` | `https://api.sarvam.ai` | Sarvam API base URL |
+| `VOX_SARVAM_TIMEOUT_MS` | `3000` | Per-request timeout for the STT call |
 
 ## Development
 

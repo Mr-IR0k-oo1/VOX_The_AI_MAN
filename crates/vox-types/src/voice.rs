@@ -3,9 +3,11 @@
 use serde::{Deserialize, Serialize};
 
 use crate::audio::AudioFormat;
+use crate::document::RetrievedDocument;
 use crate::error::{ValidationError, MAX_TOP_K};
 use crate::language::Language;
 use crate::latency::LatencyMetrics;
+use crate::query::Query;
 
 /// Request body of `POST /v1/voice/query`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -46,31 +48,45 @@ impl VoiceRequest {
 }
 
 /// Output of the speech-to-text stage.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Transcript {
     /// Recognized text.
     pub text: String,
-    /// Language the transcript was recognized in.
-    pub language: Language,
+    /// Language identified by the recognizer, when reported.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detected_language: Option<Language>,
     /// Recognizer confidence in `[0, 1]`, when reported by the backend.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub confidence: Option<f32>,
 }
 
+impl Transcript {
+    /// Creates a transcript without detection metadata.
+    #[must_use]
+    pub fn new(text: impl Into<String>) -> Self {
+        Self {
+            text: text.into(),
+            detected_language: None,
+            confidence: None,
+        }
+    }
+}
+
 /// Response body of `POST /v1/voice/query`.
 #[derive(Debug, Clone, Serialize)]
 pub struct VoiceResponse {
+    /// Server-generated identifier for this request.
+    pub request_id: String,
     /// What was heard.
     pub transcript: Transcript,
-    /// Grounded answer text; empty when the request was refused.
-    pub answer: String,
-    /// Whether the answer is grounded in retrieved evidence.
-    pub grounded: bool,
-    /// Machine-readable refusal reason; present only when `grounded` is false.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub refusal_reason: Option<String>,
-    /// Per-stage latencies in milliseconds (includes the `stt` stage).
-    pub timings_ms: LatencyMetrics,
+    /// Resolved pipeline language (hint → STT → script fallback).
+    pub language: Language,
+    /// The analyzed query (normalized text + intent).
+    pub query: Query,
+    /// Mock/sample evidence retrieved for the query.
+    pub evidence: Vec<RetrievedDocument>,
+    /// Per-stage latencies in milliseconds (includes `stt`) plus total.
+    pub metrics: LatencyMetrics,
 }
 
 #[cfg(test)]
@@ -93,18 +109,14 @@ mod tests {
 
     #[test]
     fn validate_should_reject_blank_audio() {
-        assert_eq!(
-            request("   ", 5).validate(),
-            Err(ValidationError::EmptyAudio)
-        );
+        let req = request("   ", 5);
+        assert_eq!(req.validate(), Err(ValidationError::EmptyAudio));
     }
 
     #[test]
     fn validate_should_reject_out_of_range_top_k() {
-        assert_eq!(
-            request("aGk=", 0).validate(),
-            Err(ValidationError::InvalidTopK(0))
-        );
+        let req = request("aGk=", 0);
+        assert_eq!(req.validate(), Err(ValidationError::InvalidTopK(0)));
     }
 
     #[test]
@@ -113,5 +125,12 @@ mod tests {
             serde_json::from_str(r#"{"audio_base64":"aGk=","format":"mp3"}"#).expect("deserialize");
         assert_eq!(req.language, None);
         assert_eq!(req.top_k, 5);
+    }
+
+    #[test]
+    fn transcript_should_omit_unset_metadata() {
+        let transcript = Transcript::new("hello");
+        let json = serde_json::to_value(&transcript).expect("serialize");
+        assert_eq!(json, serde_json::json!({ "text": "hello" }));
     }
 }
