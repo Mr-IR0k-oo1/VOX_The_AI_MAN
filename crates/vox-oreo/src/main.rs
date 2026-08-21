@@ -155,8 +155,9 @@ async fn run_bench(engine: &Arc<OreoEngine>, iterations: usize) {
     for round in 0..iterations.max(1) {
         for text in BENCH_QUERIES {
             let query = Query {
-                query: text.to_owned(),
-                language: vox_types::Language::En,
+                text: text.to_owned(),
+                normalized_text: String::new(),
+                language: Some(vox_types::Language::En),
                 top_k: 5,
                 intent: vox_types::QueryIntent::Unknown,
             };

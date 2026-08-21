@@ -91,8 +91,9 @@ mod tests {
 
     fn request(query: &str) -> Query {
         Query {
-            query: query.to_owned(),
-            language: Language::En,
+            text: query.to_owned(),
+            normalized_text: String::new(),
+            language: Some(Language::En),
             top_k: 5,
             intent: QueryIntent::Unknown,
         }

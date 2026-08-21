@@ -15,10 +15,9 @@ use serde_json::{json, Value};
 use tower::ServiceExt;
 
 use vox_api::{build_router, AppState, Config};
-use vox_core::{PipelineConfig, VoiceRagPipeline};
-use vox_llm::ExtractiveProvider;
+use vox_core::VoxPipeline;
 use vox_retrieval::{EmbeddedOreoClient, RetrievalClient};
-use vox_stt::StubSpeechRecognizer;
+use vox_stt::{MockRecognizer, SpeechRecognizer};
 
 /// Builds an [`AppState`] whose retrieval backend is an embedded OREO engine
 /// pre-indexed with the bundled multilingual sample corpus.
@@ -43,18 +42,12 @@ async fn oreo_app(tantivy_dir: &Path) -> axum::Router {
         .expect("index sample corpus");
 
     let retrieval: Arc<dyn RetrievalClient> = Arc::new(EmbeddedOreoClient::new(engine));
-    let pipeline = Arc::new(VoiceRagPipeline::new(
-        Arc::clone(&retrieval),
-        Arc::new(ExtractiveProvider),
-        PipelineConfig {
-            grounding_min_score: config.pipeline.grounding_min_score,
-        },
-    ));
+    let stt: Arc<dyn SpeechRecognizer> = Arc::new(MockRecognizer::new());
+    let pipeline = Arc::new(VoxPipeline::new(Arc::clone(&stt), Arc::clone(&retrieval)));
 
     build_router(Arc::new(AppState {
         pipeline,
         retrieval,
-        stt: Arc::new(StubSpeechRecognizer),
         started_at: std::time::Instant::now(),
     }))
 }

@@ -298,8 +298,9 @@ fn response_document_ids(response: &RetrievalResponse) -> Vec<String> {
 
 fn eval_query(query: &EvalQuery) -> Query {
     Query {
-        query: query.query.clone(),
-        language: query.language,
+        text: query.query.clone(),
+        normalized_text: String::new(),
+        language: Some(query.language),
         top_k: u8::try_from(EVAL_TOP_K).unwrap_or(u8::MAX),
         intent: vox_types::QueryIntent::Unknown,
     }

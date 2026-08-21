@@ -201,7 +201,7 @@ impl OreoEngine {
         let embed_started = Instant::now();
         let query_vector = self
             .embedder
-            .embed(std::slice::from_ref(&query.query))
+            .embed(std::slice::from_ref(&query.text))
             .await?
             .into_iter()
             .next();
@@ -220,14 +220,14 @@ impl OreoEngine {
 
         let hybrid = self.hybrid_retriever();
         let (fused, leg_timings) = hybrid
-            .retrieve_with_timings(&query.query, self.config.candidate_top)
+            .retrieve_with_timings(&query.text, self.config.candidate_top)
             .await?;
 
         let rerank_started = Instant::now();
         let final_count = usize::from(query.top_k).min(self.config.final_top);
         let mut ranked = self
             .reranker
-            .rerank(&query.query, fused, final_count)
+            .rerank(&query.text, fused, final_count)
             .await?;
         let rerank_ms = elapsed_ms(rerank_started.elapsed());
 

@@ -156,7 +156,7 @@ impl Config {
         } else {
             None
         };
-        let oreo = if mode == RetrievalMode::Oreo {
+        let oreo = if retrieval_mode == RetrievalMode::Oreo {
             Some(
                 vox_oreo::OreoConfig::from_source(&source)
                     .map_err(|err| ConfigError::OreoConfig(err.to_string()))?,
