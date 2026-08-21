@@ -1,6 +1,6 @@
 # Phase 3 — Retrieval Evaluation Report
 
-Measured: 2026-08-21 (Unix epoch 1787302302)
+Measured: 2026-08-21 (Unix epoch 1787309557)
 
 ## Environment
 
@@ -41,9 +41,9 @@ Full pipeline (hybrid + RRF + rerank) per chunking strategy:
 
 | Strategy | Chunks indexed | Recall@5 | MRR | P50 ms | P70 ms | P100 ms |
 |---|---|---|---|---|---|---|
-| fixed:400:80 | 20 | 1.000 | 1.000 | 4.84 | 5.08 | 6.90 |
-| sentence:700:80 | 20 | 1.000 | 1.000 | 4.81 | 5.03 | 11.18 |
-| sliding:600:300 | 20 | 1.000 | 1.000 | 4.75 | 5.01 | 8.45 |
+| fixed:400:80 | 20 | 1.000 | 1.000 | 8.88 | 10.48 | 17.72 |
+| sentence:700:80 | 20 | 1.000 | 1.000 | 7.86 | 8.70 | 13.04 |
+| sliding:600:300 | 20 | 1.000 | 1.000 | 10.36 | 11.54 | 21.60 |
 
 ## Retrieval component ablation
 
@@ -51,46 +51,46 @@ Sentence chunking held fixed; components added left to right:
 
 | Mode | Recall@5 | MRR | P50 ms | P70 ms | P100 ms |
 |---|---|---|---|---|---|
-| dense_only | 0.972 | 0.914 | 0.13 | 0.16 | 0.35 |
-| bm25_only | 1.000 | 0.986 | 0.37 | 0.42 | 1.05 |
-| dense+bm25_score_sum | 1.000 | 0.986 | 0.55 | 0.62 | 1.01 |
-| dense+bm25_rrf | 1.000 | 0.954 | 0.63 | 0.71 | 1.42 |
-| dense+bm25_rrf+rerank | 1.000 | 1.000 | 4.91 | 5.15 | 7.29 |
+| dense_only | 0.972 | 0.914 | 0.15 | 0.19 | 1.06 |
+| bm25_only | 1.000 | 0.986 | 1.00 | 1.34 | 3.00 |
+| dense+bm25_score_sum | 1.000 | 0.986 | 1.60 | 2.05 | 3.41 |
+| dense+bm25_rrf | 1.000 | 0.954 | 1.45 | 1.82 | 4.58 |
+| dense+bm25_rrf+rerank | 1.000 | 1.000 | 11.22 | 12.91 | 21.72 |
 
 ### Per-stage latency (mean ms)
 
 | Mode | embed | dense | sparse/bm25 | fuse | rerank |
 |---|---|---|---|---|---|
-| dense_only | — | 0.142 | — | — | — |
-| bm25_only | — | — | 0.395 | — | — |
-| dense+bm25_score_sum | — | 0.119 | 0.417 | 0.031 | — |
-| dense+bm25_rrf | — | 0.126 | 0.473 | 0.041 | — |
-| dense+bm25_rrf+rerank | 0.056 | 0.122 | 0.656 | 0.052 | 4.031 |
+| dense_only | — | 0.165 | — | — | — |
+| bm25_only | — | — | 1.139 | — | — |
+| dense+bm25_score_sum | — | 0.304 | 1.287 | 0.099 | — |
+| dense+bm25_rrf | — | 0.276 | 1.162 | 0.098 | — |
+| dense+bm25_rrf+rerank | 0.122 | 0.277 | 1.536 | 0.146 | 8.935 |
 
 ## Baseline latency (default configuration)
 
 | Metric | P50 ms | P70 ms | P100 ms | Mean ms |
 |---|---|---|---|---|
-| Total retrieval | 5.01 | 5.30 | 14.98 | 5.32 |
+| Total retrieval | 9.47 | 10.61 | 16.59 | 9.69 |
 
 ### Baseline stage latencies
 
 | Stage | Mean ms | P50 ms | P70 ms | P100 ms |
 |---|---|---|---|---|
-| embed | 0.060 | 0.053 | 0.057 | 0.248 |
-| dense | 0.130 | 0.120 | 0.126 | 0.320 |
-| sparse/bm25 | 0.774 | 0.711 | 0.816 | 2.512 |
-| fuse/rrf | 0.058 | 0.053 | 0.058 | 0.194 |
-| rerank | 4.230 | 4.066 | 4.220 | 11.668 |
+| embed | 0.110 | 0.093 | 0.120 | 0.377 |
+| dense | 0.241 | 0.208 | 0.266 | 0.621 |
+| sparse/bm25 | 1.400 | 1.239 | 1.553 | 4.260 |
+| fuse/rrf | 0.113 | 0.097 | 0.119 | 0.473 |
+| rerank | 7.710 | 7.559 | 8.642 | 13.896 |
 
 ## Conclusions (derived from the measurements above)
 
-- **Best chunking strategy**: 3 strategies tie on quality (Recall@5 1.000, MRR 1.000); `sliding:600:300` is fastest at P50 4.75 ms.
+- **Best chunking strategy**: 3 strategies tie on quality (Recall@5 1.000, MRR 1.000); `sentence:700:80` is fastest at P50 7.86 ms.
 - **Hybrid vs single-leg**: best single leg is `bm25_only` at Recall@5 1.000; score-sum fusion reaches 1.000 (+0.000) and RRF fusion reaches 1.000 (+0.000).
 - **Does reranking improve quality?** RRF alone: Recall@5 1.000, MRR 0.954. RRF + lexical rerank: Recall@5 1.000 (+0.000), MRR 1.000 (+0.046).
-- **Dominant latency stage**: `rerank` at mean 4.03 ms (~81% of total retrieval latency).
-- **Retrieval latency** (full pipeline): P50 4.91 ms, P70 5.15 ms, P100 7.29 ms.
-- **Best retrieval configuration overall**: `dense+bm25_rrf+rerank` (Recall@5 1.000, MRR 1.000, P50 4.91 ms).
+- **Dominant latency stage**: `rerank` at mean 8.94 ms (~80% of total retrieval latency).
+- **Retrieval latency** (full pipeline): P50 11.22 ms, P70 12.91 ms, P100 21.72 ms.
+- **Best retrieval configuration overall**: `dense+bm25_rrf+rerank` (Recall@5 1.000, MRR 1.000, P50 11.22 ms).
 
 ## Limitations
 
