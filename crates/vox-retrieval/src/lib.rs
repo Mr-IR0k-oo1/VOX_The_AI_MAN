@@ -2,7 +2,7 @@
 //!
 //! The pipeline depends only on [`RetrievalClient`]; the concrete backend is
 //! selected by configuration — [`mock::MockRetrievalClient`] until the real
-//! retrieval API is proven stable, then [`http::HttpRetrievalClient`].
+//! retrieval API is proven stable, then [`http::OREORetrievalClient`].
 
 pub mod embedded;
 pub mod error;
@@ -14,7 +14,7 @@ use vox_types::{Query, RetrievalResponse};
 
 pub use crate::embedded::EmbeddedOreoClient;
 pub use crate::error::RetrievalError;
-pub use crate::http::{HttpRetrievalClient, RetryPolicy};
+pub use crate::http::{OREORetrievalClient, RetryPolicy};
 pub use crate::mock::MockRetrievalClient;
 
 /// Substitution boundary for retrieval backends.

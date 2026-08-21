@@ -26,6 +26,29 @@ impl MockRetrievalClient {
     pub const fn new(delay: Duration) -> Self {
         Self { delay }
     }
+
+    /// Content vocabulary the sample corpus can speak about, used by callers
+    /// to configure input-guard off-topic checks. Deliberately includes a few
+    /// legitimate terms with no corpus coverage so that well-formed but
+    /// unsupported questions still reach retrieval and exercise the
+    /// insufficient-context refusal path.
+    #[must_use]
+    pub fn topic_vocabulary() -> Vec<String> {
+        let mut words: Vec<String> = CORPUS
+            .iter()
+            .flat_map(|entry| entry.triggers.iter())
+            .flat_map(|trigger| trigger.split_whitespace())
+            .map(str::to_owned)
+            .collect();
+        words.extend(
+            ["itr", "income", "return", "filing"]
+                .into_iter()
+                .map(str::to_owned),
+        );
+        words.sort();
+        words.dedup();
+        words
+    }
 }
 
 impl Default for MockRetrievalClient {
@@ -42,7 +65,7 @@ struct CorpusEntry {
     passages: &'static [&'static str],
 }
 
-const CORPUS: [CorpusEntry; 2] = [
+const CORPUS: [CorpusEntry; 4] = [
     CorpusEntry {
         triggers: &["artificial intelligence", "ai", "machine learning"],
         passages: &[
@@ -63,6 +86,24 @@ const CORPUS: [CorpusEntry; 2] = [
             "GST in India is a multi-stage, destination-based tax with slabs of \
              0%, 5%, 12%, 18%, and 28%. Returns are filed monthly or quarterly \
              depending on turnover.",
+        ],
+    },
+    CorpusEntry {
+        triggers: &["जीएसटी", "वस्तु एवं सेवा कर"],
+        passages: &[
+            "जीएसटी यानी वस्तु एवं सेवा कर भारत में लगाया जाने वाला अप्रत्यक्ष कर है। \
+             इसने कई पुराने करों की जगह ली है।",
+            "भारत में जीएसटी के स्लैब 5%, 12%, 18% और 28% हैं। टर्नओवर के आधार पर \
+             रिटर्न मासिक या त्रैमासिक भरे जाते हैं।",
+        ],
+    },
+    CorpusEntry {
+        triggers: &["குங்குமப்பூ"],
+        passages: &[
+            "குங்குமப்பூ என்பது குரோக்கஸ் சாடிவஸ் மலரின் மகரந்தத்திலிருந்து \
+             பெறப்படும் ஒரு மசாலா பொருள் ஆகும்.",
+            "குங்குமப்பூ உலகின் மிக விலையுயர்ந்த மசாலா ஆகும். இது உணவு, \
+             மருத்துவம் மற்றும் அழகுசாதனங்களில் பயன்படுகிறது.",
         ],
     },
 ];
@@ -100,13 +141,16 @@ impl RetrievalClient for MockRetrievalClient {
             .map(str::to_owned)
             .collect();
 
-        // Fill remaining slots with deterministic generic documents derived
-        // from the query itself.
+        // Fill remaining slots with deterministic neutral documents. The
+        // filler deliberately shares no vocabulary with the query: queries
+        // outside the corpus must look unsupported to the grounding stage
+        // instead of being echoed back as fake evidence.
         let top_k = usize::from(request.top_k);
         let mut filler = 0usize;
         while passages.len() < top_k {
             passages.push(format!(
-                "Reference document {filler} containing curated information related to: {normalized}"
+                "General reference note {filler} from the offline sample corpus. \
+                 It holds background material unrelated to specific requests."
             ));
             filler += 1;
         }
@@ -185,15 +229,47 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn retrieve_should_fall_back_to_generic_documents() {
+    async fn retrieve_should_fall_back_to_neutral_documents() {
         let client = MockRetrievalClient::default();
         let response = client
             .retrieve(request("obscure topic xyz", 2))
             .await
             .expect("retrieve");
 
-        assert!(response.documents[0].text.contains("Reference document 0"));
-        assert!(response.documents[1].text.contains("Reference document 1"));
+        assert!(response.documents[0]
+            .text
+            .contains("General reference note 0"));
+        assert!(response.documents[1]
+            .text
+            .contains("General reference note 1"));
+        // The filler must not echo query terms back as fake evidence.
+        assert!(!response.documents[0].text.contains("obscure"));
+    }
+
+    #[tokio::test]
+    async fn retrieve_should_serve_hindi_and_tamil_corpus_entries() {
+        let client = MockRetrievalClient::default();
+
+        let hindi = client
+            .retrieve(request("जीएसटी क्या है?", 2))
+            .await
+            .expect("hindi");
+        assert!(hindi.documents[0].text.contains("जीएसटी"));
+
+        let tamil = client
+            .retrieve(request("குங்குமப்பூ என்றால் என்ன?", 2))
+            .await
+            .expect("tamil");
+        assert!(tamil.documents[0].text.contains("குங்குமப்பூ"));
+    }
+
+    #[test]
+    fn topic_vocabulary_should_cover_corpus_words_and_unsupported_terms() {
+        let vocab = MockRetrievalClient::topic_vocabulary();
+        for word in ["gst", "tax", "ai", "जीएसटी", "குங்குமப்பூ", "itr"]
+        {
+            assert!(vocab.iter().any(|w| w == word), "missing {word}");
+        }
     }
 
     #[tokio::test]

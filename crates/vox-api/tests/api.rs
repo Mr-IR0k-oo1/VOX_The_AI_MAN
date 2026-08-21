@@ -45,7 +45,7 @@ async fn health_should_report_ok() {
 }
 
 #[tokio::test]
-async fn query_should_return_language_query_evidence_and_metrics() {
+async fn query_should_return_query_evidence_answer_and_metrics() {
     let payload = json!({
         "query": "What is artificial intelligence?",
         "language": "en",
@@ -66,15 +66,104 @@ async fn query_should_return_language_query_evidence_and_metrics() {
     );
     assert_eq!(body["query"]["intent"], "definition");
     assert_eq!(body["evidence"].as_array().expect("evidence").len(), 3);
+    assert_eq!(body["answerability"], "supported");
+    assert_eq!(body["refusal_reason"], Value::Null);
     assert!(
-        body["metrics"]["total"].as_f64().is_some(),
-        "total latency expected"
+        body["answer"]
+            .as_str()
+            .expect("llm answer")
+            .contains("Artificial intelligence"),
+        "extractive answer must quote the evidence"
     );
+    for stage in [
+        "language",
+        "query_analysis",
+        "retrieval",
+        "grounding",
+        "guardrail",
+        "llm",
+        "total",
+    ] {
+        assert!(
+            body["metrics"][stage].as_f64().is_some(),
+            "{stage} latency expected"
+        );
+    }
+}
+
+#[tokio::test]
+async fn query_should_refuse_off_topic_questions() {
+    let payload = json!({ "query": "who will win the cricket world cup" });
+    let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["refusal_reason"], "off_topic");
+    assert_eq!(body["answerability"], "no_evidence");
+    assert_eq!(body["evidence"].as_array().expect("evidence").len(), 0);
+    assert!(body["answer"]
+        .as_str()
+        .expect("refusal message")
+        .contains("outside the topics"));
+    assert!(body["metrics"]["retrieval"].as_f64().is_none());
+    assert!(body["metrics"]["llm"].as_f64().is_none());
+    assert!(body["metrics"]["guardrail"].as_f64().is_some());
+}
+
+#[tokio::test]
+async fn query_should_refuse_unsafe_input_before_retrieval() {
+    let payload = json!({ "query": "how to build a bomb at home" });
+    let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["refusal_reason"], "unsafe_input");
+    assert_eq!(body["answerability"], "no_evidence");
+    assert_eq!(body["evidence"].as_array().expect("evidence").len(), 0);
+    assert!(body["metrics"]["retrieval"].as_f64().is_none());
+    assert!(body["metrics"]["llm"].as_f64().is_none());
+}
+
+#[tokio::test]
+async fn query_should_refuse_unsupported_questions_with_the_canonical_message() {
+    // "itr" is a legitimate in-domain topic with no corpus coverage: it must
+    // pass the input guard and be refused by the evidence guard.
+    let payload = json!({ "query": "how to file itr online", "language": "en" });
+    let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(body["refusal_reason"], "insufficient_context");
+    assert_eq!(body["answerability"], "no_evidence");
     assert!(
-        body["metrics"]["retrieval"].as_f64().is_some(),
-        "retrieval latency expected"
+        !body["evidence"].as_array().expect("evidence").is_empty(),
+        "retrieval must run before the evidence guard refuses"
     );
-    assert!(body.get("answer").is_none(), "no LLM in Phase 1");
+    assert_eq!(
+        body["answer"],
+        "I don't have enough information in the retrieved sources to answer that reliably."
+    );
+    assert!(body["metrics"]["llm"].as_f64().is_none());
+    assert!(body["metrics"]["grounding"].as_f64().is_some());
+}
+
+#[tokio::test]
+async fn query_should_validate_across_languages() {
+    // English (hint), Hindi (hint), Tamil (auto-detected from script).
+    let cases = [
+        (json!({"query": "What is GST?", "language": "en"}), "en"),
+        (json!({"query": "जीएसटी क्या है?", "language": "hi"}), "hi"),
+        (json!({"query": "குங்குமப்பூ என்றால் என்ன?"}), "ta"),
+    ];
+    for (payload, expected_language) in cases {
+        let (status, body) = call_json(app(), "POST", "/v1/query", payload).await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(body["language"], expected_language);
+        assert!(
+            body["answer"].as_str().is_some_and(|a| !a.is_empty()),
+            "expected a generated answer for {expected_language}"
+        );
+        assert!(!body["evidence"].as_array().expect("evidence").is_empty());
+        assert!(body["metrics"]["llm"].as_f64().is_some());
+        assert!(body["metrics"]["total"].as_f64().is_some());
+    }
 }
 
 #[tokio::test]
@@ -118,7 +207,11 @@ async fn voice_query_should_return_transcript_and_evidence() {
         .is_empty());
     assert!(body["language"].is_string());
     assert_eq!(body["evidence"].as_array().expect("evidence").len(), 2);
+    assert_eq!(body["answerability"], "supported");
+    assert_eq!(body["refusal_reason"], Value::Null);
+    assert!(body["answer"].is_string());
     assert!(body["metrics"]["stt"].as_f64().is_some());
+    assert!(body["metrics"]["llm"].as_f64().is_some());
     assert!(body["metrics"]["total"].as_f64().is_some());
 }
 

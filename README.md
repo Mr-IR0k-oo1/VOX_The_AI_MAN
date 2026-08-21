@@ -2,18 +2,24 @@
 
 Low-latency multilingual voice RAG for Indian languages: spoken or typed
 question → STT → language detection → query analysis → hybrid retrieval
-(dense + BM25 via `POST /v1/retrieve`) → evidence, with per-stage latency
-metrics. Grounded answer generation and refusal land in later phases.
+(dense + BM25 via `POST /v1/retrieve`) → grounding → guardrails → LLM answer,
+with per-stage latency metrics. VOX refuses to answer — with a stable reason
+code and a localized grounded-refusal message — whenever the evidence does
+not support it.
 
-## Status: Phases 1–3 — pipeline foundation, OREO retrieval, evaluation
+## Status: Phases 1–6 — pipeline, OREO retrieval, evaluation, integration
 
 Phase 0 froze the architecture (shared types, backend traits, five v1
 endpoints, env config, tracing). The full pipeline then came together on
-both sides of the integration boundary and now runs end-to-end:
+both sides of the integration boundary and now runs end-to-end, reaching
+the real retrieval service through configuration alone
+(`VOX_RETRIEVAL_MODE=http`); the mock backend remains the default for local
+development and tests:
 
 ```
-voice/text → STT → language detection → query analysis → hybrid retrieval
-           → evidence → latency metrics
+voice/text → input guard → STT → language detection → query analysis
+           → OREO /v1/retrieve → grounding (evidence sufficiency)
+           → evidence guard → LLM → output guard → response (+ latency metrics)
 ```
 
 - **STT**: `MockRecognizer` (deterministic) and `SarvamRecognizer`
@@ -25,6 +31,10 @@ voice/text → STT → language detection → query analysis → hybrid retrieva
   cleanup only — no translation) + deterministic intent heuristics
   (`factual`, `definition`, `comparison`, `procedural`, `unknown`) with
   English, Hindi, and Tamil markers.
+- **Input guardrails**: unsafe requests are refused before retrieval;
+  off-topic questions are refused against the configured topic vocabulary
+  (disabled automatically when running against an HTTP backend whose domain
+  is unknown).
 - **OREO** (`vox-oreo`): independent multilingual retrieval engine:
   dataset ingestion → preprocessing (clean → NFC normalize → script-based
   language detection) → chunking → embeddings → Qdrant/Tantivy indexes →
@@ -36,14 +46,45 @@ voice/text → STT → language detection → query analysis → hybrid retrieva
   dense, Tantivy BM25 for sparse, RRF (k=60) fusing a top-20 candidate
   pool down to top-5 after lexical-overlap reranking. Every response
   carries per-stage timings (`timings_ms`).
+- **Retrieval**: `OREORetrievalClient` speaks the frozen
+  `POST /v1/retrieve` JSON contract over reqwest with a per-attempt timeout,
+  one safe retry (network errors, timeouts, 5xx, 429 only), and strict
+  response validation (non-finite scores and malformed bodies are rejected).
+  `MockRetrievalClient` (deterministic canned corpus) is selected by default;
+  nothing couples to Qdrant/Tantivy internals.
+- **Grounding**: deterministic lexical scoring of evidence sufficiency —
+  *relevance* (best single-document coverage of the query terms), *coverage*
+  (union coverage), and *consistency* (do relevant documents agree?) — mapped
+  onto `answerability`: `supported`, `weak_evidence`, `no_evidence`,
+  `conflicting_evidence`. All thresholds are configurable.
+- **Evidence guardrails**: anything not `supported` is refused before a
+  generation call is spent (`insufficient_context`, `weak_evidence`,
+  `conflicting_evidence`).
+- **LLM**: shared deterministic prompt construction instructing the model to
+  use only the supplied evidence, never invent claims, state insufficient
+  information explicitly, and answer in the request language.
+  Providers: `ExtractiveProvider` (deterministic baseline, default) and
+  `OpenAiCompatibleProvider` (`POST {base_url}/chat/completions`,
+  env-provided API key, explicit timeout, one retry on safe transient
+  failures only).
+- **Output guardrails**: generated answers are verified against the evidence
+  (content-token support ratio; invented numbers are flagged). Unsupported
+  answers trigger exactly one regeneration attempt and then refuse with
+  `unsupported_claim`; unsafe or empty output refuses immediately.
+- **Refusals** are HTTP 200 responses carrying `refusal_reason` plus a
+  localized grounded-refusal message (English canonical: *"I don't have
+  enough information in the retrieved sources to answer that reliably."*);
+  only infrastructure failures surface as errors.
 - **Evaluation** (`vox-bench`): 36-query en/hi/ta eval set over the bundled
   sample corpus; chunking-strategy comparison, retrieval-component ablation
   (dense / BM25 / score-sum / RRF / +rerank), Recall@5 + MRR quality,
   P50/P70/P100 latency per stage. Results and methodology live in
   [benchmarks/](benchmarks/).
+- **Metrics**: `stt`, `language`, `query_analysis`, `retrieval`,
+  `grounding`, `guardrail`, `llm`, `total` (ms); stages that did not run are
+  omitted.
 
-Not yet implemented (deliberately): LLM answer generation wired into the
-API, grounding check, guardrails, neural embeddings/rerankers, audio
+Not yet implemented (deliberately): neural embeddings/rerankers, audio
 transcoding, UI, deployment.
 
 ## Workspace layout
@@ -51,15 +92,15 @@ transcoding, UI, deployment.
 | Crate | Responsibility |
 |---|---|
 | `vox-types` | Shared domain types: `Query`, `QueryIntent`, `Transcript`, `RetrievedDocument`, `Language`, responses, `LatencyMetrics`, validation errors |
-| `vox-core` | Pipeline orchestration: STT → language → query analysis → retrieval, per-stage timings |
+| `vox-core` | Pipeline orchestration: guards → STT → language → analysis → retrieval → grounding → generation, per-stage timings |
 | `vox-api` | Axum server exposing the frozen v1 endpoints; config, logging, metrics |
 | `vox-stt` | `SpeechRecognizer` trait + mock + Sarvam HTTP backend |
-| `vox-retrieval` | `RetrievalClient` trait + mock backend + embedded OREO backend + HTTP client (timeouts, bounded retries) |
+| `vox-retrieval` | `RetrievalClient` trait + `OREORetrievalClient` (reqwest, timeout, one safe retry) + embedded OREO backend + deterministic mock backend |
 | `vox-oreo` | OREO retrieval engine: ingest, preprocess, chunk, embed, Qdrant/Tantivy, hybrid RRF, rerank; standalone `POST /v1/retrieve` service |
 | `vox-ingest` | Voice ingestion boundary: base64 decode, size caps, container sniffing |
-| `vox-grounding` | Evidence-sufficiency assessment → `Answerability` (later phase) |
-| `vox-llm` | `LlmProvider` trait + extractive stub provider (later phase) |
-| `vox-guard` | Guardrail decisions over evidence verdicts and generated answers (later phase) |
+| `vox-grounding` | Evidence-sufficiency scoring → `Answerability`; answer verification against evidence |
+| `vox-llm` | `LlmProvider` trait, prompt construction, extractive baseline + OpenAI-compatible provider |
+| `vox-guard` | Input/evidence/output guardrails: `Allow`/`Refuse{reason}`/`Regenerate{reason}` decisions, refusal messages |
 | `vox-bench` | Latency percentile utilities; scenario harnesses land later |
 
 Dependency direction: everything depends on `vox-types`; adapters
@@ -108,9 +149,11 @@ Example response (`POST /v1/query`):
     "top_k": 5
   },
   "evidence": [
-    { "id": "mock-0000", "text": "Artificial intelligence (AI) …", "score": 0.95, "rank": 1, "metadata": {"source":"mock","language":"en"} }
+    { "id": "mock-0000", "text": "Artificial intelligence (AI) is the simulation …", "score": 0.95, "rank": 1, "metadata": {"source":"mock","language":"en"} }
   ],
-  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.15, "total": 0.16 }
+  "answerability": "supported",
+  "answer": "Artificial intelligence (AI) is the simulation of human intelligence processes by computer systems.",
+  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.15, "grounding": 0.001, "guardrail": 0.001, "llm": 1.2, "total": 1.4 }
 }
 ```
 
@@ -140,6 +183,22 @@ Retrieval-quality evaluation (chunking strategies, component ablation,
 Recall@5/MRR, P50/P70/P100): `cargo run -p vox-bench`; outputs and the
 full report are written to [benchmarks/](benchmarks/).
 
+Refusal example (`POST /v1/query` with an off-corpus question):
+
+```json
+{
+  "request_id": "req-68a5f0c2e1a3-0008",
+  "answerability": "no_evidence",
+  "refusal_reason": "insufficient_context",
+  "answer": "I don't have enough information in the retrieved sources to answer that reliably.",
+  "metrics": { "language": 0.001, "query_analysis": 0.002, "retrieval": 0.14, "grounding": 0.001, "guardrail": 0.001, "total": 0.16 }
+}
+```
+
+Refusal reasons: `unsafe_input`, `off_topic`, `insufficient_context`,
+`weak_evidence`, `conflicting_evidence`, `unsupported_claim`,
+`unsafe_output`, `malformed_output`.
+
 ## Frozen API (Phase 0)
 
 | Endpoint | Contract |
@@ -147,8 +206,8 @@ full report are written to [benchmarks/](benchmarks/).
 | `GET /health` | Liveness + uptime |
 | `GET /metrics` | Prometheus exposition |
 | `POST /v1/retrieve` | `Query` → `RetrievalResponse` (`{documents: [...]}`) |
-| `POST /v1/query` | `Query` → `{request_id, language, query, evidence, metrics}` |
-| `POST /v1/voice/query` | `VoiceRequest` → `{request_id, transcript, language, query, evidence, metrics}` |
+| `POST /v1/query` | `Query` → `{request_id, language, query, evidence, answerability, answer?, refusal_reason?, metrics}` |
+| `POST /v1/voice/query` | `VoiceRequest` → `{request_id, transcript, language, query, evidence, answerability, answer?, refusal_reason?, metrics}` |
 
 Errors: `422` invalid input/audio, `502` upstream failure, `504` upstream
 timeout, `503` retrieval unavailable, `501` not yet implemented.
@@ -161,13 +220,12 @@ See [.env.example](.env.example).
 |---|---|---|
 | `VOX_HOST` / `VOX_PORT` | `0.0.0.0` / `8080` | Bind address |
 | `VOX_LOG_FORMAT` | `text` | `text` or `json` (level via `RUST_LOG`) |
-| `VOX_RETRIEVAL_MODE` | `mock` | `mock`, `oreo` (embedded engine), or `http` |
+| `VOX_RETRIEVAL_MODE` | `mock` | `mock`, `oreo` (embedded engine), or `http` (OREO service) |
 | `VOX_RETRIEVAL_BASE_URL` | — | Required when mode is `http` (OREO service) |
 | `VOX_RETRIEVAL_TIMEOUT_MS` | `800` | Per-attempt timeout for `/v1/retrieve` |
-| `VOX_RETRIEVAL_MAX_RETRIES` | `2` | Retries on network errors, timeouts, 5xx, 429 only |
+| `VOX_RETRIEVAL_MAX_RETRIES` | `1` | One safe retry on network errors, timeouts, 5xx, 429 only |
 | `VOX_RETRIEVAL_BACKOFF_MS` | `50` | Linear backoff base between attempts |
 | `VOX_MOCK_DELAY_MS` | `0` | Simulated latency injected by the mock backend |
-| `VOX_GROUNDING_MIN_SCORE` | `0.30` | Best-score threshold below which VOX refuses |
 | `VOX_OREO_LANGUAGES` | `en,hi,ta` | Languages kept by OREO preprocessing |
 | `VOX_OREO_CHUNKING` | `sentence:700:80` | `fixed:size:overlap`, `sentence:max:min`, or `sliding:window:stride` |
 | `VOX_OREO_EMBEDDING_DIM` | `256` | Embedding dimensionality |
@@ -184,6 +242,17 @@ See [.env.example](.env.example).
 | `VOX_SARVAM_MODEL` | `saarika:v2.5` | Sarvam model identifier |
 | `VOX_SARVAM_BASE_URL` | `https://api.sarvam.ai` | Sarvam API base URL |
 | `VOX_SARVAM_TIMEOUT_MS` | `3000` | Per-request timeout for the STT call |
+| `VOX_LLM_MODE` | `extractive` | `extractive` or `openai` |
+| `VOX_LLM_API_KEY` | — | Required when mode is `openai`; never hard-code |
+| `VOX_LLM_MODEL` | `gpt-4o-mini` | Model identifier for the completion request |
+| `VOX_LLM_BASE_URL` | `https://api.openai.com/v1` | Any OpenAI-compatible endpoint |
+| `VOX_LLM_TIMEOUT_MS` | `8000` | Per-request timeout for generation |
+| `VOX_GROUNDING_MIN_SCORE` | `0.30` | Best hybrid-retrieval score required for `supported` |
+| `VOX_GROUNDING_RELEVANCE_MIN` | `0.50` | Best single-document query-term coverage for `supported` |
+| `VOX_GROUNDING_COVERAGE_MIN` | `0.50` | Union query-term coverage across evidence for `supported` |
+| `VOX_GROUNDING_CONSISTENCY_MIN` | `0.50` | Required agreement ratio among relevant documents |
+| `VOX_GROUNDING_AGREEMENT_MIN` | `0.10` | Pairwise overlap coefficient counting as agreement |
+| `VOX_GUARD_ANSWER_SUPPORT_MIN` | `0.60` | Share of answer content tokens that must appear in the evidence |
 
 ## Development
 

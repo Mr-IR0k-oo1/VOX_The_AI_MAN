@@ -20,7 +20,7 @@ pub struct RetryPolicy {
 impl Default for RetryPolicy {
     fn default() -> Self {
         Self {
-            max_retries: 2,
+            max_retries: 1,
             backoff: Duration::from_millis(50),
         }
     }
@@ -31,14 +31,14 @@ impl Default for RetryPolicy {
 /// The only coupling to the retrieval implementation is this endpoint's JSON
 /// contract; Qdrant/Tantivy internals stay behind the service.
 #[derive(Debug, Clone)]
-pub struct HttpRetrievalClient {
+pub struct OREORetrievalClient {
     base_url: String,
     timeout: Duration,
     retry: RetryPolicy,
     http: reqwest::Client,
 }
 
-impl HttpRetrievalClient {
+impl OREORetrievalClient {
     /// Creates a client targeting `base_url` (trailing slashes are trimmed).
     ///
     /// # Errors
@@ -78,10 +78,12 @@ impl HttpRetrievalClient {
             return Err(RetrievalError::HttpStatus { status });
         }
 
-        let body: RetrievalResponse = response
-            .json()
+        let bytes = response
+            .bytes()
             .await
             .map_err(map_transport_error(self.timeout))?;
+        let body: RetrievalResponse = serde_json::from_slice(&bytes)
+            .map_err(|_| RetrievalError::InvalidResponse("malformed json body"))?;
 
         // A NaN score would silently defeat every threshold comparison
         // downstream (grounding check), so reject it at the boundary.
@@ -105,7 +107,7 @@ fn map_transport_error(timeout: Duration) -> impl Fn(reqwest::Error) -> Retrieva
 }
 
 #[async_trait]
-impl RetrievalClient for HttpRetrievalClient {
+impl RetrievalClient for OREORetrievalClient {
     fn name(&self) -> &'static str {
         "http"
     }

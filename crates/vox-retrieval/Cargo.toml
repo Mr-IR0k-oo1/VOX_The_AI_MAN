@@ -16,3 +16,6 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 vox-oreo = { workspace = true }
 vox-types = { workspace = true }
+
+[dev-dependencies]
+axum = { workspace = true }

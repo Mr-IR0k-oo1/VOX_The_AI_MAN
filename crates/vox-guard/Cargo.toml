@@ -9,3 +9,4 @@ workspace = true
 
 [dependencies]
 vox-types = { workspace = true }
+vox-grounding = { workspace = true }

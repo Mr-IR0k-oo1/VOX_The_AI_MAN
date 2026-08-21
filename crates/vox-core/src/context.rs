@@ -1,10 +1,13 @@
 //! Per-request state carried through the pipeline stages.
 
-use vox_types::{Language, LatencyMetrics, Query, QueryResponse, RetrievedDocument, Transcript};
+use vox_types::{
+    Answerability, Language, LatencyMetrics, Query, QueryResponse, RetrievedDocument, Transcript,
+};
 
 /// Everything the pipeline knows about the request it is processing.
 ///
-/// Built up stage by stage (STT → language → query analysis → retrieval) and
+/// Built up stage by stage (input guard → STT → language → query analysis →
+/// retrieval → grounding → evidence guard → generation → output guard) and
 /// converted into the endpoint response at the end.
 #[derive(Debug, Clone)]
 pub struct PipelineContext {
@@ -16,9 +19,16 @@ pub struct PipelineContext {
     pub language: Language,
     /// The analyzed query (normalized text + intent).
     pub query: Query,
-    /// Evidence returned by the retrieval boundary.
+    /// Evidence returned by the retrieval boundary. Empty when an input
+    /// guard refused before retrieval ran.
     pub evidence: Vec<RetrievedDocument>,
-    /// Per-stage latency measurements (snapshot up to retrieval).
+    /// Evidence-sufficiency verdict from the grounding stage.
+    pub answerability: Answerability,
+    /// Generated answer, when the pipeline produced one.
+    pub answer: Option<String>,
+    /// Machine-readable reason code when the pipeline refused to answer.
+    pub refusal_reason: Option<String>,
+    /// Per-stage latency measurements (snapshot up to generation).
     pub metrics: LatencyMetrics,
 }
 
@@ -31,6 +41,9 @@ impl PipelineContext {
             language: self.language,
             query: self.query,
             evidence: self.evidence,
+            answerability: self.answerability,
+            answer: self.answer,
+            refusal_reason: self.refusal_reason,
             metrics: self.metrics,
         }
     }
@@ -39,7 +52,7 @@ impl PipelineContext {
     ///
     /// `transcript` is the STT output carried through this flow; the voice
     /// contract always exposes it alongside the resolved language, analyzed
-    /// query, evidence, and metrics.
+    /// query, evidence, answer, and metrics.
     #[must_use]
     pub fn into_voice_response(self, transcript: Transcript) -> vox_types::VoiceResponse {
         vox_types::VoiceResponse {
@@ -48,6 +61,9 @@ impl PipelineContext {
             language: self.language,
             query: self.query,
             evidence: self.evidence,
+            answerability: self.answerability,
+            answer: self.answer,
+            refusal_reason: self.refusal_reason,
             metrics: self.metrics,
         }
     }

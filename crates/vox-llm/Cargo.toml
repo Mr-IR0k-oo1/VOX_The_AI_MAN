@@ -1,6 +1,6 @@
 [package]
 name = "vox-llm"
-description = "Answer-generation substitution boundary for VOX"
+description = "Answer-generation substitution boundary for VOX: extractive baseline and OpenAI-compatible provider"
 version.workspace = true
 edition.workspace = true
 
@@ -9,9 +9,13 @@ workspace = true
 
 [dependencies]
 async-trait = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
 thiserror = { workspace = true }
+tracing = { workspace = true }
 vox-types = { workspace = true }
 
 [dev-dependencies]
-serde_json = { workspace = true }
+axum = { workspace = true }
 tokio = { workspace = true }
