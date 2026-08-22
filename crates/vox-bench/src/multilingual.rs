@@ -438,7 +438,7 @@ async fn evaluate_language(
 
         match response {
             Ok(resp) => {
-                if resp.answer.as_ref().map_or(true, |a| a.trim().is_empty())
+                if resp.answer.as_ref().is_none_or(|a| a.trim().is_empty())
                     || resp.refusal_reason.is_some()
                 {
                     failures.generation += 1;
@@ -809,7 +809,7 @@ pub fn render_multilingual_markdown(report: &MultilingualReport) -> String {
             u.code, u.name
         ));
     }
-    out.push_str("\n");
+    out.push('\n');
 
     out
 }
